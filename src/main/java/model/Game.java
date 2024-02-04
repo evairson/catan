@@ -3,6 +3,7 @@ package model;
 import others.Constants;
 import view.GamePanel;
 import view.GameWindow;
+import view.menu.MainMenu;
 
 import java.awt.*;
 
@@ -11,13 +12,16 @@ public class Game implements Runnable{
     private GameWindow gameWindow;
     private Thread gameThread;
 
+    private MainMenu mainMenu;
     
 
     public Game(){
         gamePanel = new GamePanel(this);
+        mainMenu = new MainMenu(this);
         gameWindow = new GameWindow(gamePanel);
 
-        
+        gameWindow.jframe.setContentPane(mainMenu);
+        gameWindow.jframe.repaint();
         gamePanel.requestFocus();
     
         startGameLoop();

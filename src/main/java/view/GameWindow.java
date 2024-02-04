@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GameWindow{
-    private JFrame jframe;
+    public JFrame jframe;
 
     public GameWindow(GamePanel gamePanel) {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
