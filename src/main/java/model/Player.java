@@ -2,7 +2,7 @@ package model;
 
 import java.lang.Math;  
 
-public class Joueur {
+public class Player {
 
     public enum Color {
         RED,
