@@ -1,10 +1,13 @@
+package view;
+
+import controler.KeyBoardInputs;
+import controler.MouseInputs;
+import model.Game;
 
 import javax.swing.*;
 
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.nio.Buffer;
 
 public class GamePanel extends JPanel {
     private Game game;

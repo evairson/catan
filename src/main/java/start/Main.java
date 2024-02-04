@@ -1,3 +1,7 @@
+package start;
+
+import model.Game;
+
 import javax.swing.*;
 
 public class Main {

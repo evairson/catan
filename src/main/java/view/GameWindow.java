@@ -1,3 +1,6 @@
+package view;
+
+import others.Constants;
 
 import javax.swing.*;
 

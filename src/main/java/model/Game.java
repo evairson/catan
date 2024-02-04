@@ -1,3 +1,9 @@
+package model;
+
+import others.Constants;
+import view.GamePanel;
+import view.GameWindow;
+
 import java.awt.*;
 
 public class Game implements Runnable{

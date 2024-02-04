@@ -1,3 +1,5 @@
+package others;
+
 public class Constants {
 
     public static class Game{
