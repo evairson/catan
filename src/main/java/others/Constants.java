@@ -10,5 +10,9 @@ public class Constants {
         public static int HEIGHT = 0;
     }
 
+    public static class others{
+        public static final String MUSIC_DIRECTORY = "";
+    }
+
 }
 
