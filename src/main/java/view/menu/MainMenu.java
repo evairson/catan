@@ -3,32 +3,25 @@ package view.menu;
 import model.Game;
 import view.GameWindow;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 public class MainMenu extends JPanel {
 
-    private Game game;
+    private GameWindow game;
     private JButton playButton;
     private JButton optionsButton;
     private Image backgroundImage;
 
-    public MainMenu(Game game) {
+    public MainMenu(GameWindow game) {
+        this.game = game;
         setLayout(null); // Disposer les boutons verticalement
-        loadBackgroundImage("src/resources/mainMenu.png");
+        loadBackgroundImage("src/main/resources/mainMenu.png");
 //        initializeButtons();
     }
 
     private void loadBackgroundImage(String path){
+        System.out.println(path);
         ImageIcon icon = new ImageIcon(path);
         backgroundImage = icon.getImage().getScaledInstance(1920,1080, Image.SCALE_SMOOTH);
     }
@@ -38,7 +31,7 @@ public class MainMenu extends JPanel {
         g.drawImage(backgroundImage, 0, 0, this);
     }
 
-//    private void initializeButtons() {
+//     private void initializeButtons() {
 //        ImageIcon playIcon = new ImageIcon("src/resources/button.png");
 //        Image img = playIcon.getImage();
 //        Image newimg = img.getScaledInstance(305, 320,  java.awt.Image.SCALE_SMOOTH);

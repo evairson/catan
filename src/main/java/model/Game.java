@@ -17,12 +17,8 @@ public class Game implements Runnable{
 
     public Game(){
         gamePanel = new GamePanel(this);
-        mainMenu = new MainMenu(this);
         gameWindow = new GameWindow(gamePanel);
-
-        gameWindow.jframe.setContentPane(mainMenu);
-        gameWindow.jframe.repaint();
-        gamePanel.requestFocus();
+//        gamePanel.requestFocus();
     
         startGameLoop();
     }
@@ -72,7 +68,7 @@ public class Game implements Runnable{
             }
 
             if(deltaF >= 1){
-                gamePanel.repaint();
+//                gamePanel.repaint();
                 deltaF--;
                 frames++;
             }
