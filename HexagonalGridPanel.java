@@ -115,6 +115,7 @@ public class HexagonalGridPanel extends JPanel {
 
                 xPoints[i] = (int) corner.getX();
                 yPoints[i] = (int) corner.getY();
+                
             }
 
             // Draw the wider hexagon sides
