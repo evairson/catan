@@ -7,5 +7,8 @@ public class Main {
             System.out.println("launching game");
             Game game = new Game();
         });
+
+        GameBoard board=new GameBoard();
+        System.out.println(board);
     }
 }
