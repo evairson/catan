@@ -15,6 +15,7 @@ public class Player {
     private Boolean turn;
     private int dice1;
     private int dice2;
+    private String nom;
     // private ArrayList<Card> cardsRessources;
     // private ArrayList<Card> cardsDev;
     // private ArrayList<Building> buildings;
@@ -24,7 +25,7 @@ public class Player {
     public Color getColor(){
         return color;
     }
-
+    
     public void setColor(Color c){
         color = c;
     }
