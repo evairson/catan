@@ -1,6 +1,6 @@
 package model;
 
-import java.lang.Math;  
+import java.lang.Math;
 
 public class Player {
 
@@ -16,6 +16,7 @@ public class Player {
     private int dice1;
     private int dice2;
     private String nom;
+    // private Coordonnee cord;
     // private ArrayList<Card> cardsRessources;
     // private ArrayList<Card> cardsDev;
     // private ArrayList<Building> buildings;
