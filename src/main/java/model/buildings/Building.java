@@ -3,8 +3,6 @@ package model.buildings;
 import model.Player;
 import model.resources.Resources;
 
-import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public abstract class Building{

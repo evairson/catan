@@ -1,11 +1,9 @@
 package model;
 
 import model.buildings.Building;
-import model.buildings.Colony;
 import model.resources.Resources;
 
 import java.lang.Math;
-import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 
 public class Player {

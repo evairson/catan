@@ -1,7 +1,6 @@
 package model.buildings;
 
 import model.Player;
-import model.buildings.Building;
 import model.resources.Resources;
 
 import java.awt.*;
