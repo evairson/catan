@@ -9,7 +9,7 @@ import java.awt.*;
 public class GameWindow{
     private JFrame jframe;
 
-    public GameWindow(GamePanel gamePanel) {
+    public GameWindow(view.GamePanel gamePanel) {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         //get la taille de ton écran
