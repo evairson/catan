@@ -4,15 +4,15 @@ public class Thief {
     // private Coordonnee cord;
     private boolean onDesert;
 
-    Thief(){
+    Thief() {
         onDesert = true;
     }
 
-    public void setOnDesert(boolean b){
+    public void setOnDesert(boolean b) {
         onDesert = b;
     }
 
-    public boolean isOnDesert(){
+    public boolean isOnDesert() {
         return onDesert;
     }
 

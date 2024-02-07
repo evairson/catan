@@ -1,6 +1,7 @@
 package model.resources;
 
-public class Wheat extends Resources{
+public class Wheat extends Resources {
+
     public Wheat() {
     }
 
