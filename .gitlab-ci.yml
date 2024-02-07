@@ -1,0 +1,12 @@
+image: openjdk:11
+
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+    - javac -d build src/**/*.java
+  artifacts:
+    paths:
+      - build/
