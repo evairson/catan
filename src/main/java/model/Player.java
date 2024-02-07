@@ -1,6 +1,12 @@
 package model;
 
+import model.buildings.Building;
+import model.buildings.Colony;
+import model.resources.Resources;
+
 import java.lang.Math;
+import java.time.format.ResolverStyle;
+import java.util.ArrayList;
 
 public class Player {
 
@@ -17,7 +23,7 @@ public class Player {
     private int dice2;
     private String nom;
     // private Coordonnee cord;
-    private ArrayList<Resources> ressources;
+    private ArrayList<Resources> resources;
     // private ArrayList<Card> cardsDev;
     private ArrayList<Building> buildings;
 
@@ -40,6 +46,14 @@ public class Player {
 
     public int getDies(){
         return dice1 + dice2;
+    }
+
+    public ArrayList<Building> getBuildings(){
+        return buildings;
+    }
+
+    public ArrayList<Resources> getResources(){
+        return resources;
     }
 
 // ------------------------------------

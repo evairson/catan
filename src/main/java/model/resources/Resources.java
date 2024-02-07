@@ -10,6 +10,8 @@ public abstract class Resources {
         this.amount = 0;
     }
 
+
+
     /**
      * Adds an amount to the current amount of the resource
      *
