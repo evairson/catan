@@ -17,16 +17,15 @@ public class Player {
     private int dice2;
     private String nom;
     // private Coordonnee cord;
-    // private ArrayList<Card> cardsRessources;
+    private ArrayList<Resources> ressources;
     // private ArrayList<Card> cardsDev;
-    // private ArrayList<Building> buildings;
+    private ArrayList<Building> buildings;
 
 // Getter / Setter :  ---------------
 
     public Color getColor(){
         return color;
     }
-    
     public void setColor(Color c){
         color = c;
     }
