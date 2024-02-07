@@ -6,6 +6,7 @@ stages:
 build:
   stage: build
   script:
+    - ls
     - javac -d build src/**/*.java
   artifacts:
     paths:
