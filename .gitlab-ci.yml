@@ -6,8 +6,7 @@ stages:
 build:
   stage: build
   script:
-    - ls
-    - javac -d build src/**/*.java
+    - find . -name "*.java" | xargs javac -classpath build -d bin
   artifacts:
     paths:
       - build/
