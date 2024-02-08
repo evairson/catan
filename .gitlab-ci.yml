@@ -9,7 +9,7 @@ lint:
   script:
     - apt-get update && apt-get install -y checkstyle
     - find src/ -name "*.java" -exec checkstyle -c ./checkstyle.xml {} \; > checkstyle_report.txt
-    - if grep -q "\[ERROR\]" checkstyle_report.txt; then exit 1; fi
+    - if egrep -q "\[ERROR\]" checkstyle_report.txt; then exit 1; fi
 
 build:
   stage: build
