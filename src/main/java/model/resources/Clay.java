@@ -1,6 +1,7 @@
 package model.resources;
 
-public class Clay extends Resources{
+public class Clay extends Resources {
+
     public Clay() {
     }
     public Clay(int amount) {
@@ -8,7 +9,7 @@ public class Clay extends Resources{
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return "Clay : " + getAmount();
     }
 }

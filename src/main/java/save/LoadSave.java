@@ -7,38 +7,30 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-
-
-
 public class LoadSave {
-    
 
-    public static BufferedImage GetBufferedImage(String fileName){
+    public static BufferedImage getBufferedImage(String fileName) {
         BufferedImage img = null;
-        InputStream is = GetInputStream(fileName);
-        try{
+        InputStream is = getInputStream(fileName);
+        try {
             img = ImageIO.read(is);
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally{
-            try{
+        } finally {
+            try {
                 is.close();
-            }
-            catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         return img;
     }
 
-    public static InputStream GetInputStream(String fileName){
+    public static InputStream getInputStream(String fileName) {
         InputStream is = null;
-        try{
+        try {
             is = new FileInputStream(fileName);
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return is;

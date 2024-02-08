@@ -1,12 +1,12 @@
 package model;
 
+import java.util.ArrayList;
+
 import model.buildings.Building;
 import model.resources.Resources;
 
-import java.lang.Math;
-import java.util.ArrayList;
-
 public class Player {
+    static final int NUMBER_DICE = 7;
 
     public enum Color {
         RED,
@@ -27,48 +27,46 @@ public class Player {
 
 // Getter / Setter :  ---------------
 
-    public Color getColor(){
+    public Color getColor() {
         return color;
     }
-    public void setColor(Color c){
+
+    public void setColor(Color c) {
         color = c;
     }
 
-    public Boolean isTurn(){
+    public Boolean isTurn() {
         return turn;
     }
 
-    public void setTurn(Boolean b){
+    public void setTurn(Boolean b) {
         turn = b;
     }
 
-    public int getDies(){
+    public int getDies() {
         return dice1 + dice2;
     }
 
-    public ArrayList<Building> getBuildings(){
+    public ArrayList<Building> getBuildings() {
         return buildings;
     }
 
-    public ArrayList<Resources> getResources(){
+    public ArrayList<Resources> getResources() {
         return resources;
     }
 
 // ------------------------------------
 
-    public void throwDice1(){
-        dice1 = (int)(Math.random()*7); // (max-min+1)*min
+    public void throwDice1() {
+        dice1 = (int) (Math.random() * NUMBER_DICE); // (max-min+1)*min
     }
 
-    public void throwDice2(){
-        dice2 = (int)(Math.random()*7);
+    public void throwDice2() {
+        dice2 = (int) (Math.random() * NUMBER_DICE);
     }
 
-    public void throwDices(){
+    public void throwDices() {
         throwDice1();
         throwDice2();
     }
-
-
-
 }

@@ -1,10 +1,10 @@
 package model.resources;
 
-public class Stone extends Resources{
+public class Stone extends Resources {
     public Stone() {
     }
 
-    public Stone(int amount){
+    public Stone(int amount) {
         super(amount);
     }
 

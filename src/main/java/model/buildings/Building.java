@@ -5,10 +5,10 @@ import model.resources.Resources;
 
 import java.util.ArrayList;
 
-public abstract class Building{
+public abstract class Building {
     private Player owner;
 
-    public boolean buyable(Player player, ArrayList<Resources> cost){
+    public boolean buyable(Player player, ArrayList<Resources> cost) {
         for (Resources value : cost) {
             for (Resources resource : player.getResources()) {
                 if (value.getClass() != resource.getClass()) {
@@ -23,9 +23,9 @@ public abstract class Building{
         return true;
     }
 
-    public boolean buy(Player player, ArrayList<Resources> cost){
-        if(buyable(player, cost)){
-            for(int i = 0; i < cost.size(); i++){
+    public boolean buy(Player player, ArrayList<Resources> cost) {
+        if (buyable(player, cost)) {
+            for (int i = 0; i < cost.size(); i++) {
                 player.getResources().get(i).payAmount(cost.get(i).getAmount());
                 return true;
             }
