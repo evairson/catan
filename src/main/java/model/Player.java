@@ -1,6 +1,10 @@
 package model;
 
+import model.buildings.Building;
+import model.resources.Resources;
+
 import java.lang.Math;
+import java.util.ArrayList;
 
 public class Player {
 
@@ -17,16 +21,15 @@ public class Player {
     private int dice2;
     private String nom;
     // private Coordonnee cord;
-    // private ArrayList<Card> cardsRessources;
+    private ArrayList<Resources> resources;
     // private ArrayList<Card> cardsDev;
-    // private ArrayList<Building> buildings;
+    private ArrayList<Building> buildings;
 
 // Getter / Setter :  ---------------
 
     public Color getColor(){
         return color;
     }
-    
     public void setColor(Color c){
         color = c;
     }
@@ -41,6 +44,14 @@ public class Player {
 
     public int getDies(){
         return dice1 + dice2;
+    }
+
+    public ArrayList<Building> getBuildings(){
+        return buildings;
+    }
+
+    public ArrayList<Resources> getResources(){
+        return resources;
     }
 
 // ------------------------------------
