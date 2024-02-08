@@ -35,7 +35,7 @@ public class Layout {
 
     public Point cubeCoCornerOffset(Layout layout, int corner) {
         Point size = layout.size;
-        double angle = 2.0 * Math.PI * (layout.orientation.startAngle - corner) / 6;
+        double angle = 2.0 * Math.PI * (layout.orientation.getStartAngle() - corner) / 6;
         return new Point(size.getX() * Math.cos(angle), size.getY() * Math.sin(angle));
     }
 

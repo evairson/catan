@@ -61,7 +61,7 @@ public class CubeCoordinates {
         if (direction < 0 || direction > 5) {
             throw new IllegalArgumentException("Direction must be between 0 and 5");
         }
-        return Constants.CubeCoordinatesConst.CubeDirections.get(direction);
+        return Constants.CubeCoordinatesConst.DIRECTIONS.get(direction);
     }
 
     public CubeCoordinates neighbor(int direction/* 0 to 5 */) {

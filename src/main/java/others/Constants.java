@@ -3,6 +3,13 @@ package others;
 import model.geometry.Orientation;
 
 public class Constants {
+    public static class CubeCoordinatesConst {
+        public static final Orientation[] DIRECTIONS = new Orientation[] {
+                new Orientation(1, 0, -1), new Orientation(1, -1, 0),
+                new Orientation(0, -1, 1), new Orientation(-1, 0, 1),
+                new Orientation(-1, 1, 0), new Orientation(0, 1, -1)
+        };
+    }
 
     public static class Game {
         public static final double SCALE = 1;
