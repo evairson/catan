@@ -111,7 +111,7 @@ public class FractionalCubeCoordinates {
                 closestNeighbour = neighbours[i].round();
             }
         }
-        CubeCoordinates[] result = { closestNeighbour, secondClosestNeighbour };
+        CubeCoordinates[] result = {closestNeighbour, secondClosestNeighbour};
         return result;
     }
 }
