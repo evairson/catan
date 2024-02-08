@@ -86,7 +86,8 @@ public class GameBoard {
                 boolean found = false;
                 for (Point storedVertex : verticesMap.keySet()) {
                     if (arePointsEqual(vertex, storedVertex)) {
-                        // Si oui, ajouter la tuile actuelle à la liste des tuiles associées à ce sommet
+                        // Si oui, ajouter la tuile actuelle à la liste des tuiles
+                        // associées à ce sommet
                         verticesMap.get(storedVertex).addTile(tile);
                         found = true;
                         break;
@@ -164,7 +165,8 @@ public class GameBoard {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // Créer un Layout avec votre orientation, origine et taille préférées
-            Layout layout = new Layout(OrientationConstants.POINTY, new Point(400, 400), new Point(50, 50));
+            Layout layout = new Layout(Constants.OrientationConstants.POINTY,
+                    new Point(400, 400), new Point(50, 50));
 
             // Créer un GameBoard avec le Layout
             GameBoard gameBoard = new GameBoard(layout);
@@ -238,5 +240,4 @@ public class GameBoard {
             frame.setVisible(true);
         });
     }
-
 }

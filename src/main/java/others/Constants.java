@@ -24,10 +24,12 @@ public class Constants {
 
     public static class OrientationConstants {
         public static final Orientation FLAT = new Orientation(0.0, 3.0 / 2.0, 0.0,
-                Math.sqrt(3.0) / 2.0, Math.sqrt(3.0), 2.0 / 3.0, 0.0, -1.0 / 3.0, Math.sqrt(3.0) / 3.0);
+                Math.sqrt(3.0) / 2.0, Math.sqrt(3.0), 2.0 / 3.0, 0.0,
+                -1.0 / 3.0, Math.sqrt(3.0) / 3.0);
 
         public static final Orientation POINTY = new Orientation(0.5, Math.sqrt(3.0),
-                Math.sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0, Math.sqrt(3.0) / 3.0, -1.0 / 3.0, 0.0, 2.0 / 3.0);
+                Math.sqrt(3.0) / 2.0, 0.0, 3.0 / 2.0, Math.sqrt(3.0) / 3.0,
+                -1.0 / 3.0, 0.0, 2.0 / 3.0);
 
     }
 
