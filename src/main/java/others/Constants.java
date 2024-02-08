@@ -1,13 +1,14 @@
 package others;
 
 import model.geometry.Orientation;
+import model.geometry.CubeCoordinates;
 
 public class Constants {
     public static class CubeCoordinatesConst {
-        public static final Orientation[] DIRECTIONS = new Orientation[] {
-            new Orientation(1, 0, -1), new Orientation(1, -1, 0),
-            new Orientation(0, -1, 1), new Orientation(-1, 0, 1),
-            new Orientation(-1, 1, 0), new Orientation(0, 1, -1)
+        public static final CubeCoordinates[] DIRECTIONS = new CubeCoordinates[] {
+            new CubeCoordinates(1, 0, -1), new CubeCoordinates(1, -1, 0),
+            new CubeCoordinates(0, -1, 1), new CubeCoordinates(-1, 0, 1),
+            new CubeCoordinates(-1, 1, 0), new CubeCoordinates(0, 1, -1)
         };
     }
 
