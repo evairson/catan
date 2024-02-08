@@ -1,3 +1,5 @@
+package model.tiles;
+
 public class Tile{
     private int q;
     private int r;

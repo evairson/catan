@@ -1,3 +1,7 @@
+package model.tiles;
+
+import model.geometry.Point;
+
 import java.util.HashSet;
 import java.util.Set;
 

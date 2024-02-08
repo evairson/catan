@@ -1,4 +1,4 @@
-
+package controler;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -8,7 +8,7 @@ import java.awt.event.MouseMotionListener;
 
 public class MouseInputs implements MouseListener, MouseMotionListener {
 
-    public MouseInputs(){
+    public MouseInputs() {
     }
 
     @Override
@@ -38,5 +38,5 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
     @Override
     public void mouseExited(MouseEvent e) {
     }
-    
+
 }

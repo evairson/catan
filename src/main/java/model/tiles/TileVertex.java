@@ -1,3 +1,5 @@
+package model.tiles;
+
 import java.util.HashSet;
 import java.util.Set;
 

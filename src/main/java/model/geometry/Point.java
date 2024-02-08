@@ -1,3 +1,5 @@
+package model.geometry;
+
 public class Point {
     private double x, y;
 

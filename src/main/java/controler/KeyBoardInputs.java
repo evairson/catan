@@ -1,12 +1,13 @@
+package controler;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 
 
-public class KeyBoardInputs implements KeyListener{
+public class KeyBoardInputs implements KeyListener {
 
-    public KeyBoardInputs(){
+    public KeyBoardInputs() {
     }
 
     @Override
@@ -20,5 +21,4 @@ public class KeyBoardInputs implements KeyListener{
     @Override
     public void keyReleased(KeyEvent e) {
     }
-    
 }

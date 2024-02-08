@@ -1,3 +1,5 @@
+package model.geometry;
+
 public class Orientation {
     public double startAngle; // multiple of 60 degrees
     public double f0, f1, f2, f3;

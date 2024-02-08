@@ -1,10 +1,13 @@
+package view;
+
+import controler.KeyBoardInputs;
+import controler.MouseInputs;
+import model.Game;
 
 import javax.swing.*;
 
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.nio.Buffer;
 
 public class GamePanel extends JPanel {
     private Game game;
@@ -24,12 +27,12 @@ public class GamePanel extends JPanel {
         setPanelSize();
     }
 
-    private void setPanelSize(){
+    private void setPanelSize() {
         Dimension size = new Dimension(WIDTH, HEIGHT);
         setPreferredSize(size);
     }
 
-    private void updateGame(){
+    private void updateGame() {
         game.update();
     }
 

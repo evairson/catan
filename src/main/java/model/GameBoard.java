@@ -1,3 +1,7 @@
+package model;
+import model.geometry.*;
+import model.tiles.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;

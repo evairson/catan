@@ -1,3 +1,8 @@
+package model.geometry;
+
+import others.Constants.CubeCoordinatesConst;
+import others.Constants;
+
 import java.util.ArrayList;
 
 public class CubeCoordinates {

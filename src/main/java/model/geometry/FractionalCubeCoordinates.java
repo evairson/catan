@@ -1,3 +1,4 @@
+package model.geometry;
 public class FractionalCubeCoordinates {
     private double q, r, s;
 

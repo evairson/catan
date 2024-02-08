@@ -1,3 +1,5 @@
+package model.geometry;
+
 import java.util.ArrayList;
 public class Layout {
     private Orientation orientation;
