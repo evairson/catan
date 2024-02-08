@@ -23,4 +23,12 @@ public class Point {
     public double getY() {
         return this.y;
     }
+
+    public double distance(Point p) {
+        return Math.sqrt(Math.pow(this.x - p.x, 2) + Math.pow(this.y - p.y, 2));
+    }
+
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
 }

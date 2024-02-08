@@ -17,6 +17,10 @@ public class Layout {
         return new Point(x + layout.origin.getX(), y + layout.origin.getY());
     }
 
+    public Point FractionalCubeToPixel(Layout layout, FractionalCubeCoordinates h) {
+        return CubeToPixel(layout, h.round());
+    }
+
     public FractionalCubeCoordinates PixelToFractionalCubeCo(Layout layout, Point p) {
         Orientation M = layout.orientation;
         Point pt = new Point((p.getX() - layout.origin.getX()) / layout.size.getX(), (p.getY() - layout.origin.getY()) / layout.size.getY());
@@ -34,6 +38,15 @@ public class Layout {
     public ArrayList<Point> PolygonCorners(Layout layout, CubeCoordinates h) {
         ArrayList<Point> corners = new ArrayList<Point>();
         Point center = CubeToPixel(layout, h);
+        for (int i = 0; i < 6; i++) {
+            Point offset = CubeCoCornerOffset(layout, i);
+            corners.add(new Point(center.getX() + offset.getX(), center.getY() + offset.getY()));
+        }
+        return corners;
+    }
+    public ArrayList<Point> PolygonCorners(Layout layout, FractionalCubeCoordinates h) {
+        ArrayList<Point> corners = new ArrayList<Point>();
+        Point center = CubeToPixel(layout, h.round());
         for (int i = 0; i < 6; i++) {
             Point offset = CubeCoCornerOffset(layout, i);
             corners.add(new Point(center.getX() + offset.getX(), center.getY() + offset.getY()));

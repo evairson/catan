@@ -1,20 +1,37 @@
+import java.util.HashSet;
+import java.util.Set;
+
 public class TileEdge {
-    private boolean hasRoad;
+    private Point start;
+    private Point end;
+    private Set<Tile> tiles;
 
-    public TileEdge() {
-        this.hasRoad = false;
+    public TileEdge(Point start, Point end) {
+        this.start = start;
+        this.end = end;
+        tiles = new HashSet<>();
     }
 
-    public boolean hasRoad() {
-        return hasRoad;
-    }   
-
-    public void PlaceRoad(boolean hasRoad) {
-        this.hasRoad = hasRoad;
+    public TileEdge(Point start, Point end, Set<Tile> tiles) {
+        this.start = start;
+        this.end = end;
+        this.tiles = tiles;
     }
 
-    public void RemoveRoad() {
-        this.hasRoad = false;
+    public Point getStart() {
+        return start;
+    }
+
+    public Point getEnd() {
+        return end;
+    }
+
+    public Set<Tile> getTiles() {
+        return tiles;
+    }
+
+    public void addTile(Tile tile) {
+        tiles.add(tile);
     }
 
 }

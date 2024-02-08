@@ -1,48 +1,18 @@
+import java.util.HashSet;
+import java.util.Set;
+
 public class TileVertex {
-    private boolean hasSettlement;
-    private boolean hasCity;
+    private Set<Tile> tiles;
 
     public TileVertex() {
-        this.hasSettlement = false;
-        this.hasCity = false;
+        tiles = new HashSet<>();
     }
 
-    public boolean hasSettlement() {
-        return hasSettlement;
+    public void addTile(Tile tile) {
+        tiles.add(tile);
     }
 
-    public boolean hasCity() {
-        return hasCity;
+    public Set<Tile> getTiles() {
+        return tiles;
     }
-
-    public boolean PlaceSettlement() {
-        if (hasSettlement == false && hasCity == false) {
-            hasSettlement = true;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean PlaceCity(boolean hasCity) {
-        if (hasSettlement == true && hasCity == false) {
-            this.hasCity = hasCity;
-            return true;
-        }
-        return false;
-    }
-
-    public void RemoveSettlement() {
-        hasSettlement = false;
-    }
-
-    public void RemoveCity() {
-        hasCity = false;
-    }
-
-    public void RemoveAll() {
-        hasSettlement = false;
-        hasCity = false;
-    }
-
-    
 }
