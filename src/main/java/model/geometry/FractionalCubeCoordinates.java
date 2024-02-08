@@ -1,6 +1,9 @@
 package model.geometry;
+
 public class FractionalCubeCoordinates {
-    private double q, r, s;
+    private double q;
+    private double r;
+    private double s;
 
     public FractionalCubeCoordinates(double q, double r, double s) {
         this.q = q;
@@ -36,12 +39,12 @@ public class FractionalCubeCoordinates {
         int q = (int) Math.round(this.q);
         int r = (int) Math.round(this.r);
         int s = (int) Math.round(this.s);
-        double q_diff = Math.abs(q - this.q);
-        double r_diff = Math.abs(r - this.r);
-        double s_diff = Math.abs(s - this.s);
-        if (q_diff > r_diff && q_diff > s_diff) {
+        double qDiff = Math.abs(q - this.q);
+        double rDiff = Math.abs(r - this.r);
+        double sDiff = Math.abs(s - this.s);
+        if (qDiff > rDiff && qDiff > sDiff) {
             q = -r - s;
-        } else if (r_diff > s_diff) {
+        } else if (rDiff > sDiff) {
             r = -q - s;
         } else {
             s = -q - r;
@@ -56,12 +59,18 @@ public class FractionalCubeCoordinates {
     public CubeCoordinates findClosestNeighbour() {
         CubeCoordinates rounded = this.round();
         FractionalCubeCoordinates[] neighbours = new FractionalCubeCoordinates[6];
-        neighbours[0] = new FractionalCubeCoordinates(rounded.getQ() + 1, rounded.getR() - 1, rounded.getS());
-        neighbours[1] = new FractionalCubeCoordinates(rounded.getQ() + 1, rounded.getR(), rounded.getS() - 1);
-        neighbours[2] = new FractionalCubeCoordinates(rounded.getQ(), rounded.getR() + 1, rounded.getS() - 1);
-        neighbours[3] = new FractionalCubeCoordinates(rounded.getQ() - 1, rounded.getR() + 1, rounded.getS());
-        neighbours[4] = new FractionalCubeCoordinates(rounded.getQ() - 1, rounded.getR(), rounded.getS() + 1);
-        neighbours[5] = new FractionalCubeCoordinates(rounded.getQ(), rounded.getR() - 1, rounded.getS() + 1);
+        neighbours[0] = new FractionalCubeCoordinates(rounded.getQ() + 1,
+                rounded.getR() - 1, rounded.getS());
+        neighbours[1] = new FractionalCubeCoordinates(rounded.getQ() + 1,
+                rounded.getR(), rounded.getS() - 1);
+        neighbours[2] = new FractionalCubeCoordinates(rounded.getQ(),
+                rounded.getR() + 1, rounded.getS() - 1);
+        neighbours[3] = new FractionalCubeCoordinates(rounded.getQ() - 1,
+                rounded.getR() + 1, rounded.getS());
+        neighbours[4] = new FractionalCubeCoordinates(rounded.getQ() - 1,
+                rounded.getR(), rounded.getS() + 1);
+        neighbours[5] = new FractionalCubeCoordinates(rounded.getQ(),
+                rounded.getR() - 1, rounded.getS() + 1);
 
         double minDistance = Double.MAX_VALUE;
         CubeCoordinates closestNeighbour = new CubeCoordinates(0, 0, 0);
@@ -74,15 +83,22 @@ public class FractionalCubeCoordinates {
         }
         return closestNeighbour;
     }
+
     public CubeCoordinates[] findTwoClosestNeighbours() {
         CubeCoordinates rounded = this.round();
         FractionalCubeCoordinates[] neighbours = new FractionalCubeCoordinates[6];
-        neighbours[0] = new FractionalCubeCoordinates(rounded.getQ() + 1, rounded.getR() - 1, rounded.getS());
-        neighbours[1] = new FractionalCubeCoordinates(rounded.getQ() + 1, rounded.getR(), rounded.getS() - 1);
-        neighbours[2] = new FractionalCubeCoordinates(rounded.getQ(), rounded.getR() + 1, rounded.getS() - 1);
-        neighbours[3] = new FractionalCubeCoordinates(rounded.getQ() - 1, rounded.getR() + 1, rounded.getS());
-        neighbours[4] = new FractionalCubeCoordinates(rounded.getQ() - 1, rounded.getR(), rounded.getS() + 1);
-        neighbours[5] = new FractionalCubeCoordinates(rounded.getQ(), rounded.getR() - 1, rounded.getS() + 1);
+        neighbours[0] = new FractionalCubeCoordinates(rounded.getQ() + 1,
+                rounded.getR() - 1, rounded.getS());
+        neighbours[1] = new FractionalCubeCoordinates(rounded.getQ() + 1,
+                rounded.getR(), rounded.getS() - 1);
+        neighbours[2] = new FractionalCubeCoordinates(rounded.getQ(),
+                rounded.getR() + 1, rounded.getS() - 1);
+        neighbours[3] = new FractionalCubeCoordinates(rounded.getQ() - 1,
+                rounded.getR() + 1, rounded.getS());
+        neighbours[4] = new FractionalCubeCoordinates(rounded.getQ() - 1,
+                rounded.getR(), rounded.getS() + 1);
+        neighbours[5] = new FractionalCubeCoordinates(rounded.getQ(),
+                rounded.getR() - 1, rounded.getS() + 1);
 
         double minDistance = Double.MAX_VALUE;
         CubeCoordinates closestNeighbour = new CubeCoordinates(0, 0, 0);
@@ -95,8 +111,7 @@ public class FractionalCubeCoordinates {
                 closestNeighbour = neighbours[i].round();
             }
         }
-        CubeCoordinates[] result = {closestNeighbour, secondClosestNeighbour};
+        CubeCoordinates[] result = { closestNeighbour, secondClosestNeighbour };
         return result;
     }
-
 }

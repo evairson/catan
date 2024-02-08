@@ -37,5 +37,4 @@ public class TileEdge {
     public void addTile(Tile tile) {
         tiles.add(tile);
     }
-
 }

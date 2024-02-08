@@ -1,6 +1,8 @@
 package model;
+
 import model.geometry.*;
 import model.tiles.*;
+import others.Constants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,9 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class GameBoard {
     private HashMap<CubeCoordinates, Tile> board;
@@ -19,10 +19,10 @@ public class GameBoard {
     private HashMap<Point, TileVertex> verticesMap;
     private HashMap<Point, TileEdge> edgesMap;
 
-    //sert à stocker les coordonnées du sommet le plus proche de la souris
-    //peut aller dans une autre classe... git
-    public Point closestVertex = new Point(0, 0);
-    public Point closestEdge = new Point(0, 0);
+    // sert à stocker les coordonnées du sommet le plus proche de la souris
+    // peut aller dans une autre classe... git
+    private Point closestVertex = new Point(0, 0);
+    private Point closestEdge = new Point(0, 0);
 
     public GameBoard(Layout layout) {
         board = new HashMap<CubeCoordinates, Tile>();
@@ -79,7 +79,7 @@ public class GameBoard {
             Tile tile = entry.getValue();
 
             // Obtenir les coordonnées des sommets de la tuile
-            ArrayList<Point> hexagonVertices = layout.PolygonCorners(layout, cubeCoord);
+            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, cubeCoord);
             // Pour chaque sommet de la tuile
             for (Point vertex : hexagonVertices) {
                 // Vérifier si ce sommet est déjà dans la map
@@ -112,7 +112,7 @@ public class GameBoard {
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
             Tile tile = entry.getValue();
-            ArrayList<Point> hexagonVertices = layout.PolygonCorners(layout, cubeCoord);
+            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, cubeCoord);
             for (int i = 0; i < 6; i++) {
                 Point start = hexagonVertices.get(i);
                 Point end = hexagonVertices.get((i + 1) % 6);
@@ -132,7 +132,8 @@ public class GameBoard {
 
         // Vérifier si les coordonnées x et y des points sont proches les unes des
         // autres avec une marge d'erreur
-        return Math.abs(p1.getX() - p2.getX()) < epsilon && Math.abs(p1.getY() - p2.getY()) < epsilon;
+        return Math.abs(p1.getX() - p2.getX()) < epsilon
+                && Math.abs(p1.getY() - p2.getY()) < epsilon;
     }
 
     private void drawVertices(Graphics g) {
@@ -140,7 +141,8 @@ public class GameBoard {
         g2d.setColor(Color.BLACK); // Couleur des sommets
 
         for (Point vertex : verticesMap.keySet()) {
-            g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4); // Dessiner le sommet
+            g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
+            // Dessiner le sommet
         }
     }
 
@@ -148,7 +150,8 @@ public class GameBoard {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK); // Couleur des arêtes
         for (TileEdge edge : edgesMap.values()) {
-            g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(), (int) edge.getEnd().getX(),
+            g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
+                    (int) edge.getEnd().getX(),
                     (int) edge.getEnd().getY()); // Dessiner l'arête
         }
     }
@@ -161,7 +164,7 @@ public class GameBoard {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // Créer un Layout avec votre orientation, origine et taille préférées
-            Layout layout = new Layout(Orientation.POINTY, new Point(400, 400), new Point(50, 50));
+            Layout layout = new Layout(OrientationConstants.POINTY, new Point(400, 400), new Point(50, 50));
 
             // Créer un GameBoard avec le Layout
             GameBoard gameBoard = new GameBoard(layout);
@@ -221,7 +224,8 @@ public class GameBoard {
                     if (minDistanceToVertex < 20) {
                         Graphics2D g2d = (Graphics2D) panel.getGraphics();
                         g2d.setColor(Color.RED);
-                        g2d.fillOval((int) closestVertex.getX() - 10, (int) closestVertex.getY() - 10, 20, 20);
+                        g2d.fillOval((int) closestVertex.getX() - 10,
+                                (int) closestVertex.getY() - 10, 20, 20);
                     } else {
                         // Clear previous red oval
                         panel.repaint();

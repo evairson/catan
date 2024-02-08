@@ -1,12 +1,11 @@
 package model.geometry;
 
-import others.Constants.CubeCoordinatesConst;
 import others.Constants;
 
-import java.util.ArrayList;
-
 public class CubeCoordinates {
-    private int q, r, s;
+    private int q;
+    private int r;
+    private int s;
 
     public CubeCoordinates(int q, int r, int s) {
         if (q + r + s != 0) {
@@ -27,6 +26,15 @@ public class CubeCoordinates {
         }
         CubeCoordinates c = (CubeCoordinates) obj;
         return (c.q == this.q && c.r == this.r && c.s == this.s);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + q;
+        result = 31 * result + r;
+        result = 31 * result + s;
+        return result;
     }
 
     public CubeCoordinates add(CubeCoordinates b) {
