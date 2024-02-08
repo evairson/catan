@@ -12,8 +12,8 @@ public class Colony extends Building {
 
     private Point p;
 
-    private ArrayList<Resources> cost_colony; //dans l'ordre
-    private ArrayList<Resources> cost_city;
+    private ArrayList<Resources> costColony; //dans l'ordre
+    private ArrayList<Resources> costCity;
 
     public Colony(Point p) {
         this.p = p;
@@ -39,9 +39,9 @@ public class Colony extends Building {
 
     public ArrayList<Resources> getCost(boolean isCity) {
         if (isCity) {
-            return cost_city;
+            return costCity;
         }
-        return cost_colony;
+        return costColony;
     }
 
     public boolean buy(Player player, Point p, boolean isCity) {

@@ -15,7 +15,7 @@ public class Constants {
         public static final double DOUBLE_BILLION = 1000000000.0;
     }
 
-    public static class others{
+    public static class Others {
         public static final String MUSIC_DIRECTORY = "";
     }
 

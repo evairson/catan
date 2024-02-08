@@ -15,7 +15,7 @@ public class Player {
         ORANGE
     }
 
-     private Color color;
+    private Color color;
     private Boolean turn;
     private int dice1;
     private int dice2;
