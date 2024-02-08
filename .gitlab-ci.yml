@@ -9,7 +9,6 @@ lint:
   script:
     - apt-get update && apt-get install -y checkstyle
     - find src/ -name "*.java" -exec checkstyle -c ./checkstyle.xml {} \;
-  allow_failure: true
 
 build:
   stage: build

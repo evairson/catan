@@ -73,3 +73,4 @@ public abstract class Resources {
         return amount;
     }
 }
+

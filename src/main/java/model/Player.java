@@ -1,5 +1,10 @@
 package model;
 
+import java.util.ArrayList;
+
+import model.buildings.Building;
+import model.resources.Resources;
+
 public class Player {
     static final int NUMBER_DICE = 7;
 
@@ -16,9 +21,9 @@ public class Player {
     private int dice2;
     private String nom;
     // private Coordonnee cord;
-    // private ArrayList<Card> cardsRessources;
+    private ArrayList<Resources> resources;
     // private ArrayList<Card> cardsDev;
-    // private ArrayList<Building> buildings;
+    private ArrayList<Building> buildings;
 
 // Getter / Setter :  ---------------
 
@@ -40,6 +45,14 @@ public class Player {
 
     public int getDies() {
         return dice1 + dice2;
+    }
+
+    public ArrayList<Building> getBuildings() {
+        return buildings;
+    }
+
+    public ArrayList<Resources> getResources() {
+        return resources;
     }
 
 // ------------------------------------
