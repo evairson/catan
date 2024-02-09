@@ -2,6 +2,7 @@ package model;
 
 import others.Constants;
 import view.GamePanel;
+import view.GameState;
 import view.GameWindow;
 
 import java.awt.*;
@@ -10,15 +11,22 @@ public class Game implements Runnable {
     private GamePanel gamePanel;
     private GameWindow gameWindow;
     private Thread gameThread;
+    private Playing playing;
 
     public Game() {
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
 
+        playing = new Playing();
+
 
         gamePanel.requestFocus();
 
         startGameLoop();
+    }
+
+    public Playing getPlaying() {
+        return playing;
     }
 
 
@@ -35,6 +43,11 @@ public class Game implements Runnable {
     }
 
     public void render(Graphics g) {
+        switch (GameState.getState()) {
+            case Playing: playing.draw(g); break;
+            case Menu: break; //à faire
+            default :
+        }
     }
 
     @Override
