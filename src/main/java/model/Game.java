@@ -13,13 +13,25 @@ public class Game implements Runnable {
     private GamePanel gamePanel;
     private GameWindow gameWindow;
     private Thread gameThread;
-    public static GameBoard board;
+    private static GameBoard board;
+
+    public static GameBoard getBoard() {
+        return board;
+    }
+
+
+    public static void setBoard(GameBoard board) {
+        Game.board = board;
+    }
+
 
     public Game() {
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
 
-        Layout layout = new Layout(Constants.OrientationConstants.POINTY, new Point(400, 400), new Point(50, 50));
+        Point point1 = new Point(400, 400);
+        Point point2 = new Point(50, 50);
+        Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
         board = new GameBoard(layout);
 
 
@@ -42,8 +54,9 @@ public class Game implements Runnable {
     }
 
     public void render(Graphics g) {
-        switch(GameState.state){
+        switch (GameState.getState()) {
             case Board: board.draw(g);
+            default :
         }
     }
 

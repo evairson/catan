@@ -2,10 +2,6 @@ package model;
 
 import model.geometry.*;
 import model.tiles.*;
-import others.Constants;
-
-import javax.swing.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -26,9 +22,9 @@ public class GameBoard {
     // peut aller dans une autre classe... git
     private Point closestVertex = new Point(0, 0);
     private Point closestEdge = new Point(0, 0);
-    double minDistanceToEdge;
-    Point mousePosition;
-    double minDistanceToVertex;
+    private double minDistanceToEdge;
+    private Point mousePosition;
+    private double minDistanceToVertex;
 
     public GameBoard(Layout layout) {
         board = new HashMap<CubeCoordinates, Tile>();
@@ -169,7 +165,7 @@ public class GameBoard {
         drawEdges(g);
     }
 
-    public void draw(Graphics g){
+    public void draw(Graphics g) {
         drawBoard(g);
         if (minDistanceToVertex < 20) {
             g.setColor(Color.RED);
@@ -184,8 +180,7 @@ public class GameBoard {
             g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
                     (int) edge.getEnd().getX(),
                     (int) edge.getEnd().getY());
-        } 
-        catch (Exception e) { //probleme ici une erreur est catch disant edge null
+        } catch (Exception e) { //probleme ici une erreur est catch disant edge null
         }
     }
 
