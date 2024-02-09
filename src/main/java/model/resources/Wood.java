@@ -1,6 +1,6 @@
-package src.main.java.model.resources;
+package model.resources;
 
-public class Wood extends Resources{
+public class Wood extends Resources {
     public Wood() {
     }
     public Wood(int amount) {

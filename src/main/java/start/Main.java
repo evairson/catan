@@ -1,4 +1,4 @@
-package src.main.java.start;
+package start;
 
 import model.Game;
 

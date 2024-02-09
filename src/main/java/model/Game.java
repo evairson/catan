@@ -2,46 +2,58 @@ package model;
 
 import others.Constants;
 import view.GamePanel;
+import view.GameState;
 import view.GameWindow;
 import view.menu.MainMenu;
 
 import java.awt.*;
 
-public class Game implements Runnable{
+public class Game implements Runnable {
     private GamePanel gamePanel;
     private GameWindow gameWindow;
     private Thread gameThread;
-
+    private Playing playing;
     private MainMenu mainMenu;
-    
 
-    public Game(){
+    public Game() {
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
-//        gamePanel.requestFocus();
-    
+
+        playing = new Playing();
+
+
+        gamePanel.requestFocus();
+
         startGameLoop();
     }
 
-
-    public GamePanel getGamePanel(){
-        return gamePanel;
+    public Playing getPlaying() {
+        return playing;
     }
 
 
-    private void startGameLoop(){
+    public final GamePanel getGamePanel() {
+        return gamePanel;
+    }
+
+    private void startGameLoop() {
         gameThread = new Thread(this);
         gameThread.start();
     }
 
-    public void update(){
+    public void update() {
     }
 
-    public void render(Graphics g){
+    public void render(Graphics g) {
+        switch (GameState.getState()) {
+            case Playing: playing.draw(g); break;
+            case Menu: break; //à faire
+            default :
+        }
     }
 
     @Override
-    public void run() {
+    public final void run() {
 
         long previousTime = System.nanoTime();
 
@@ -52,28 +64,33 @@ public class Game implements Runnable{
         double deltaU = 0;
         double deltaF = 0;
 
-        while(true){
-            double timePerFrame = 1000000000.0 / Constants.Game.FPS_SET;
-            double timePerUpdate = 1000000000.0 / Constants.Game.UPS_SET;
+        while (true) {
+            double timePerFrame = Constants.Number.DOUBLE_BILLION / Constants.Game.FPS_SET;
+            double timePerUpdate = Constants.Number.DOUBLE_BILLION / Constants.Game.UPS_SET;
             long currentTime = System.nanoTime();
 
-            deltaU += (currentTime - previousTime) / timePerUpdate; 
+            deltaU += (currentTime - previousTime) / timePerUpdate;
             deltaF += (currentTime - previousTime) / timePerFrame;
             previousTime = currentTime;
 
-            if(deltaU >= 1){
+            if (deltaU >= 1) {
                 update();
                 updates++;
                 deltaU--;
             }
 
+<<<<<<< HEAD
             if(deltaF >= 1){
 //                gamePanel.repaint();
+=======
+            if (deltaF >= 1) {
+                gamePanel.repaint();
+>>>>>>> origin/dev
                 deltaF--;
                 frames++;
             }
 
-            if(System.currentTimeMillis() - lastCheck >= 1000){
+            if (System.currentTimeMillis() - lastCheck >= Constants.Number.SECOND) {
                 lastCheck = System.currentTimeMillis();
                 System.out.println("FPS :" + frames + " | Ups " + updates);
                 updates = 0;
@@ -83,6 +100,6 @@ public class Game implements Runnable{
         }
     }
 
-    
+
 }
 

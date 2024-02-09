@@ -9,6 +9,9 @@ import java.awt.*;
 
 public class GameWindow extends JFrame {
 
+public class GameWindow {
+    private JFrame jframe;
+
     private GamePanel gamePanel;
     private MainMenu mainMenu;
 
@@ -23,6 +26,7 @@ public class GameWindow extends JFrame {
         if(gds.length > 1) { // S'il y a plus d'un écran, ça lance sur le deuxième écran
             Rectangle bounds = gds[0].getDefaultConfiguration().getBounds(); // Récupère les limites du deuxième écran
             setLocation(bounds.x + (bounds.width - getWidth()) / 2, bounds.y + (bounds.height - getHeight()) / 2);
+
         } else {
             setLocationRelativeTo(null);
         } //full useless si un écran :)
@@ -40,8 +44,8 @@ public class GameWindow extends JFrame {
         setResizable(true);
 
         System.out.println(Constants.Game.WIDTH + " " + Constants.Game.HEIGHT);
-   }
-    public void close(int i){
+    }
+    public void close(int i) {
         System.exit(i);
     }
 }

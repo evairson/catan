@@ -1,6 +1,7 @@
-package src.main.java.model.resources;
+package model.resources;
 
-public class Wheat extends Resources{
+public class Wheat extends Resources {
+
     public Wheat() {
     }
 

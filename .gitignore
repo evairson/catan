@@ -4,4 +4,8 @@ bin
 .idea
 out
 projet-prog.iml
+<<<<<<< HEAD
 catan.iml
+=======
+*.DS_Store
+>>>>>>> origin/dev
