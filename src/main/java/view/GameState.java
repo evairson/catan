@@ -2,9 +2,9 @@ package view;
 
 
 public enum GameState {
-    Board;
+    Playing, Menu;
 
-    private static GameState state = Board;
+    private static GameState state = Playing;
 
     public static GameState getState() {
         return state;
