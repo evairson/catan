@@ -7,37 +7,26 @@ import view.GameWindow;
 
 import java.awt.*;
 
-import model.geometry.Layout;
-
 public class Game implements Runnable {
     private GamePanel gamePanel;
     private GameWindow gameWindow;
     private Thread gameThread;
-    private static GameBoard board;
-
-    public static GameBoard getBoard() {
-        return board;
-    }
-
-
-    public static void setBoard(GameBoard board) {
-        Game.board = board;
-    }
-
+    private Playing playing;
 
     public Game() {
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
 
-        Point point1 = new Point(400, 400);
-        Point point2 = new Point(50, 50);
-        Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
-        board = new GameBoard(layout);
+        playing = new Playing();
 
 
         gamePanel.requestFocus();
 
         startGameLoop();
+    }
+
+    public Playing getPlaying() {
+        return playing;
     }
 
 
@@ -55,7 +44,8 @@ public class Game implements Runnable {
 
     public void render(Graphics g) {
         switch (GameState.getState()) {
-            case Board: board.draw(g);
+            case Playing: playing.draw(g); break;
+            case Menu: break; //à faire
             default :
         }
     }

@@ -12,7 +12,10 @@ import view.GameState;
 
 public class MouseInputs implements MouseListener, MouseMotionListener {
 
-    public MouseInputs() {
+    private Game game;
+
+    public MouseInputs(Game game) {
+        this.game = game;
     }
 
     @Override
@@ -22,7 +25,7 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
     @Override
     public void mouseMoved(MouseEvent e) {
         switch (GameState.getState()) {
-            case Board: Game.getBoard().mouseMoved(e);
+            case Playing: game.getPlaying().mouseMoved(e);
             default:
                 break;
         }
