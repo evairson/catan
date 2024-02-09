@@ -26,10 +26,14 @@ public class GameBoard {
     // peut aller dans une autre classe... git
     private Point closestVertex = new Point(0, 0);
     private Point closestEdge = new Point(0, 0);
+    double minDistanceToEdge;
+    Point mousePosition;
+    double minDistanceToVertex;
 
     public GameBoard(Layout layout) {
         board = new HashMap<CubeCoordinates, Tile>();
         this.layout = layout;
+        this.initialiseBoard();
         // rendre la centre et la taille de la grille dynamique
 
     }
@@ -165,82 +169,47 @@ public class GameBoard {
         drawEdges(g);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            // Créer un Layout avec votre orientation, origine et taille préférées
-            Layout layout = new Layout(Constants.OrientationConstants.POINTY,
-                    new Point(400, 400), new Point(50, 50));
+    public void draw(Graphics g){
+        drawBoard(g);
+        if (minDistanceToVertex < 20) {
+            g.setColor(Color.RED);
+            g.fillOval((int) closestVertex.getX() - 10,
+                    (int) closestVertex.getY() - 10, 20, 20);
+        }
+        try {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setColor(Color.RED);
+            TileEdge edge = this.edgesMap.get(this.closestEdge);
+            g2d.setStroke(new BasicStroke(6));
+            g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
+                    (int) edge.getEnd().getX(),
+                    (int) edge.getEnd().getY());
+        } 
+        catch (Exception e) { //probleme ici une erreur est catch disant edge null
+        }
+    }
 
-            // Créer un GameBoard avec le Layout
-            GameBoard gameBoard = new GameBoard(layout);
-
-            // Initialiser le tableau de jeu
-            gameBoard.initialiseBoard();
-
-            JFrame frame = new JFrame("Test Game Board");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(800, 800);
-            frame.setLocationRelativeTo(null);
-            // Créer un JPanel personnalisé pour dessiner le jeu
-            JPanel panel = new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    gameBoard.drawBoard(g);
-                    try {
-                        Graphics2D g2d = (Graphics2D) g;
-                        g2d.setColor(Color.RED);
-                        TileEdge edge = gameBoard.edgesMap.get(gameBoard.closestEdge);
-                        g2d.setStroke(new BasicStroke(6));
-                        g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
-                                (int) edge.getEnd().getX(),
-                                (int) edge.getEnd().getY());
-                    } catch (Exception e) {
-                    }
-
-                }
-            };
-
-            panel.addMouseMotionListener(new MouseAdapter() {
-                @Override
-                public void mouseMoved(MouseEvent e) {
-                    Point mousePosition = new Point(e.getX(), e.getY());
-                    double minDistanceToVertex = Double.MAX_VALUE;
-                    double minDistanceToEdge = Double.MAX_VALUE;
-                    Point closestVertex = null;
-                    Point closestEdge = null;
-                    for (Point vertex : gameBoard.verticesMap.keySet()) {
-                        double distance = vertex.distance(mousePosition);
-                        if (distance < minDistanceToVertex) {
-                            minDistanceToVertex = distance;
-                            closestVertex = vertex;
-                            gameBoard.closestVertex = closestVertex;
-                        }
-                    }
-                    for (Point edge : gameBoard.edgesMap.keySet()) {
-                        double distance = edge.distance(mousePosition);
-                        if (distance < minDistanceToEdge) {
-                            minDistanceToEdge = distance;
-                            closestEdge = edge;
-                            gameBoard.closestEdge = closestEdge;
-                        }
-                    }
-
-                    if (minDistanceToVertex < 20) {
-                        Graphics2D g2d = (Graphics2D) panel.getGraphics();
-                        g2d.setColor(Color.RED);
-                        g2d.fillOval((int) closestVertex.getX() - 10,
-                                (int) closestVertex.getY() - 10, 20, 20);
-                    } else {
-                        // Clear previous red oval
-                        panel.repaint();
-                    }
-
-                }
-            });
-
-            frame.add(panel);
-            frame.setVisible(true);
-        });
+    public void mouseMoved(MouseEvent e) {
+        mousePosition = new Point(e.getX(), e.getY());
+        minDistanceToVertex = Double.MAX_VALUE;
+        minDistanceToEdge = Double.MAX_VALUE;
+        closestVertex = null;
+        closestEdge = null;
+        for (Point vertex : this.verticesMap.keySet()) {
+            double distance = vertex.distance(mousePosition);
+            if (distance < minDistanceToVertex) {
+                minDistanceToVertex = distance;
+                closestVertex = vertex;
+                this.closestVertex = closestVertex;
+            }
+        }
+        for (Point edge : this.edgesMap.keySet()) {
+            double distance = edge.distance(mousePosition);
+            if (distance < minDistanceToEdge) {
+                minDistanceToEdge = distance;
+                closestEdge = edge;
+                this.closestEdge = closestEdge;
+            }
+        }
     }
 }

@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 public class Layout {
     private Orientation orientation;
-    private Point origin;
-    private Point size;
+    private java.awt.Point origin;
+    private java.awt.Point size;
 
-    public Layout(Orientation orientation, Point origin, Point size) {
+    public Layout(Orientation orientation, java.awt.Point point, java.awt.Point point2) {
         this.orientation = orientation;
-        this.origin = origin;
-        this.size = size;
+        this.origin = point;
+        this.size = point2;
     }
 
     public Point cubeToPixel(Layout layout, CubeCoordinates h) {
@@ -34,7 +34,7 @@ public class Layout {
     }
 
     public Point cubeCoCornerOffset(Layout layout, int corner) {
-        Point size = layout.size;
+        java.awt.Point size = layout.size;
         double angle = 2.0 * Math.PI * (layout.orientation.getStartAngle() - corner) / 6;
         return new Point(size.getX() * Math.cos(angle), size.getY() * Math.sin(angle));
     }

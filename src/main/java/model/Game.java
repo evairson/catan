@@ -2,18 +2,25 @@ package model;
 
 import others.Constants;
 import view.GamePanel;
+import view.GameState;
 import view.GameWindow;
 
 import java.awt.*;
+
+import model.geometry.Layout;
 
 public class Game implements Runnable {
     private GamePanel gamePanel;
     private GameWindow gameWindow;
     private Thread gameThread;
+    public static GameBoard board;
 
     public Game() {
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
+
+        Layout layout = new Layout(Constants.OrientationConstants.POINTY, new Point(400, 400), new Point(50, 50));
+        board = new GameBoard(layout);
 
 
         gamePanel.requestFocus();
@@ -35,6 +42,9 @@ public class Game implements Runnable {
     }
 
     public void render(Graphics g) {
+        switch(GameState.state){
+            case Board: board.draw(g);
+        }
     }
 
     @Override
