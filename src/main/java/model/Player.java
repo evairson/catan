@@ -25,6 +25,13 @@ public class Player {
     // private ArrayList<Card> cardsDev;
     private ArrayList<Building> buildings;
 
+    public Player(Color c, String nom) {
+        color = c;
+        this.nom = nom;
+        resources = new ArrayList<>();
+        buildings = new ArrayList<>();
+    }
+
 // Getter / Setter :  ---------------
 
     public Color getColor() {
@@ -69,4 +76,17 @@ public class Player {
         throwDice1();
         throwDice2();
     }
+
+    public void placeBuilding() {
+        // TODO :
+    }
+
+    public void createOrBuy() {
+        // TODO :
+    }
+
+    public void changeWith(Player p) {
+        // TODO :
+    }
+
 }

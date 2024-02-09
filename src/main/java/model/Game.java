@@ -1,6 +1,7 @@
 package model;
 
 import others.Constants;
+import others.ListPlayers;
 import view.GamePanel;
 import view.GameState;
 import view.GameWindow;
@@ -14,6 +15,16 @@ public class Game implements Runnable {
     private GameWindow gameWindow;
     private Thread gameThread;
     private static GameBoard board;
+    private ListPlayers players; // ListPlayers extends ArrayList
+
+    // players has a currentPlayer not necessary to have an attribut for this.
+    public Player getCurrentPlayer() {
+        return players.getCurrentPlayer();
+    }
+
+    public ListPlayers getPlayers() {
+        return players;
+    }
 
     public static GameBoard getBoard() {
         return board;
@@ -36,6 +47,10 @@ public class Game implements Runnable {
 
 
         gamePanel.requestFocus();
+
+        Player player1 = new Player(Player.Color.RED, "Player1");
+        Player player2 = new Player(Player.Color.WHITE, "Player2");
+        players = new ListPlayers(0, player1, player2);
 
         startGameLoop();
     }
@@ -103,6 +118,11 @@ public class Game implements Runnable {
         }
     }
 
+    // Player action : -----------------
+
+    public void endTurn() {
+        players.next();
+    }
 
 }
 
