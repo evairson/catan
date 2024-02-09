@@ -1,6 +1,5 @@
 package view.menu;
 
-import model.Game;
 import view.GameWindow;
 
 import javax.imageio.ImageIO;
@@ -18,7 +17,10 @@ public class MainMenu extends JPanel {
     private GameWindow game;
     private JButton playButton;
     private JButton optionsButton;
+    private JButton quitButton;
     private Image backgroundImage;
+
+    private int scaleHeight;
 
     public MainMenu(GameWindow game) {
         this.game = game;
@@ -27,21 +29,22 @@ public class MainMenu extends JPanel {
         initializeButtons();
     }
 
-    private void loadBackgroundImage(String path){
-        System.out.println(path);
+    private void loadBackgroundImage(String path) {
         ImageIcon icon = new ImageIcon(path);
-        backgroundImage = icon.getImage().getScaledInstance(1920,1080, Image.SCALE_SMOOTH);
+        backgroundImage = icon.getImage().getScaledInstance(1280, 720, Image.SCALE_SMOOTH);
     }
 
-    protected void paintComponent(Graphics g){
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(backgroundImage, 0, 0, this);
     }
 
-     private void initializeButtons() {
+    private void initializeButtons() {
         try {
             Image image = ImageIO.read(new File("src/main/resources/playButton.png"));
-            Image playImage = image.getScaledInstance(image.getWidth(null) / 3, image.getHeight(null) / 3, Image.SCALE_SMOOTH);
+            int scaledWidth = image.getWidth(null) / 2;
+            int scaledHeight = image.getHeight(null) / 2;
+            Image playImage = image.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
             playButton = new JButton(new ImageIcon(playImage)) {
                 @Override
                 protected void paintComponent(Graphics g) {
@@ -71,58 +74,90 @@ public class MainMenu extends JPanel {
                 }
             });
 
-            playButton.setBounds(500, 300, playImage.getWidth(null), playImage.getHeight(null));
+            playButton.setBounds(500, 100, playImage.getWidth(null), playImage.getHeight(null));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-//         try {
-//            Image[] images = new Image[2];
-//            images[0] = ImageIO.read(new File("src/resources/modeNormalButton.png"));
-//            images[1] = ImageIO.read(new File("src/resources/modeMarathonButton.png"));
-//
-//            for (int i = 0; i < images.length; i++) {
-//                images[i] = images[i].getScaledInstance(
-//                        images[i].getWidth(null) / 3, images[i].getHeight(null) / 3,
-//                        Image.SCALE_SMOOTH
-//                );
-//            }
-//            optionsButton = new JButton(new ImageIcon(images[0])) {
-//                @Override
-//                protected void paintComponent(Graphics g) {
-//                    Graphics2D g2d = (Graphics2D) g.create();
-//                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//                    g2d.drawImage(images[0], 0, 0, this.getWidth(), this.getHeight(), null);
-//                    g2d.dispose();
-//                    super.paintComponent(g);
-//                }
-//
-//                @Override
-//                public boolean contains(int x, int y) {
-//                    Area area = new Area(new Rectangle2D.Double(0, 0, this.getWidth(), this.getHeight()));
-//                    return area.contains(x, y);
-//                }
-//            };
-//
-//            optionsButton.setPreferredSize(new Dimension(images[0].getWidth(null), images[0].getHeight(null)));
-//            optionsButton.setBorderPainted(false);
-//            optionsButton.setFocusPainted(false);
-//            optionsButton.setContentAreaFilled(false);
-//
-//            optionsButton.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    startOptions();
-//                }
-//            });
-//
-//            optionsButton.setBounds(320, 330, images[0].getWidth(null), images[0].getHeight(null));
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
+         try {
+             Image image = ImageIO.read(new File("src/main/resources/optionsButton.png"));
+             Image optionsImage = image.getScaledInstance(image.getWidth(null) / 2, image.getHeight(null) / 2, Image.SCALE_SMOOTH);
+
+             optionsButton = new JButton(new ImageIcon(optionsImage)) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2d = (Graphics2D) g.create();
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2d.drawImage(optionsImage, 0, 0, this.getWidth(), this.getHeight(), null);
+                    g2d.dispose();
+                    super.paintComponent(g);
+                }
+
+                @Override
+                public boolean contains(int x, int y) {
+                    Area area = new Area(new Rectangle2D.Double(0, 0, this.getWidth(), this.getHeight()));
+                    return area.contains(x, y);
+                }
+            };
+
+            optionsButton.setPreferredSize(new Dimension(optionsImage.getWidth(null), optionsImage.getHeight(null)));
+            optionsButton.setBorderPainted(false);
+            optionsButton.setFocusPainted(false);
+            optionsButton.setContentAreaFilled(false);
+
+            optionsButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    startOptions();
+                }
+            });
+
+            optionsButton.setBounds(550, 330, optionsImage.getWidth(null), optionsImage.getHeight(null));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+         try {
+             Image image = ImageIO.read(new File("src/main/resources/quitButton.png"));
+             Image quitImage = image.getScaledInstance(image.getWidth(null) / 2, image.getHeight(null) / 2, Image.SCALE_SMOOTH);
+
+             quitButton = new JButton(new ImageIcon(quitImage)) {
+                 @Override
+                 protected void paintComponent(Graphics g) {
+                     Graphics2D g2d = (Graphics2D) g.create();
+                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                     g2d.drawImage(quitImage, 0, 0, this.getWidth(), this.getHeight(), null);
+                     g2d.dispose();
+                     super.paintComponent(g);
+                 }
+
+                 @Override
+                 public boolean contains(int x, int y) {
+                     Area area = new Area(new Rectangle2D.Double(0, 0, this.getWidth(), this.getHeight()));
+                     return area.contains(x, y);
+                 }
+             };
+
+             quitButton.setPreferredSize(new Dimension(quitImage.getWidth(null), quitImage.getHeight(null)));
+             quitButton.setBorderPainted(false);
+             quitButton.setFocusPainted(false);
+             quitButton.setContentAreaFilled(false);
+
+             quitButton.addActionListener(new ActionListener() {
+                 @Override
+                 public void actionPerformed(ActionEvent e) {
+                     quitGame();
+                 }
+             });
+
+             quitButton.setBounds(558, 450, quitImage.getWidth(null), quitImage.getHeight(null));
+         } catch (IOException ex) {
+             ex.printStackTrace();
+         }
 
         add(playButton);
-//        add(optionsButton);
+        add(optionsButton);
+        add(quitButton);
     }
     
     public void startGame(){
@@ -132,4 +167,6 @@ public class MainMenu extends JPanel {
     public void startOptions(){
         System.out.println("Options du jeu...");
     }
+
+    public void quitGame() { System.exit(0); }
 }

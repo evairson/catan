@@ -9,9 +9,6 @@ import java.awt.*;
 
 public class GameWindow extends JFrame {
 
-public class GameWindow {
-    private JFrame jframe;
-
     private GamePanel gamePanel;
     private MainMenu mainMenu;
 
@@ -31,17 +28,14 @@ public class GameWindow {
             setLocationRelativeTo(null);
         } //full useless si un écran :)
 
-        Constants.Game.WIDTH = width;
-        Constants.Game.HEIGHT = height;
-
         mainMenu = new MainMenu(this);
         setLayout(new BorderLayout());
         add(mainMenu, BorderLayout.CENTER);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(width,height);
+        setSize(1280,720);
         setVisible(true);
-        setResizable(true);
+        setResizable(false);
 
         System.out.println(Constants.Game.WIDTH + " " + Constants.Game.HEIGHT);
     }

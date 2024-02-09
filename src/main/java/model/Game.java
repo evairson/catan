@@ -79,13 +79,8 @@ public class Game implements Runnable {
                 deltaU--;
             }
 
-<<<<<<< HEAD
             if(deltaF >= 1){
 //                gamePanel.repaint();
-=======
-            if (deltaF >= 1) {
-                gamePanel.repaint();
->>>>>>> origin/dev
                 deltaF--;
                 frames++;
             }
