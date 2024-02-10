@@ -15,12 +15,10 @@ import java.io.IOException;
 public class MainMenu extends JPanel {
 
     private GameWindow game;
-    private JButton playButton;
-    private JButton optionsButton;
-    private JButton quitButton;
+    private JButton playBtn;
+    private JButton optionsBtn;
+    private JButton quitBtn;
     private Image backgroundImage;
-
-    private int scaleHeight;
 
     public MainMenu(GameWindow game) {
         this.game = game;
@@ -40,133 +38,76 @@ public class MainMenu extends JPanel {
     }
 
     private void initializeButtons() {
-        try {
-            Image image = ImageIO.read(new File("src/main/resources/playButton.png"));
-            int scaledWidth = image.getWidth(null) / 2;
-            int scaledHeight = image.getHeight(null) / 2;
-            Image playImage = image.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
-            playButton = new JButton(new ImageIcon(playImage)) {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    Graphics2D g2d = (Graphics2D) g.create();
-                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2d.drawImage(playImage, 0, 0, this.getWidth(), this.getHeight(), null);
-                    g2d.dispose();
-                    super.paintComponent(g);
-                }
-
-                @Override
-                public boolean contains(int x, int y) {
-                    Area area = new Area(new Rectangle2D.Double(0, 0, this.getWidth(), this.getHeight()));
-                    return area.contains(x, y);
-                }
-            };
-
-            playButton.setPreferredSize(new Dimension(playImage.getWidth(null), playImage.getHeight(null)));
-            playButton.setBorderPainted(false);
-            playButton.setFocusPainted(false);
-            playButton.setContentAreaFilled(false);
-
-            playButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    startGame();
-                }
-            });
-
-            playButton.setBounds(500, 100, playImage.getWidth(null), playImage.getHeight(null));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-         try {
-             Image image = ImageIO.read(new File("src/main/resources/optionsButton.png"));
-             Image optionsImage = image.getScaledInstance(image.getWidth(null) / 2, image.getHeight(null) / 2, Image.SCALE_SMOOTH);
-
-             optionsButton = new JButton(new ImageIcon(optionsImage)) {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    Graphics2D g2d = (Graphics2D) g.create();
-                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2d.drawImage(optionsImage, 0, 0, this.getWidth(), this.getHeight(), null);
-                    g2d.dispose();
-                    super.paintComponent(g);
-                }
-
-                @Override
-                public boolean contains(int x, int y) {
-                    Area area = new Area(new Rectangle2D.Double(0, 0, this.getWidth(), this.getHeight()));
-                    return area.contains(x, y);
-                }
-            };
-
-            optionsButton.setPreferredSize(new Dimension(optionsImage.getWidth(null), optionsImage.getHeight(null)));
-            optionsButton.setBorderPainted(false);
-            optionsButton.setFocusPainted(false);
-            optionsButton.setContentAreaFilled(false);
-
-            optionsButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    startOptions();
-                }
-            });
-
-            optionsButton.setBounds(550, 330, optionsImage.getWidth(null), optionsImage.getHeight(null));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-         try {
-             Image image = ImageIO.read(new File("src/main/resources/quitButton.png"));
-             Image quitImage = image.getScaledInstance(image.getWidth(null) / 2, image.getHeight(null) / 2, Image.SCALE_SMOOTH);
-
-             quitButton = new JButton(new ImageIcon(quitImage)) {
-                 @Override
-                 protected void paintComponent(Graphics g) {
-                     Graphics2D g2d = (Graphics2D) g.create();
-                     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                     g2d.drawImage(quitImage, 0, 0, this.getWidth(), this.getHeight(), null);
-                     g2d.dispose();
-                     super.paintComponent(g);
-                 }
-
-                 @Override
-                 public boolean contains(int x, int y) {
-                     Area area = new Area(new Rectangle2D.Double(0, 0, this.getWidth(), this.getHeight()));
-                     return area.contains(x, y);
-                 }
-             };
-
-             quitButton.setPreferredSize(new Dimension(quitImage.getWidth(null), quitImage.getHeight(null)));
-             quitButton.setBorderPainted(false);
-             quitButton.setFocusPainted(false);
-             quitButton.setContentAreaFilled(false);
-
-             quitButton.addActionListener(new ActionListener() {
-                 @Override
-                 public void actionPerformed(ActionEvent e) {
-                     quitGame();
-                 }
-             });
-
-             quitButton.setBounds(558, 450, quitImage.getWidth(null), quitImage.getHeight(null));
-         } catch (IOException ex) {
-             ex.printStackTrace();
-         }
-
-        add(playButton);
-        add(optionsButton);
-        add(quitButton);
+        createButton("src/main/resources/playButton.png", 500, 100, 2);
+        createButton("src/main/resources/optionsButton.png", 550, 330, 2);
+        createButton("src/main/resources/quitButton.png", 558, 450, 2);
     }
-    
-    public void startGame(){
+
+    private void createButton(String imagePath, int xCoord, int yCoord, int divider) {
+        try {
+            Image image = ImageIO.read(new File(imagePath));
+            int scaledWidth = image.getWidth(null) / divider;
+            int scaledHeight = image.getHeight(null) / divider;
+            Image buttonImage = image.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+
+            JButton button = new JButton(new ImageIcon(buttonImage)) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2d = (Graphics2D) g.create();
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2d.drawImage(buttonImage, 0, 0, this.getWidth(), this.getHeight(), null);
+                    g2d.dispose();
+                    super.paintComponent(g);
+                }
+                @Override
+                public boolean contains(int x, int y) {
+                    int width = this.getWidth();
+                    int height = this.getHeight();
+                    Area area = new Area(new Rectangle2D.Double(0, 0, width, height));
+                    return area.contains(x, y);
+                }
+            };
+
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String[] list = imagePath.split("/");
+                    String action = list[list.length - 1].split("Button")[0];
+                    buttonClicked(action);
+                }
+            });
+
+            button.setPreferredSize(new Dimension(scaledWidth, scaledHeight));
+            button.setBorderPainted(false);
+            button.setFocusPainted(false);
+            button.setContentAreaFilled(false);
+            button.setBounds(xCoord, yCoord, scaledWidth, scaledHeight);
+
+            this.add(button);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void buttonClicked(String action) {
+        switch (action) {
+            case "play" -> startGame();
+            case "options" -> startOptions();
+            case "quit" -> System.exit(0);
+            default -> quitGame();
+        }
+    }
+
+    public void startGame() {
         System.out.println("Lancement du jeu...");
     }
-    
-    public void startOptions(){
+
+    public void startOptions() {
         System.out.println("Options du jeu...");
     }
 
-    public void quitGame() { System.exit(0); }
+    public void quitGame() {
+        System.exit(0);
+    }
 }
