@@ -92,10 +92,10 @@ public class MainMenu extends JPanel {
 
     private void buttonClicked(String action) {
         switch (action) {
-            case "play" -> startGame();
-            case "options" -> startOptions();
-            case "quit" -> System.exit(0);
-            default -> quitGame();
+            case "play" : startGame(); break;
+            case "options" : startOptions(); break;
+            case "quit" : System.exit(0); break;
+            default : quitGame(); break;
         }
     }
 
