@@ -1,7 +1,6 @@
 package view.menu;
 
 import others.Constants;
-import view.GameWindow;
 import view.utilities.ButtonImage;
 import javax.swing.*;
 import java.awt.*;
