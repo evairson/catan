@@ -1,7 +1,5 @@
 package view.utilities;
 
-import others.Constants;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -23,22 +21,13 @@ public class ButtonImage extends JButton {
     private void initializeButton(String imagePath, String hoverImagePath, int xCoordBaseWidth,
                                   int yCoordBaseHeight, Runnable action) {
         try {
-            // Résolution cible
-            int width = Constants.Game.WIDTH;
-            int height = Constants.Game.HEIGHT;
-
-            // Calcul des facteurs d'échelle
-            double scaleFactorX = (double) width / Constants.Game.BASE_WIDTH;
-            double scaleFactorY = (double) height / Constants.Game.BASE_HEIGHT;
 
             // Coordonnées pour la résolution cible
-            int xCoord = (int) (xCoordBaseWidth * scaleFactorX);
-            int yCoord = (int) (yCoordBaseHeight * scaleFactorY);
+            int xCoord = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight)[0];
+            int yCoord = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight)[1];
 
             // Nouveau diviseur pour la résolution cible
-            double targetDiagonal = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
-            double diagonalRatio = targetDiagonal / Constants.Game.BASE_DIAGONAL;
-            double divider = Constants.Game.BASE_DIVIDER_IMAGE / diagonalRatio;
+            double divider = Resolution.divider();
 
             // Charger l'image originale pour obtenir ses dimensions
             Image originalImage = ImageIO.read(new File(imagePath));

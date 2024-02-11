@@ -10,9 +10,12 @@ import java.awt.*;
 public class GameWindow extends JFrame {
 
     private GamePanel gamePanel;
+
+    private ActionPlayerPanel actionPlayer;
     private MainMenu mainMenu;
 
-    public GameWindow(GamePanel gamePanel) {
+    public GameWindow(GamePanel gamePanel, ActionPlayerPanel actionPlayer) {
+        this.actionPlayer = actionPlayer;
         this.gamePanel = gamePanel;
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
@@ -29,9 +32,10 @@ public class GameWindow extends JFrame {
             setLocationRelativeTo(null);
         } //full useless si un écran :)
 
-        mainMenu = new MainMenu();
+        //mainMenu = new MainMenu();
         setLayout(new BorderLayout());
-        add(mainMenu, BorderLayout.CENTER);
+        //add(mainMenu, BorderLayout.CENTER);
+        add(actionPlayer);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(Constants.Game.WIDTH, Constants.Game.HEIGHT);

@@ -19,20 +19,30 @@ public class Player {
     private Boolean turn;
     private int dice1;
     private int dice2;
-    private String nom;
+    private String name;
     // private Coordonnee cord;
     private ArrayList<Resources> resources;
+
+
     // private ArrayList<Card> cardsDev;
     private ArrayList<Building> buildings;
 
-    public Player(Color c, String nom) {
+    public Player(Color c, String name) {
         color = c;
-        this.nom = nom;
+        this.name = name;
         resources = new ArrayList<>();
         buildings = new ArrayList<>();
     }
 
 // Getter / Setter :  ---------------
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Color getColor() {
         return color;
