@@ -8,13 +8,13 @@ import view.GameWindow;
 
 import java.awt.*;
 
-import model.geometry.Layout;
-
 public class Game implements Runnable {
     private GamePanel gamePanel;
     private GameWindow gameWindow;
     private Thread gameThread;
     private static GameBoard board;
+    private Playing playing;
+
     private ListPlayers players; // ListPlayers extends ArrayList
 
     // players has a currentPlayer not necessary to have an attribut for this.
@@ -40,10 +40,7 @@ public class Game implements Runnable {
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
 
-        Point point1 = new Point(400, 400);
-        Point point2 = new Point(50, 50);
-        Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
-        board = new GameBoard(layout);
+        playing = new Playing();
 
 
         gamePanel.requestFocus();
@@ -53,6 +50,10 @@ public class Game implements Runnable {
         players = new ListPlayers(0, player1, player2);
 
         startGameLoop();
+    }
+
+    public Playing getPlaying() {
+        return playing;
     }
 
 
@@ -70,7 +71,8 @@ public class Game implements Runnable {
 
     public void render(Graphics g) {
         switch (GameState.getState()) {
-            case Board: board.draw(g);
+            case Playing: playing.draw(g); break;
+            case Menu: break; //à faire
             default :
         }
     }
