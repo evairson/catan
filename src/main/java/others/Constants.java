@@ -3,6 +3,9 @@ package others;
 import model.geometry.Orientation;
 import model.geometry.CubeCoordinates;
 
+import java.awt.*;
+
+
 public class Constants {
     public static class CubeCoordinatesConst {
         public static final CubeCoordinates[] DIRECTIONS = new CubeCoordinates[] {
@@ -16,8 +19,12 @@ public class Constants {
         public static final double SCALE = 1;
         public static final int FPS_SET = 120;
         public static final int UPS_SET = 200;
-        public static final int WIDTH = 0;
-        public static final int HEIGHT = 0;
+
+        public static final int BASE_WIDTH = 1280;
+        public static final int BASE_HEIGHT = 720;
+        public static final double BASE_DIAGONAL = 1468.6047; // Th. de Pytaghore
+        public static final int WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        public static final int HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
     }
 
     public static class Number {
