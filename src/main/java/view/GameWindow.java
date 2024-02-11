@@ -16,8 +16,6 @@ public class GameWindow extends JFrame {
         this.gamePanel = gamePanel;
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
-        int width = gd.getDisplayMode().getWidth();
-        int height = gd.getDisplayMode().getHeight();
 
         GraphicsDevice[] gds = ge.getScreenDevices();
         if (gds.length > 1) { // S'il y a plus d'un écran, ça lance sur le deuxième écran
@@ -31,12 +29,12 @@ public class GameWindow extends JFrame {
             setLocationRelativeTo(null);
         } //full useless si un écran :)
 
-        mainMenu = new MainMenu(this);
+        mainMenu = new MainMenu();
         setLayout(new BorderLayout());
         add(mainMenu, BorderLayout.CENTER);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1280, 720);
+        setSize(Constants.Game.WIDTH, Constants.Game.HEIGHT);
         setVisible(true);
         setResizable(false);
 
