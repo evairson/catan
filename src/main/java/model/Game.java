@@ -5,6 +5,7 @@ import others.ListPlayers;
 import view.GamePanel;
 import view.GameState;
 import view.GameWindow;
+import view.menu.MainMenu;
 
 import java.awt.*;
 
@@ -14,6 +15,7 @@ public class Game implements Runnable {
     private Thread gameThread;
     private static GameBoard board;
     private Playing playing;
+    private MainMenu mainMenu;
 
     private ListPlayers players; // ListPlayers extends ArrayList
 
@@ -105,7 +107,7 @@ public class Game implements Runnable {
             }
 
             if (deltaF >= 1) {
-                gamePanel.repaint();
+//                gamePanel.repaint();
                 deltaF--;
                 frames++;
             }
