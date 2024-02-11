@@ -1,37 +1,44 @@
 package view;
 
 import others.Constants;
+import view.menu.MainMenu;
 
 import javax.swing.*;
 
 import java.awt.*;
 
-public class GameWindow {
-    private JFrame jframe;
+public class GameWindow extends JFrame {
 
-    public GameWindow(view.GamePanel gamePanel) {
+    private GamePanel gamePanel;
+    private MainMenu mainMenu;
+
+    public GameWindow(GamePanel gamePanel) {
+        this.gamePanel = gamePanel;
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
-        //get la taille de ton écran
-
-        jframe = new JFrame("JSP ENCORE MDR");
-        gd.setFullScreenWindow(jframe);
+        int width = gd.getDisplayMode().getWidth();
+        int height = gd.getDisplayMode().getHeight();
 
         GraphicsDevice[] gds = ge.getScreenDevices();
-        if (gds.length > 1) {
-            // S'il y a plus d'un écran, ça lance sur le deuxième écran
-            Rectangle bounds = gds[0].getDefaultConfiguration().getBounds();
+        if (gds.length > 1) { // S'il y a plus d'un écran, ça lance sur le deuxième écran
             // Récupère les limites du deuxième écran
-            int x = bounds.x + (bounds.width - jframe.getWidth()) / 2;
-            int y = bounds.y + (bounds.height - jframe.getHeight()) / 2;
-            jframe.setLocation(x, y);
+            Rectangle bounds = gds[0].getDefaultConfiguration().getBounds();
+            int borderX = bounds.x + (bounds.width - getWidth()) / 2;
+            int borderY = bounds.y + (bounds.height - getHeight()) / 2;
+            setLocation(borderX, borderY);
+
         } else {
-            jframe.setLocationRelativeTo(null);
+            setLocationRelativeTo(null);
         } //full useless si un écran :)
 
-        jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jframe.add(gamePanel);
-        jframe.setVisible(true);
+        mainMenu = new MainMenu(this);
+        setLayout(new BorderLayout());
+        add(mainMenu, BorderLayout.CENTER);
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1280, 720);
+        setVisible(true);
+        setResizable(false);
 
         System.out.println(Constants.Game.WIDTH + " " + Constants.Game.HEIGHT);
     }

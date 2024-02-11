@@ -4,6 +4,7 @@ import others.Constants;
 import view.GamePanel;
 import view.GameState;
 import view.GameWindow;
+import view.menu.MainMenu;
 
 import java.awt.*;
 
@@ -12,6 +13,7 @@ public class Game implements Runnable {
     private GameWindow gameWindow;
     private Thread gameThread;
     private Playing playing;
+    private MainMenu mainMenu;
 
     public Game() {
         gamePanel = new GamePanel(this);
@@ -78,7 +80,7 @@ public class Game implements Runnable {
             }
 
             if (deltaF >= 1) {
-                gamePanel.repaint();
+//                gamePanel.repaint();
                 deltaF--;
                 frames++;
             }
