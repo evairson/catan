@@ -23,6 +23,7 @@ public class Constants {
         public static final int BASE_WIDTH = 1280;
         public static final int BASE_HEIGHT = 720;
         public static final double BASE_DIAGONAL = 1468.6047; // Th. de Pytaghore
+        public static final int BASE_DIVIDER_IMAGE = 2;
         public static final int WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
         public static final int HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
     }

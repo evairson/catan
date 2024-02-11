@@ -29,7 +29,7 @@ public class GameWindow extends JFrame {
             setLocationRelativeTo(null);
         } //full useless si un écran :)
 
-        mainMenu = new MainMenu(this);
+        mainMenu = new MainMenu();
         setLayout(new BorderLayout());
         add(mainMenu, BorderLayout.CENTER);
 
