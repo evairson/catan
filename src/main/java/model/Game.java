@@ -19,7 +19,6 @@ public class Game implements Runnable {
 
         playing = new Playing();
 
-
         gamePanel.requestFocus();
 
         startGameLoop();
@@ -28,7 +27,6 @@ public class Game implements Runnable {
     public Playing getPlaying() {
         return playing;
     }
-
 
     public final GamePanel getGamePanel() {
         return gamePanel;
@@ -44,9 +42,12 @@ public class Game implements Runnable {
 
     public void render(Graphics g) {
         switch (GameState.getState()) {
-            case Playing: playing.draw(g); break;
-            case Menu: break; //à faire
-            default :
+            case Playing:
+                playing.draw(g);
+                break;
+            case Menu:
+                break; // à faire
+            default:
         }
     }
 
@@ -85,7 +86,7 @@ public class Game implements Runnable {
 
             if (System.currentTimeMillis() - lastCheck >= Constants.Number.SECOND) {
                 lastCheck = System.currentTimeMillis();
-                System.out.println("FPS :" + frames + " | Ups " + updates);
+                // System.out.println("FPS :" + frames + " | Ups " + updates);
                 updates = 0;
                 frames = 0;
             }
@@ -93,6 +94,4 @@ public class Game implements Runnable {
         }
     }
 
-
 }
-
