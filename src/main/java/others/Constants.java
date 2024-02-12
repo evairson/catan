@@ -9,9 +9,9 @@ import java.awt.*;
 public class Constants {
     public static class CubeCoordinatesConst {
         public static final CubeCoordinates[] DIRECTIONS = new CubeCoordinates[] {
-                new CubeCoordinates(1, 0, -1), new CubeCoordinates(1, -1, 0),
-                new CubeCoordinates(0, -1, 1), new CubeCoordinates(-1, 0, 1),
-                new CubeCoordinates(-1, 1, 0), new CubeCoordinates(0, 1, -1)
+            new CubeCoordinates(1, 0, -1), new CubeCoordinates(1, -1, 0),
+            new CubeCoordinates(0, -1, 1), new CubeCoordinates(-1, 0, 1),
+            new CubeCoordinates(-1, 1, 0), new CubeCoordinates(0, 1, -1)
         };
     }
 
@@ -29,8 +29,8 @@ public class Constants {
     }
 
     public static class BoardConstants {
-        public static final int[] TILE_DICE_VALUES_DEFAULT = new int[] { 9, 8, 5, 12, 11, 3, 6, 10, 6, 4, 11, 2, 4,
-                3, 5, 9, 10, 8, 0 };
+        public static final int[] TILE_DICE_VALUES_DEFAULT = new int[] {9, 8, 5, 12, 11, 3, 6, 10, 6, 4, 11,
+            2, 4, 3, 5, 9, 10, 8, 0 };
 
         public static final int DESERT = 0;
         public static final int WOOD = 1;
@@ -39,14 +39,15 @@ public class Constants {
         public static final int SHEEP = 4;
         public static final int ORE = 5;
 
-        public static final int[] TILE_TYPES_DEFAULT = new int[] { WOOD, WOOD, WOOD, WOOD, WHEAT, WHEAT, WHEAT,
-                WHEAT, BRICK, BRICK, BRICK, SHEEP, SHEEP, SHEEP, SHEEP, ORE, ORE, ORE };
+        public static final int[] TILE_TYPES_DEFAULT = new int[] {WOOD, WOOD, WOOD, WOOD, WHEAT, WHEAT, WHEAT,
+            WHEAT, BRICK, BRICK, BRICK, SHEEP, SHEEP, SHEEP, SHEEP, ORE, ORE, ORE };
 
         private static int[] randomizeArray(int[] arr) {
             for (int i = arr.length - 1; i > 0; i--) {
                 int index = (int) (Math.random() * (arr.length));
-                if (arr[index] == 6 || arr[index] == 8 || arr[i] == 6 || arr[i] == 8)
+                if (arr[index] == 6 || arr[index] == 8 || arr[i] == 6 || arr[i] == 8) {
                     continue; // skip the 8 and 6 dice values
+                }
                 int a = arr[index];
                 arr[index] = arr[i];
                 arr[i] = a;
