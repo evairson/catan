@@ -86,14 +86,14 @@ public class GameBoard {
                     }
                     if (tileDiceValue != 0) {
                         presetTileResourceType++;
-                    }else{
+                    } else {
                         tileResourceType = 0;
                     }
                     addTile(q, r, tileDiceValue, tileResourceType);
                     presetTileDiceValue++;
 
-                    System.out.println("Tile (" + q + ", " + r + ", " + s + "), Ressource Type: " + tileResourceType
-                            + " added to the board");
+                    System.out.println("Tile (" + q + ", " + r + ", " + s + "), Ressource Type: "
+                        + tileResourceType + " added to the board");
                 }
             }
         }
@@ -285,8 +285,10 @@ public class GameBoard {
     }
 
     private void drawText(Graphics g, String text, Point center) {
-        if (text.equals("0"))
+        if (text.equals("0")) {
             return;
+        }
+
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLUE); // Set the color of the text
 
