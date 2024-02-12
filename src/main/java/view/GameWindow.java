@@ -1,13 +1,10 @@
 package view;
 
 import others.Constants;
-import start.Main;
 import view.menu.MainMenu;
 
 import javax.swing.*;
 
-import model.Game;
-import model.GameBoard;
 
 import java.awt.*;
 
