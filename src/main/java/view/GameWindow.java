@@ -5,6 +5,7 @@ import view.menu.MainMenu;
 
 import javax.swing.*;
 
+
 import java.awt.*;
 
 public class GameWindow extends JFrame {
@@ -14,7 +15,7 @@ public class GameWindow extends JFrame {
     private ActionPlayerPanel actionPlayer;
     private MainMenu mainMenu;
 
-    public GameWindow(GamePanel gamePanel, ActionPlayerPanel actionPlayer) {
+    public GameWindow(GamePanel gamePanel, ActionPlayerPanel actionPlayer, MainMenu mainMenu) {
         this.actionPlayer = actionPlayer;
         this.gamePanel = gamePanel;
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -32,10 +33,13 @@ public class GameWindow extends JFrame {
             setLocationRelativeTo(null);
         } //full useless si un écran :)
 
-        mainMenu = new MainMenu();
-        setLayout(new BorderLayout());
-        //add(mainMenu, BorderLayout.CENTER);
-        add(actionPlayer);
+        this.mainMenu = mainMenu;
+        setLayout(null);
+        add(mainMenu);
+        //add(actionPlayer, BorderLayout.CENTER);
+        //GameBoard board = new GameBoard(null);
+        //add(board);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(Constants.Game.WIDTH, Constants.Game.HEIGHT);
         setVisible(true);
