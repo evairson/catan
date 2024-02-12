@@ -2,6 +2,9 @@ package model;
 
 import model.geometry.*;
 import model.tiles.*;
+import others.Constants;
+import model.geometry.CubeCoordinates;
+
 import java.awt.event.MouseEvent;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -10,6 +13,9 @@ import java.awt.BasicStroke;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Polygon;
 
 public class GameBoard {
     private HashMap<CubeCoordinates, Tile> board;
@@ -17,9 +23,9 @@ public class GameBoard {
     private int gridSize = 2;
     private HashMap<Point, TileVertex> verticesMap;
     private HashMap<Point, TileEdge> edgesMap;
-
+    private HashMap<Tile, Color> tileColors;
     // sert à stocker les coordonnées du sommet le plus proche de la souris
-    // peut aller dans une autre classe... git
+    // peut aller dans une autre classe...
     private Point closestVertex = new Point(0, 0);
     private Point closestEdge = new Point(0, 0);
     private double minDistanceToEdge;
@@ -31,10 +37,6 @@ public class GameBoard {
         this.layout = layout;
         this.initialiseBoard();
         // rendre la centre et la taille de la grille dynamique
-
-    }
-
-    public void drawThickVertex(Point vertex) {
 
     }
 
@@ -50,6 +52,16 @@ public class GameBoard {
         board.put(new CubeCoordinates(q, r, s), new Tile(q, r));
     }
 
+    public void addTile(int q, int r, int diceValue) {
+        int s = -q - r;
+        board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue));
+    }
+
+    public void addTile(int q, int r, int diceValue, int resourceType) {
+        int s = -q - r;
+        board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue, resourceType));
+    }
+
     public Tile getTile(int q, int r) {
         int s = -q - r;
         return board.get(new CubeCoordinates(q, r, s));
@@ -61,16 +73,61 @@ public class GameBoard {
 
     public void initialiseBoard() {
         int maxDistance = this.gridSize;
+        int presetTileDiceValue = 0;
+        int presetTileResourceType = 0;
         for (int q = -gridSize; q <= gridSize; q++) {
             for (int r = -gridSize; r <= gridSize; r++) {
                 int s = -q - r;
                 if (Math.abs(s) <= gridSize && Math.abs(r) <= gridSize && Math.abs(q) <= gridSize) {
-                    addTile(q, r);
+                    int tileDiceValue = Constants.BoardConstants.TILE_DICE_VALUES[presetTileDiceValue];
+                    int tileResourceType = 0;
+                    if (presetTileResourceType < Constants.BoardConstants.TILE_TYPES.length) {
+                        tileResourceType = Constants.BoardConstants.TILE_TYPES[presetTileResourceType];
+                    }
+                    if (tileDiceValue != 0) {
+                        presetTileResourceType++;
+                    } else {
+                        tileResourceType = 0;
+                    }
+                    addTile(q, r, tileDiceValue, tileResourceType);
+                    presetTileDiceValue++;
+
+                    System.out.println("Tile (" + q + ", " + r + ", " + s + "), Ressource Type: "
+                        + tileResourceType + " added to the board");
                 }
             }
         }
+        assignTileColors();
         initialiseVertices();
         initialiseEdges();
+    }
+
+    private void assignTileColors() {
+        tileColors = new HashMap<>();
+        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
+            Tile tile = entry.getValue();
+            int resourceType = tile.getResourceType();
+            switch (resourceType) {
+                case 1:
+                    tileColors.put(tile, Color.GREEN);
+                    break;
+                case 2:
+                    tileColors.put(tile, Color.YELLOW);
+                    break;
+                case 3:
+                    tileColors.put(tile, Color.RED);
+                    break;
+                case 4:
+                    tileColors.put(tile, Color.WHITE);
+                    break;
+                case 5:
+                    tileColors.put(tile, Color.GRAY);
+                    break;
+                default:
+                    tileColors.put(tile, Color.BLACK);
+                    break;
+            }
+        }
     }
 
     private void initialiseVertices() {
@@ -109,6 +166,7 @@ public class GameBoard {
                 }
             }
         }
+
     }
 
     private void initialiseEdges() {
@@ -142,11 +200,24 @@ public class GameBoard {
 
     private void drawVertices(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLACK); // Couleur des sommets
 
+        for (Map.Entry<Tile, Color> entry : tileColors.entrySet()) {
+            Tile tile = entry.getKey();
+            Color color = entry.getValue();
+            CubeCoordinates cubeCoord = tile.getCoordinates();
+            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
+
+            g2d.setColor(color);
+            Polygon hexagon = new Polygon();
+            for (Point vertex : hexagonVertices) {
+                hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
+            }
+            g2d.fillPolygon(hexagon);
+        }
+        // Draw the vertices
+        g2d.setColor(Color.BLACK); // Color for the vertices
         for (Point vertex : verticesMap.keySet()) {
             g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
-            // Dessiner le sommet
         }
     }
 
@@ -161,8 +232,13 @@ public class GameBoard {
     }
 
     public void drawBoard(Graphics g) {
+
         drawVertices(g);
         drawEdges(g);
+        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
+            CubeCoordinates cubeCoord = entry.getKey();
+            drawText(g, entry.getValue().getDiceValue() + "", layout.cubeToPixel(layout, cubeCoord));
+        }
     }
 
     public void draw(Graphics g) {
@@ -180,7 +256,7 @@ public class GameBoard {
             g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
                     (int) edge.getEnd().getX(),
                     (int) edge.getEnd().getY());
-        } catch (Exception e) { //probleme ici une erreur est catch disant edge null
+        } catch (Exception e) { // null seulement la première fois qu'on survole un hexagone
         }
     }
 
@@ -206,5 +282,28 @@ public class GameBoard {
                 this.closestEdge = closestEdge;
             }
         }
+    }
+
+    private void drawText(Graphics g, String text, Point center) {
+        if (text.equals("0")) {
+            return;
+        }
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(Color.BLUE); // Set the color of the text
+
+        // Set the font and size of the text
+        Font font = new Font("Arial", Font.PLAIN, 12);
+        g2d.setFont(font);
+
+        // Draw the text
+        FontMetrics fontMetrics = g2d.getFontMetrics(font);
+        int textWidth = fontMetrics.stringWidth(text);
+        int textHeight = fontMetrics.getHeight();
+
+        int startX = (int) center.getX() - textWidth / 2;
+        int startY = (int) center.getY() + textHeight / 2;
+
+        g2d.drawString(text, startX, startY);
     }
 }
