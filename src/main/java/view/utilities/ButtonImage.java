@@ -13,13 +13,15 @@ public class ButtonImage extends JButton {
     private Image buttonHover;
 
     public ButtonImage(String imagePath, String hoverImagePath, int xCoordBaseWidth,
-                       int yCoordBaseHeight, double scale, Runnable action) {
+                       int yCoordBaseHeight, double scale, Runnable action, MouseAdapter hoverEvent) {
         super();
-        initializeButton(imagePath, hoverImagePath, xCoordBaseWidth, yCoordBaseHeight, scale, action);
+        initializeButton(imagePath, hoverImagePath, xCoordBaseWidth, yCoordBaseHeight, scale,
+                action, hoverEvent);
     }
 
     private void initializeButton(String imagePath, String hoverImagePath, int xCoordBaseWidth,
-                                  int yCoordBaseHeight, double scale, Runnable action) {
+                                  int yCoordBaseHeight, double scale, Runnable action,
+                                  MouseAdapter hoverEvent) {
         try {
 
             // Coordonnées pour la résolution cible
@@ -55,11 +57,13 @@ public class ButtonImage extends JButton {
                     setIcon(new ImageIcon(buttonImage));
                 }
             });
+            addMouseListener(hoverEvent);
 
             addActionListener(e -> action.run());
 
             setPreferredSize(new Dimension(scaledWidth, scaledHeight));
             setBorderPainted(false);
+            setOpaque(false);
             setFocusPainted(false);
             setContentAreaFilled(false);
             setBounds(xCoord, yCoord, scaledWidth, scaledHeight);

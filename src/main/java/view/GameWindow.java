@@ -36,7 +36,6 @@ public class GameWindow extends JFrame {
         setLayout(new BorderLayout());
         //add(mainMenu, BorderLayout.CENTER);
         add(actionPlayer);
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(Constants.Game.WIDTH, Constants.Game.HEIGHT);
         setVisible(true);

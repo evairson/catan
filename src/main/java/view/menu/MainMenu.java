@@ -33,11 +33,11 @@ public class MainMenu extends JPanel {
     private void initializeButtons() {
         String basePath = "src/main/resources/";
         playBtn = new ButtonImage(basePath + "playButton.png", basePath + "playButtonHover.png",
-                500, 100, 1, this::startGame);
+                500, 100, 1, this::startGame, null);
         optionsBtn = new ButtonImage(basePath + "optionsButton.png", basePath + "optionsButtonHover.png",
-                550, 330, 1, this::startOptions);
+                550, 330, 1, this::startOptions, null);
         quitBtn = new ButtonImage(basePath + "quitButton.png", basePath + "quitButtonHover.png",
-                558, 450, 1, this::quitGame);
+                558, 450, 1, this::quitGame, null);
         add(playBtn);
         add(optionsBtn);
         add(quitBtn);
