@@ -26,6 +26,7 @@ public class ActionPlayerPanel extends JPanel {
     private ButtonImage colony;
     private ButtonImage road;
 
+    private ButtonImage plus;
 
     private ButtonImage card;
 
@@ -75,6 +76,9 @@ public class ActionPlayerPanel extends JPanel {
         road = new ButtonImage(basePath + "building/road.png", basePath + "building/road.png",
         1150, 220, 2, null);
 
+        plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
+        1160, 310, 8, null);
+
         add(wood);
         add(wool);
         add(ore);
@@ -84,6 +88,8 @@ public class ActionPlayerPanel extends JPanel {
         add(city);
         add(colony);
         add(road);
+
+        add(plus);
 
         add(tradeButton);
         add(endTurn);
