@@ -39,7 +39,6 @@ public class Game implements Runnable {
         Game.board = board;
     }
 
-
     public Game() {
         Player player1 = new Player(Player.Color.RED, "Player1");
         Player player2 = new Player(Player.Color.YELLOW, "Player2");
@@ -47,16 +46,15 @@ public class Game implements Runnable {
         Player player4 = new Player(Player.Color.GREEN, "Player4");
         players = new ListPlayers(0, player1, player2, player3, player4);
 
-
+        mainMenu = new MainMenu(this);
         gamePanel = new GamePanel(this);
         actionPlayer = new ActionPlayerPanel(this);
-        gameWindow = new GameWindow(gamePanel, actionPlayer);
+        gameWindow = new GameWindow(gamePanel, actionPlayer, mainMenu);
 
         playing = new Playing();
 
 
-        gamePanel.requestFocus();
-
+        mainMenu.requestFocus();
 
 
         startGameLoop();
@@ -74,6 +72,11 @@ public class Game implements Runnable {
     private void startGameLoop() {
         gameThread = new Thread(this);
         gameThread.start();
+    }
+
+    public void addPanels() {
+        actionPlayer.add(gamePanel);
+        gameWindow.add(actionPlayer);
     }
 
     public void update() {
@@ -115,7 +118,11 @@ public class Game implements Runnable {
             }
 
             if (deltaF >= 1) {
-//                gamePanel.repaint();
+                mainMenu.repaint();
+                actionPlayer.repaint();
+                gamePanel.repaint();
+                gameWindow.repaint();
+                gameWindow.revalidate();
                 deltaF--;
                 frames++;
             }

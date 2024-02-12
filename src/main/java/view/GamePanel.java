@@ -3,6 +3,7 @@ package view;
 import controler.KeyBoardInputs;
 import controler.MouseInputs;
 import model.Game;
+import others.Constants;
 
 import javax.swing.*;
 
@@ -25,6 +26,8 @@ public class GamePanel extends JPanel {
         addKeyListener(new KeyBoardInputs());
 
         setPanelSize();
+        setOpaque(true);
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
     }
 
     private void setPanelSize() {

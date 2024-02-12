@@ -3,6 +3,9 @@ package view.menu;
 import others.Constants;
 import view.utilities.ButtonImage;
 import javax.swing.*;
+
+import model.Game;
+
 import java.awt.*;
 
 public class MainMenu extends JPanel {
@@ -11,11 +14,15 @@ public class MainMenu extends JPanel {
     private JButton optionsBtn;
     private JButton quitBtn;
     private Image backgroundImage;
+    private Game game;
 
-    public MainMenu() {
+    public MainMenu(Game game) {
+        this.game = game;
         setLayout(null); // Disposer les boutons verticalement
         loadBackgroundImage("src/main/resources/mainMenu.png");
         initializeButtons();
+        setVisible(true);
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
     }
 
     private void loadBackgroundImage(String path) {
@@ -45,6 +52,9 @@ public class MainMenu extends JPanel {
 
     public void startGame() {
         System.out.println("Lancement du jeu...");
+        Container parent = getParent();
+        parent.remove(this);
+        game.addPanels();
     }
 
     public void startOptions() {

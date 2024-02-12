@@ -9,6 +9,7 @@ import java.lang.*;
 import java.io.IOException;
 
 import model.Game;
+import others.Constants;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
 
@@ -38,6 +39,8 @@ public class ActionPlayerPanel extends JPanel {
         this.game = game;
         setLayout(null);
         setOpaque(true);
+        setVisible(true);
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         try {
             createNamePlayer();
         } catch (IOException e) {
