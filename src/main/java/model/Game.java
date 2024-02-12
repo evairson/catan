@@ -1,6 +1,8 @@
 package model;
 
 import others.Constants;
+import others.ListPlayers;
+import view.ActionPlayerPanel;
 import view.GamePanel;
 import view.GameState;
 import view.GameWindow;
@@ -10,19 +12,50 @@ import java.awt.*;
 
 public class Game implements Runnable {
     private GamePanel gamePanel;
+    private ActionPlayerPanel actionPlayer;
     private GameWindow gameWindow;
     private Thread gameThread;
+    private static GameBoard board;
     private Playing playing;
     private MainMenu mainMenu;
 
+    private ListPlayers players; // ListPlayers extends ArrayList
+
+    // players has a currentPlayer not necessary to have an attribut for this.
+    public Player getCurrentPlayer() {
+        return players.getCurrentPlayer();
+    }
+
+    public ListPlayers getPlayers() {
+        return players;
+    }
+
+    public static GameBoard getBoard() {
+        return board;
+    }
+
+
+    public static void setBoard(GameBoard board) {
+        Game.board = board;
+    }
+
     public Game() {
+        Player player1 = new Player(Player.Color.RED, "Player1");
+        Player player2 = new Player(Player.Color.YELLOW, "Player2");
+        Player player3 = new Player(Player.Color.BLUE, "Player3");
+        Player player4 = new Player(Player.Color.GREEN, "Player4");
+        players = new ListPlayers(0, player1, player2, player3, player4);
+
+        mainMenu = new MainMenu(this);
         gamePanel = new GamePanel(this);
-        gameWindow = new GameWindow(gamePanel);
+        actionPlayer = new ActionPlayerPanel(this);
+        gameWindow = new GameWindow(gamePanel, actionPlayer, mainMenu);
 
         playing = new Playing();
 
 
-        gamePanel.requestFocus();
+        mainMenu.requestFocus();
+
 
         startGameLoop();
     }
@@ -39,6 +72,11 @@ public class Game implements Runnable {
     private void startGameLoop() {
         gameThread = new Thread(this);
         gameThread.start();
+    }
+
+    public void addPanels() {
+        actionPlayer.add(gamePanel);
+        gameWindow.add(actionPlayer);
     }
 
     public void update() {
@@ -80,7 +118,11 @@ public class Game implements Runnable {
             }
 
             if (deltaF >= 1) {
-//                gamePanel.repaint();
+                mainMenu.repaint();
+                actionPlayer.repaint();
+                gamePanel.repaint();
+                gameWindow.repaint();
+                gameWindow.revalidate();
                 deltaF--;
                 frames++;
             }
@@ -95,6 +137,11 @@ public class Game implements Runnable {
         }
     }
 
+    // Player action : -----------------
+
+    public void endTurn() {
+        players.next();
+    }
 
 }
 
