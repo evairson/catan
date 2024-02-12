@@ -42,9 +42,9 @@ public class Game implements Runnable {
 
     public Game() {
         Player player1 = new Player(Player.Color.RED, "Player1");
-        Player player2 = new Player(Player.Color.WHITE, "Player2");
+        Player player2 = new Player(Player.Color.YELLOW, "Player2");
         Player player3 = new Player(Player.Color.BLUE, "Player3");
-        Player player4 = new Player(Player.Color.ORANGE, "Player4");
+        Player player4 = new Player(Player.Color.GREEN, "Player4");
         players = new ListPlayers(0, player1, player2, player3, player4);
 
 

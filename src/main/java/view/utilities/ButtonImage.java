@@ -13,13 +13,13 @@ public class ButtonImage extends JButton {
     private Image buttonHover;
 
     public ButtonImage(String imagePath, String hoverImagePath, int xCoordBaseWidth,
-                       int yCoordBaseHeight, Runnable action) {
+                       int yCoordBaseHeight, double scale, Runnable action) {
         super();
-        initializeButton(imagePath, hoverImagePath, xCoordBaseWidth, yCoordBaseHeight, action);
+        initializeButton(imagePath, hoverImagePath, xCoordBaseWidth, yCoordBaseHeight, scale, action);
     }
 
     private void initializeButton(String imagePath, String hoverImagePath, int xCoordBaseWidth,
-                                  int yCoordBaseHeight, Runnable action) {
+                                  int yCoordBaseHeight, double scale, Runnable action) {
         try {
 
             // Coordonnées pour la résolution cible
@@ -27,7 +27,7 @@ public class ButtonImage extends JButton {
             int yCoord = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight)[1];
 
             // Nouveau diviseur pour la résolution cible
-            double divider = Resolution.divider();
+            double divider = scale * Resolution.divider();
 
             // Charger l'image originale pour obtenir ses dimensions
             Image originalImage = ImageIO.read(new File(imagePath));

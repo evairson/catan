@@ -10,9 +10,9 @@ public class Player {
 
     public enum Color {
         RED,
-        WHITE,
+        YELLOW,
         BLUE,
-        ORANGE
+        GREEN
     }
 
     private Color color;
@@ -46,6 +46,16 @@ public class Player {
 
     public Color getColor() {
         return color;
+    }
+
+    public String getColorString() {
+        switch (color) {
+            case GREEN : return "Green";
+            case BLUE : return "Blue";
+            case RED : return "Red";
+            case YELLOW : return "Yellow";
+            default : return "none";
+        }
     }
 
     public void setColor(Color c) {
