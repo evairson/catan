@@ -34,7 +34,7 @@ public class GameWindow extends JFrame {
         } //full useless si un écran :)
 
         this.mainMenu = mainMenu;
-        setLayout(null);
+        setLayout(new BorderLayout());
         add(mainMenu);
         //add(actionPlayer, BorderLayout.CENTER);
         //GameBoard board = new GameBoard(null);
