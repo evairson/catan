@@ -101,7 +101,7 @@ public class ActionPlayerPanel extends JPanel {
         1150, 220, 2, null, null);
 
         plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
-        1160, 310, 8, null, null);
+        1160, 310, 8, this::buy, null);
 
 //        add(wood);
 //        add(wool);
@@ -140,7 +140,12 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void trade() {
-        // A remplir
+        // TODO : A remplir
+    }
+
+    private void buy() {
+        game.getCurrentPlayer().createOrBuy();
+        // TODO : à remplir
     }
 
     private void createNamePlayer() throws IOException {
