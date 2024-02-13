@@ -11,6 +11,7 @@ import java.lang.*;
 import java.io.IOException;
 
 import model.Game;
+import others.Constants;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
@@ -39,6 +40,7 @@ public class ActionPlayerPanel extends JPanel {
 
 
     public ActionPlayerPanel(Game game) {
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         this.game = game;
         setLayout(null);
         setOpaque(true);

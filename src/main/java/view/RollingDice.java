@@ -3,28 +3,31 @@ package view;
 import view.utilities.ImgService;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import others.Constants;
+
 import java.util.Random;
 
 public class RollingDice extends JPanel {
 
     public RollingDice() {
         setLayout(null);
-
-
+        setOpaque(true);
+        setSize(500, 500);
         JLabel diceOneImg = ImgService.loadImage("/view/dice/d1b.png");
-        diceOneImg.setBounds(43, 45, 64, 64);
+        diceOneImg.setBounds(0, 45, 64, 64);
         this.add(diceOneImg);
 
         JLabel diceTwoImg = ImgService.loadImage("/view/dice/d1r.png");
-        diceTwoImg.setBounds(178, 45, 64, 64);
+        diceTwoImg.setBounds(90, 45, 64, 64);
         this.add(diceTwoImg);
+
+        setBounds(Constants.Game.WIDTH - 230, Constants.Game.HEIGHT - 400, 250, 250);
 
 
         Random rand = new Random();
         JButton rollButton = new JButton("Roll!");
-        rollButton.setBounds(90, 200, 100, 25);
+        rollButton.setBounds(26, 135, 100, 25);
         rollButton.addActionListener(actionEvent -> {
             rollButton.setEnabled(false);
 

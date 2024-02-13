@@ -6,6 +6,7 @@ import view.ActionPlayerPanel;
 import view.GamePanel;
 import view.GameState;
 import view.GameWindow;
+import view.RollingDice;
 import view.menu.MainMenu;
 
 import java.awt.*;
@@ -74,6 +75,8 @@ public class Game implements Runnable {
     }
 
     public void addPanels() {
+        RollingDice dice = new RollingDice();
+        actionPlayer.add(dice);
         actionPlayer.add(gamePanel);
         gameWindow.add(actionPlayer);
     }
