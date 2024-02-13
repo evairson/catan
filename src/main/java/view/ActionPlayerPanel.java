@@ -10,6 +10,7 @@ import java.lang.*;
 
 import java.io.IOException;
 
+import model.App;
 import model.Game;
 import others.Constants;
 import view.utilities.Animation;
@@ -35,13 +36,17 @@ public class ActionPlayerPanel extends JPanel {
     private ButtonImage card;
 
     private JLabel namePlayer;
+    private App app;
     private Game game;
     private ResourcesPanel resourcesPanel;
 
 
-    public ActionPlayerPanel(Game game) {
+    public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
-        this.game = game;
+        this.app = app;
+        game = app.getGame();
+
+
         setLayout(null);
         setOpaque(true);
         try {
