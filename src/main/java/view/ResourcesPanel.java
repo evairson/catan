@@ -16,8 +16,7 @@ public class ResourcesPanel extends JPanel {
 
     public ResourcesPanel(MouseAdapter animMouse) {
         this.animMouse = animMouse;
-        setLayout(null); // Utiliser null layout pour un positionnement manuel
-//        setBackground(Color.RED);
+        setLayout(null);
         createResourceButtons();
     }
 
