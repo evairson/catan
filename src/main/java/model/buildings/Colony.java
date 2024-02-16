@@ -10,17 +10,14 @@ public class Colony extends Building {
     private boolean isCity = false;
     private boolean isPort = false;
 
-    private Point p;
 
     private ArrayList<Resources> costColony; //dans l'ordre
     private ArrayList<Resources> costCity;
 
-    public Colony(Point p) {
-        this.p = p;
+    public Colony() {
     }
 
-    public Colony(Point p, Boolean isCity, boolean isPort) {
-        this(p);
+    public Colony( Boolean isCity, boolean isPort) {
         this.isCity = isCity;
         this.isPort = isPort;
     }
@@ -44,9 +41,9 @@ public class Colony extends Building {
         return costColony;
     }
 
-    public boolean buy(Player player, Point p, boolean isCity) {
+    public boolean buy(Player player, boolean isCity) {
         if (super.buy(player, getCost(isCity))) {
-            Colony colony = new Colony(p, isCity, false);
+            Colony colony = new Colony( isCity, false);
             //faudrait check si c'est un port aussi là
             player.getBuildings().add(colony);
             return true;
