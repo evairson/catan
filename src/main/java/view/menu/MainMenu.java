@@ -4,7 +4,7 @@ import others.Constants;
 import view.utilities.ButtonImage;
 import javax.swing.*;
 
-import model.Game;
+import model.App;
 
 import java.awt.*;
 
@@ -14,10 +14,10 @@ public class MainMenu extends JPanel {
     private JButton optionsBtn;
     private JButton quitBtn;
     private Image backgroundImage;
-    private Game game;
+    private App app;
 
-    public MainMenu(Game game) {
-        this.game = game;
+    public MainMenu(App app) {
+        this.app = app;
         setLayout(null); // Disposer les boutons verticalement
         loadBackgroundImage("src/main/resources/mainMenu.png");
         initializeButtons();
@@ -40,28 +40,28 @@ public class MainMenu extends JPanel {
     private void initializeButtons() {
         String basePath = "src/main/resources/";
         playBtn = new ButtonImage(basePath + "playButton.png", basePath + "playButtonHover.png",
-                500, 100, 1, this::startGame, null);
+                500, 100, 1, this::startapp, null);
         optionsBtn = new ButtonImage(basePath + "optionsButton.png", basePath + "optionsButtonHover.png",
                 550, 330, 1, this::startOptions, null);
         quitBtn = new ButtonImage(basePath + "quitButton.png", basePath + "quitButtonHover.png",
-                558, 450, 1, this::quitGame, null);
+                558, 450, 1, this::quitapp, null);
         add(playBtn);
         add(optionsBtn);
         add(quitBtn);
     }
 
-    public void startGame() {
+    public void startapp() {
         System.out.println("Lancement du jeu...");
         Container parent = getParent();
         parent.remove(this);
-        game.addPanels();
+        app.addPanels();
     }
 
     public void startOptions() {
         System.out.println("Options du jeu...");
     }
 
-    public void quitGame() {
+    public void quitapp() {
         System.exit(0);
     }
 }
