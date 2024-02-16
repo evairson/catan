@@ -3,6 +3,8 @@ package model;
 import java.util.ArrayList;
 
 import model.buildings.Building;
+import model.cards.CardStack;
+import model.cards.DevelopmentCard;
 import model.resources.Resources;
 
 public class Player {
@@ -24,7 +26,7 @@ public class Player {
     private ArrayList<Resources> resources;
 
 
-    // private ArrayList<Card> cardsDev;
+    private ArrayList<DevelopmentCard> cardsDev;
     private ArrayList<Building> buildings;
 
     public Player(Color c, String name) {
@@ -32,6 +34,7 @@ public class Player {
         this.name = name;
         resources = new ArrayList<>();
         buildings = new ArrayList<>();
+        cardsDev = new ArrayList<>();
     }
 
 // Getter / Setter :  ---------------
@@ -82,7 +85,16 @@ public class Player {
         return resources;
     }
 
+    public ArrayList<DevelopmentCard> getCardsDev() {
+        return cardsDev;
+    }
+
+    public void setCardsDev(ArrayList<DevelopmentCard> cardsDev) {
+        this.cardsDev = cardsDev;
+    }
+
 // ------------------------------------
+
 
     public void throwDice1() {
         dice1 = (int) (Math.random() * NUMBER_DICE); // (max-min+1)*min
@@ -107,6 +119,10 @@ public class Player {
 
     public void changeWith(Player p) {
         // TODO :
+    }
+
+    public void drawCard(CardStack stack) {
+        cardsDev.add(stack.getCardStack().pop());
     }
 
 }

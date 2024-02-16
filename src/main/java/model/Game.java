@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import model.cards.CardStack;
 import model.geometry.Layout;
 import model.geometry.Point;
 import others.Constants;
@@ -12,6 +13,7 @@ import others.ListPlayers;
 public class Game implements StateMethods {
     private static GameBoard board;
     private ListPlayers players; // ListPlayers extends ArrayList
+    private CardStack stack;
 
     Game() {
         Player player1 = new Player(Player.Color.RED, "Player1");
@@ -25,8 +27,12 @@ public class Game implements StateMethods {
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
         board = new GameBoard(layout);
 
+        stack = new CardStack();
     }
 
+    public CardStack getStack() {
+        return stack;
+    }
 
     public void endTurn() {
         players.next();
