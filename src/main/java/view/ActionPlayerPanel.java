@@ -40,6 +40,7 @@ public class ActionPlayerPanel extends JPanel {
     private Game game;
     private ResourcesPanel resourcesPanel;
 
+    private JPanel cardsPanel;
     private JPanel cardPanel;
 
 
@@ -99,7 +100,7 @@ public class ActionPlayerPanel extends JPanel {
 //             600, 550, 2, null);
 
         card = new ButtonImage(basePath + "card.png", basePath + "card.png",
-        770, 560, 3, this::addCardPanel, null);
+        770, 560, 3, this::addcardsPanel, null);
 
 
         city = new ButtonImage(basePath + "building/city.png", basePath + "building/city.png",
@@ -109,8 +110,8 @@ public class ActionPlayerPanel extends JPanel {
         road = new ButtonImage(basePath + "building/road.png", basePath + "building/road.png",
         1150, 220, 2, null, null);
 
-        plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
-        1160, 310, 8, this::drawCard, null);
+        plus = new ButtonImage(basePath + "card.png", basePath + "card.png",
+        1170, 310, 5, this::drawCard, null);
 
 //        add(wood);
 //        add(wool);
@@ -157,16 +158,45 @@ public class ActionPlayerPanel extends JPanel {
         // TODO : à remplir
     }
 
-    private void addCardPanel() {
-        cardPanel = new JPanel();
-        cardPanel.setLayout(null);
-        cardPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+    private void addcardsPanel() {
+        cardsPanel = new JPanel();
+        cardsPanel.setLayout(null);
+        cardsPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         String basePath = "src/main/resources/";
         for (int i = 0; i < game.getCurrentPlayer().getCardsDev().size(); i++) {
             ButtonImage b = new ButtonImage(basePath + "card.png", basePath + "card.png",
                 300 + i * 100, 310, 2, this::useCard, null);
-            cardPanel.add(b);
+            cardsPanel.add(b);
         }
+        JPanel self = this;
+        cardsPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                self.remove(cardsPanel);
+                repaint();
+                revalidate();
+            }
+        });
+        cardsPanel.setOpaque(false);
+        add(cardsPanel, 10);
+        repaint();
+        revalidate();
+
+    }
+
+    private void useCard() {
+        // TODO :
+    }
+
+    private void drawCard() {
+        game.getCurrentPlayer().drawCard(game.getStack());
+        cardPanel = new JPanel();
+        cardPanel.setLayout(null);
+        cardPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+        String basePath = "src/main/resources/";
+        ButtonImage b = new ButtonImage(basePath + "card.png", basePath + "card.png",
+            600, 310, 2, this::useCard, null);
+        cardPanel.add(b);
         JPanel self = this;
         cardPanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -180,15 +210,6 @@ public class ActionPlayerPanel extends JPanel {
         add(cardPanel, 10);
         repaint();
         revalidate();
-
-    }
-
-    private void useCard() {
-        // TODO :
-    }
-
-    private void drawCard() {
-        game.getCurrentPlayer().drawCard(game.getStack());
     }
 
     private void createNamePlayer() throws IOException {
