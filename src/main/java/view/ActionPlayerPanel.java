@@ -159,6 +159,9 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void addcardsPanel() {
+        if (cardsPanel != null) {
+            remove(cardsPanel);
+        }
         cardsPanel = new JPanel();
         cardsPanel.setLayout(null);
         cardsPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -173,6 +176,7 @@ public class ActionPlayerPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 self.remove(cardsPanel);
+                cardsPanel = null;
                 repaint();
                 revalidate();
             }
@@ -190,6 +194,9 @@ public class ActionPlayerPanel extends JPanel {
 
     private void drawCard() {
         game.getCurrentPlayer().drawCard(game.getStack());
+        if (cardPanel != null) {
+            remove(cardPanel);
+        }
         cardPanel = new JPanel();
         cardPanel.setLayout(null);
         cardPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -202,6 +209,7 @@ public class ActionPlayerPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 self.remove(cardPanel);
+                cardPanel = null;
                 repaint();
                 revalidate();
             }
