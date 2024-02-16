@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import model.App;
 import model.Game;
+import model.Player;
 import others.Constants;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
@@ -42,6 +43,7 @@ public class ActionPlayerPanel extends JPanel {
 
     private JPanel cardsPanel;
     private JPanel cardPanel;
+    private JPanel playersPanel;
 
 
     public ActionPlayerPanel(App app) {
@@ -53,10 +55,12 @@ public class ActionPlayerPanel extends JPanel {
         setLayout(null);
         setOpaque(true);
         try {
-            createNamePlayer();
+            createNamePlayer(game.getCurrentPlayer(), namePlayer, 1000, 570);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        createPlayerPanel();
 
         Animation animate = new Animation();
         int xCoord = Resolution.calculateResolution(200, 650)[0];
@@ -146,6 +150,7 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        revalidate();
         repaint();
     }
 
@@ -220,21 +225,39 @@ public class ActionPlayerPanel extends JPanel {
         revalidate();
     }
 
-    private void createNamePlayer() throws IOException {
+    private void createNamePlayer(Player player, JLabel label, int x1, int y1) throws IOException {
         String src = "src/main/resources/pion/pion";
-        String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
+        String imagePath = src + player.getColorString() + ".png";
         Image origiImg = ImageIO.read(new File(imagePath));
         int scale = (int) (40 / Resolution.divider());
         Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
-        String text = game.getCurrentPlayer().getName().toUpperCase();
-        namePlayer = new JLabel(" " + text, new ImageIcon(buttonImage), JLabel.CENTER);
-        namePlayer.setVerticalTextPosition(JLabel.CENTER);
-        namePlayer.setHorizontalTextPosition(JLabel.RIGHT);
+        String text = player.getName().toUpperCase();
+        label = new JLabel(" " + text, new ImageIcon(buttonImage), JLabel.CENTER);
+        label.setVerticalTextPosition(JLabel.CENTER);
+        label.setHorizontalTextPosition(JLabel.RIGHT);
 
-        namePlayer.setFont(new Font("SansSerif", Font.BOLD, scale));
-        double x = Resolution.calculateResolution(1000, 570)[0];
-        double y = Resolution.calculateResolution(1000, 570)[1];
-        namePlayer.setBounds((int) x, (int) y, (int) (scale * 10), (int) (scale * 1.2));
-        add(namePlayer);
+        label.setFont(new Font("SansSerif", Font.BOLD, scale));
+        double x = Resolution.calculateResolution(x1, y1)[0];
+        double y = Resolution.calculateResolution(x1, y1)[1];
+        label.setBounds((int) x, (int) y, (int) (scale * 10), (int) (scale * 1.2));
+        add(label);
+    }
+
+    private void createPlayerPanel() {
+        playersPanel = new JPanel();
+        playersPanel.setLayout(null);
+        int x = Resolution.calculateResolution(30, 10)[0];
+        int y = Resolution.calculateResolution(30, 10)[1];
+        playersPanel.setBounds(x, y, (int) (2000 / Resolution.divider()), (int) (100 / Resolution.divider()));
+        for (int i = 0; i < game.getPlayers().size(); i++) {
+            JLabel panel = new JLabel();
+            try {
+                createNamePlayer(game.getPlayers().get(i), panel, i * 200, 20);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            playersPanel.add(panel);
+        }
+        add(playersPanel);
     }
 }
