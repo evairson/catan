@@ -2,8 +2,10 @@ package model;
 
 import java.util.ArrayList;
 
-import model.buildings.Building;
+import model.buildings.*;
 import model.resources.Resources;
+import model.tiles.TileEdge;
+import model.tiles.TileVertex;
 
 public class Player {
     static final int NUMBER_DICE = 7;
@@ -23,7 +25,6 @@ public class Player {
     // private Coordonnee cord;
     private ArrayList<Resources> resources;
 
-
     // private ArrayList<Card> cardsDev;
     private ArrayList<Building> buildings;
 
@@ -34,7 +35,7 @@ public class Player {
         buildings = new ArrayList<>();
     }
 
-// Getter / Setter :  ---------------
+    // Getter / Setter : ---------------
 
     public String getName() {
         return name;
@@ -50,11 +51,16 @@ public class Player {
 
     public String getColorString() {
         switch (color) {
-            case GREEN : return "Green";
-            case BLUE : return "Blue";
-            case RED : return "Red";
-            case YELLOW : return "Yellow";
-            default : return "none";
+            case GREEN:
+                return "Green";
+            case BLUE:
+                return "Blue";
+            case RED:
+                return "Red";
+            case YELLOW:
+                return "Yellow";
+            default:
+                return "none";
         }
     }
 
@@ -82,7 +88,7 @@ public class Player {
         return resources;
     }
 
-// ------------------------------------
+    // ------------------------------------
 
     public void throwDice1() {
         dice1 = (int) (Math.random() * NUMBER_DICE); // (max-min+1)*min
@@ -97,7 +103,21 @@ public class Player {
         throwDice2();
     }
 
-    public void placeBuilding() {
+    public void placeBuilding(TileVertex vertex) {
+        // TODO :
+    }
+
+    public void buildRoad(TileEdge edge) {
+        if (edge.getBuilding() == null) {
+            edge.setBuilding(new Road(edge, color));
+        }
+    }
+
+    public void buildColony(TileVertex vertex) {
+        // TODO :
+    }
+
+    public void buildCity(TileVertex vertex) {
         // TODO :
     }
 

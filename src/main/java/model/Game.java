@@ -7,6 +7,8 @@ import view.GamePanel;
 import view.GameState;
 import view.GameWindow;
 import view.menu.MainMenu;
+import model.tiles.TileEdge;
+import model.tiles.TileVertex;
 
 import java.awt.*;
 
@@ -34,7 +36,6 @@ public class Game implements Runnable {
         return board;
     }
 
-
     public static void setBoard(GameBoard board) {
         Game.board = board;
     }
@@ -52,12 +53,38 @@ public class Game implements Runnable {
         gameWindow = new GameWindow(gamePanel, actionPlayer, mainMenu);
 
         playing = new Playing();
-
+        board = playing.getBoard();
 
         mainMenu.requestFocus();
 
-
         startGameLoop();
+    }
+
+    public void buildCity() {
+        board.setLookingForVertex(!board.isLookingForVertex());
+        if (board.isLookingForVertex()) {
+            TileVertex cVertex = board.getClosestTileVertex();
+            getCurrentPlayer().buildCity(cVertex);
+        }
+    }
+
+    public void buildColony() {
+        board.setLookingForVertex(!board.isLookingForVertex());
+        if (board.isLookingForVertex()) {
+            
+            TileVertex cVertex = board.getClosestTileVertex();
+            getCurrentPlayer().buildColony(cVertex);
+        }
+    }
+
+    public void buildRoad() {
+        if (board.isLookingForVertex())
+            board.setLookingForVertex(!board.isLookingForVertex());
+        board.setLookingForEdge(!board.isLookingForEdge());
+        if (board.isLookingForEdge()) {
+            TileEdge cEdge = board.getClosestTileEdge();
+            getCurrentPlayer().buildRoad(cEdge);
+        }
     }
 
     public Playing getPlaying() {

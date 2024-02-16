@@ -4,6 +4,7 @@ import model.Player;
 import model.resources.Resources;
 
 import java.util.ArrayList;
+import java.awt.*;
 
 public abstract class Building {
     private Player owner;
@@ -23,6 +24,21 @@ public abstract class Building {
         return true;
     }
 
+    public Color getColorInAwt() {
+        switch (owner.getColor()) {
+            case RED:
+                return Color.RED;
+            case YELLOW:
+                return Color.YELLOW;
+            case BLUE:
+                return Color.BLUE;
+            case GREEN:
+                return Color.GREEN;
+            default:
+                return Color.BLACK;
+        }
+    }
+
     public boolean buy(Player player, ArrayList<Resources> cost) {
         if (buyable(player, cost)) {
             for (int i = 0; i < cost.size(); i++) {
@@ -33,4 +49,3 @@ public abstract class Building {
         return false;
     }
 }
-

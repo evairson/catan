@@ -19,6 +19,10 @@ public class Playing implements StateMethods {
 
     }
 
+    public GameBoard getBoard() {
+        return board;
+    }
+
     public void draw(Graphics g) {
         board.draw(g);
     }
@@ -37,6 +41,9 @@ public class Playing implements StateMethods {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (board.isLookingForVertex()) {
+            
+        }
     }
 
     @Override

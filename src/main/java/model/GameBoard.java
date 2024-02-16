@@ -32,12 +32,53 @@ public class GameBoard {
     private Point mousePosition;
     private double minDistanceToVertex;
 
+    private boolean lookingForVertex = false;
+    private boolean lookingForEdge = false;
+    TileVertex closestTileVertex = new TileVertex();
+    TileEdge closestTileEdge = new TileEdge();
+
     public GameBoard(Layout layout) {
         board = new HashMap<CubeCoordinates, Tile>();
         this.layout = layout;
         this.initialiseBoard();
         // rendre la centre et la taille de la grille dynamique
 
+    }
+
+    public TileVertex getClosestTileVertex() {
+        return closestTileVertex;
+    }
+
+    public TileEdge getClosestTileEdge() {
+        return closestTileEdge;
+    }
+
+    public void setClosestTileVertex(TileVertex closestTileVertex) {
+        this.closestTileVertex = closestTileVertex;
+    }
+
+    public void setClosestTileEdge(TileEdge closestTileEdge) {
+        this.closestTileEdge = closestTileEdge;
+    }
+
+    public void setLookingForVertex(boolean lookingForVertex) {
+        this.lookingForVertex = lookingForVertex;
+    }
+
+    public void setLookingForEdge(boolean lookingForEdge) {
+        this.lookingForEdge = lookingForEdge;
+    }
+
+    public void setGridSize(int gridSize) {
+        this.gridSize = gridSize;
+    }
+
+    public boolean isLookingForVertex() {
+        return lookingForVertex;
+    }
+
+    public boolean isLookingForEdge() {
+        return lookingForEdge;
     }
 
     public void addTile(Tile t) {
@@ -93,7 +134,7 @@ public class GameBoard {
                     presetTileDiceValue++;
 
                     System.out.println("Tile (" + q + ", " + r + ", " + s + "), Ressource Type: "
-                        + tileResourceType + " added to the board");
+                            + tileResourceType + " added to the board");
                 }
             }
         }
@@ -225,6 +266,10 @@ public class GameBoard {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK); // Couleur des arêtes
         for (TileEdge edge : edgesMap.values()) {
+            if (edge.getBuilding() != null) {
+                g2d.setColor(edge.getBuilding().getColorInAwt());
+                g2d.setStroke(new BasicStroke(6));
+            }
             g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
                     (int) edge.getEnd().getX(),
                     (int) edge.getEnd().getY()); // Dessiner l'arête
@@ -266,22 +311,41 @@ public class GameBoard {
         minDistanceToEdge = Double.MAX_VALUE;
         closestVertex = null;
         closestEdge = null;
-        for (Point vertex : this.verticesMap.keySet()) {
-            double distance = vertex.distance(mousePosition);
-            if (distance < minDistanceToVertex) {
-                minDistanceToVertex = distance;
-                closestVertex = vertex;
-                this.closestVertex = closestVertex;
-            }
+
+        if (lookingForVertex) {
+            closestTileVertex = findClosestVertex();
+        } else if (lookingForEdge) {
+            closestTileEdge = findClosestEdge();
         }
+
+    }
+
+    public TileEdge findClosestEdge() {
+        TileEdge closestTileEdge = new TileEdge();
         for (Point edge : this.edgesMap.keySet()) {
             double distance = edge.distance(mousePosition);
             if (distance < minDistanceToEdge) {
                 minDistanceToEdge = distance;
                 closestEdge = edge;
                 this.closestEdge = closestEdge;
+                closestTileEdge = this.edgesMap.get(edge);
             }
         }
+        return closestTileEdge;
+    }
+
+    public TileVertex findClosestVertex() {
+        TileVertex closestTileVertex = new TileVertex();
+        for (Point vertex : this.verticesMap.keySet()) {
+            double distance = vertex.distance(mousePosition);
+            if (distance < minDistanceToVertex) {
+                minDistanceToVertex = distance;
+                closestVertex = vertex;
+                this.closestVertex = closestVertex;
+                closestTileVertex = this.verticesMap.get(vertex);
+            }
+        }
+        return this.verticesMap.get(this.closestVertex);
     }
 
     private void drawText(Graphics g, String text, Point center) {
