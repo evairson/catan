@@ -138,21 +138,6 @@ public class ActionPlayerPanel extends JPanel {
         update();
     }
 
-    private void update() {
-        namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
-        try {
-            String src = "src/main/resources/pion/pion";
-            String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
-            Image origiImg = ImageIO.read(new File(imagePath));
-            Image buttonImage = origiImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-            namePlayer.setIcon(new ImageIcon(buttonImage));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        revalidate();
-        repaint();
-    }
-
     private void trade() {
         // TODO : A remplir
     }
@@ -252,7 +237,9 @@ public class ActionPlayerPanel extends JPanel {
                 int scale = (int) (40 / Resolution.divider());
                 Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
                 String text = game.getPlayers().get(i).getName().toUpperCase();
-                panel = new JLabel(" " + text, new ImageIcon(buttonImage), JLabel.CENTER);
+                Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
+                String textUnderligne = player ? "<html><u> " + text + "</u></html>"  : " " + text;
+                panel = new JLabel(textUnderligne, new ImageIcon(buttonImage), JLabel.CENTER);
                 panel.setVerticalTextPosition(JLabel.CENTER);
                 panel.setHorizontalTextPosition(JLabel.RIGHT);
                 panel.setFont(new Font("SansSerif", Font.BOLD, scale));
@@ -266,4 +253,26 @@ public class ActionPlayerPanel extends JPanel {
         }
         add(playersPanel);
     }
+
+    private void update() {
+        namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
+        for (int i = 0; i < game.getPlayers().size(); i++) {
+            String text = game.getPlayers().get(i).getName().toUpperCase();
+            Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
+            String textUnderligne = player ? "<html><u>" + text + "</u></html>"  : " " + text;
+            ((JLabel) playersPanel.getComponents()[i]).setText(textUnderligne);
+        }
+        try {
+            String src = "src/main/resources/pion/pion";
+            String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
+            Image origiImg = ImageIO.read(new File(imagePath));
+            Image buttonImage = origiImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+            namePlayer.setIcon(new ImageIcon(buttonImage));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        revalidate();
+        repaint();
+    }
+
 }
