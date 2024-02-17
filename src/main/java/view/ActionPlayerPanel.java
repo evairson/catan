@@ -12,6 +12,9 @@ import java.io.IOException;
 
 import model.App;
 import model.Game;
+import model.cards.DevelopmentCard;
+import model.cards.KnightCard;
+import model.cards.ProgessCard;
 import others.Constants;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
@@ -151,8 +154,9 @@ public class ActionPlayerPanel extends JPanel {
         cardsPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         String basePath = "src/main/resources/";
         for (int i = 0; i < game.getCurrentPlayer().getCardsDev().size(); i++) {
-            ButtonImage b = new ButtonImage(basePath + "card.png", basePath + "card.png",
-                300 + i * 100, 310, 2, this::useCard, null);
+            String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(i));
+            ButtonImage b = new ButtonImage(basePath + card, basePath + card,
+                300 + i * 100, 250, 1.5, this::useCard, null);
             cardsPanel.add(b);
         }
         JPanel self = this;
@@ -176,6 +180,16 @@ public class ActionPlayerPanel extends JPanel {
         // TODO :
     }
 
+    private String cardImageUrl(DevelopmentCard card) {
+        if (card instanceof KnightCard) {
+            return "cards/knight.png";
+        } else if (card instanceof ProgessCard) {
+            return "cards/progress.png";
+        } else {
+            return "cards/point.png";
+        }
+    }
+
     private void drawCard() {
         game.getCurrentPlayer().drawCard(game.getStack());
         if (cardPanel != null) {
@@ -185,12 +199,15 @@ public class ActionPlayerPanel extends JPanel {
         cardPanel.setLayout(null);
         cardPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         String basePath = "src/main/resources/";
-        ButtonImage b = new ButtonImage(basePath + "card.png", basePath + "card.png",
-            600, 310, 2, this::useCard, null);
+        int last = game.getCurrentPlayer().getCardsDev().size();
+        String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(last - 1));
+        ButtonImage b = new ButtonImage(basePath + card, basePath + card,
+            600, 250, 1.5, this::useCard, null);
         cardPanel.add(b);
         JPanel self = this;
         cardPanel.addMouseListener(new MouseAdapter() {
             @Override
+
             public void mouseClicked(MouseEvent e) {
                 self.remove(cardPanel);
                 cardPanel = null;
