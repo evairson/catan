@@ -12,7 +12,6 @@ import java.io.IOException;
 
 import model.App;
 import model.Game;
-import model.Player;
 import others.Constants;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
@@ -55,7 +54,7 @@ public class ActionPlayerPanel extends JPanel {
         setLayout(null);
         setOpaque(true);
         try {
-            createNamePlayer(game.getCurrentPlayer(), namePlayer, 1000, 570);
+            createNamePlayer();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -158,11 +157,6 @@ public class ActionPlayerPanel extends JPanel {
         // TODO : A remplir
     }
 
-    private void buy() {
-        game.getCurrentPlayer().createOrBuy();
-        // TODO : à remplir
-    }
-
     private void addcardsPanel() {
         if (cardsPanel != null) {
             remove(cardsPanel);
@@ -225,22 +219,22 @@ public class ActionPlayerPanel extends JPanel {
         revalidate();
     }
 
-    private void createNamePlayer(Player player, JLabel label, int x1, int y1) throws IOException {
+    private void createNamePlayer() throws IOException {
         String src = "src/main/resources/pion/pion";
-        String imagePath = src + player.getColorString() + ".png";
+        String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
         Image origiImg = ImageIO.read(new File(imagePath));
         int scale = (int) (40 / Resolution.divider());
         Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
-        String text = player.getName().toUpperCase();
-        label = new JLabel(" " + text, new ImageIcon(buttonImage), JLabel.CENTER);
-        label.setVerticalTextPosition(JLabel.CENTER);
-        label.setHorizontalTextPosition(JLabel.RIGHT);
+        String text = game.getCurrentPlayer().getName().toUpperCase();
+        namePlayer = new JLabel(" " + text, new ImageIcon(buttonImage), JLabel.CENTER);
+        namePlayer.setVerticalTextPosition(JLabel.CENTER);
+        namePlayer.setHorizontalTextPosition(JLabel.RIGHT);
 
-        label.setFont(new Font("SansSerif", Font.BOLD, scale));
-        double x = Resolution.calculateResolution(x1, y1)[0];
-        double y = Resolution.calculateResolution(x1, y1)[1];
-        label.setBounds((int) x, (int) y, (int) (scale * 10), (int) (scale * 1.2));
-        add(label);
+        namePlayer.setFont(new Font("SansSerif", Font.BOLD, scale));
+        double x = Resolution.calculateResolution(1000, 570)[0];
+        double y = Resolution.calculateResolution(1000, 570)[1];
+        namePlayer.setBounds((int) x, (int) y, (int) (scale * 10), (int) (scale * 1.2));
+        add(namePlayer);
     }
 
     private void createPlayerPanel() {
@@ -252,7 +246,19 @@ public class ActionPlayerPanel extends JPanel {
         for (int i = 0; i < game.getPlayers().size(); i++) {
             JLabel panel = new JLabel();
             try {
-                createNamePlayer(game.getPlayers().get(i), panel, i * 200, 20);
+                String src = "src/main/resources/pion/pion";
+                String imagePath = src + game.getPlayers().get(i).getColorString() + ".png";
+                Image origiImg = ImageIO.read(new File(imagePath));
+                int scale = (int) (40 / Resolution.divider());
+                Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
+                String text = game.getPlayers().get(i).getName().toUpperCase();
+                panel = new JLabel(" " + text, new ImageIcon(buttonImage), JLabel.CENTER);
+                panel.setVerticalTextPosition(JLabel.CENTER);
+                panel.setHorizontalTextPosition(JLabel.RIGHT);
+                panel.setFont(new Font("SansSerif", Font.BOLD, scale));
+                double x1 = Resolution.calculateResolution(i * 200, 20)[0];
+                double y1 = Resolution.calculateResolution(i * 200, 20)[1];
+                panel.setBounds((int) x1, (int) y1, (int) (scale * 10), (int) (scale * 1.2));
             } catch (IOException e) {
                 e.printStackTrace();
             }
