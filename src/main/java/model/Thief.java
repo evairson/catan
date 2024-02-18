@@ -1,7 +1,9 @@
 package model;
 
+import model.tiles.Tile;
+
 public class Thief {
-    // private Coordonnee cord;
+    private Tile tile;
     private boolean onDesert;
 
     Thief() {
@@ -14,6 +16,14 @@ public class Thief {
 
     public boolean isOnDesert() {
         return onDesert;
+    }
+
+    public Tile getTile() {
+        return tile;
+    }
+
+    public void setTile(Tile tile) {
+        this.tile = tile;
     }
 
 

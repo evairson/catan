@@ -31,13 +31,19 @@ public class GameBoard {
     private double minDistanceToEdge;
     private Point mousePosition;
     private double minDistanceToVertex;
+    private Thief thief;
 
-    public GameBoard(Layout layout) {
+    public GameBoard(Layout layout, Thief thief) {
+        this.thief = thief;
         board = new HashMap<CubeCoordinates, Tile>();
         this.layout = layout;
         this.initialiseBoard();
         // rendre la centre et la taille de la grille dynamique
 
+    }
+
+    public Layout getLayout() {
+        return layout;
     }
 
     public void addTile(Tile t) {
@@ -59,7 +65,11 @@ public class GameBoard {
 
     public void addTile(int q, int r, int diceValue, int resourceType) {
         int s = -q - r;
-        board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue, resourceType));
+        Tile tile = new Tile(q, r, diceValue, resourceType);
+        if (resourceType == 0) {
+            thief.setTile(tile);
+        }
+        board.put(new CubeCoordinates(q, r, s), tile);
     }
 
     public Tile getTile(int q, int r) {

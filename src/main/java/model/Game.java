@@ -14,6 +14,7 @@ public class Game implements StateMethods {
     private static GameBoard board;
     private ListPlayers players; // ListPlayers extends ArrayList
     private CardStack stack;
+    private Thief thief;
 
     Game() {
         Player player1 = new Player(Player.Color.RED, "Player1");
@@ -25,13 +26,18 @@ public class Game implements StateMethods {
         Point point1 = new Point(400, 400);
         Point point2 = new Point(50, 50);
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
-        board = new GameBoard(layout);
+        thief = new Thief();
+        board = new GameBoard(layout, thief);
 
         stack = new CardStack();
     }
 
     public CardStack getStack() {
         return stack;
+    }
+
+    public Thief getThief() {
+        return thief;
     }
 
     public void endTurn() {
@@ -44,6 +50,14 @@ public class Game implements StateMethods {
 
     public ListPlayers getPlayers() {
         return players;
+    }
+
+    public static GameBoard getBoard() {
+        return board;
+    }
+
+    public static void setBoard(GameBoard board) {
+        Game.board = board;
     }
 
     public void draw(Graphics g) {
