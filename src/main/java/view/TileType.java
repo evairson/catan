@@ -5,7 +5,8 @@ public enum TileType {
     ORE("src/main/resources/ore.png"),
     WOOD("src/main/resources/wood.png"),
     CLAY("src/main/resources/clay.png"),
-    WOOL("src/main/resources/wool.png");
+    WOOL("src/main/resources/wool.png"),
+    DESERT("src/main/resources/wool.png");
 
     private String imagePath;
 
@@ -17,8 +18,3 @@ public enum TileType {
         return imagePath;
     }
 }
-
-
-
-
-

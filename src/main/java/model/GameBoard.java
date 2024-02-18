@@ -4,6 +4,7 @@ import model.geometry.*;
 import model.geometry.Point;
 import model.tiles.*;
 import others.Constants;
+import view.TileType;
 import model.geometry.CubeCoordinates;
 
 import javax.imageio.ImageIO;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import view.TileType.*;
 
 public class GameBoard {
     private HashMap<CubeCoordinates, Tile> board;
@@ -98,7 +100,7 @@ public class GameBoard {
         board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue));
     }
 
-    public void addTile(int q, int r, int diceValue, int resourceType) {
+    public void addTile(int q, int r, int diceValue, TileType resourceType) {
         int s = -q - r;
         board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue, resourceType));
     }
@@ -130,7 +132,7 @@ public class GameBoard {
                     } else {
                         tileResourceType = 0;
                     }
-                    addTile(q, r, tileDiceValue, tileResourceType);
+                    addTile(q, r, tileDiceValue, getTileType(tileResourceType));
                     presetTileDiceValue++;
 
                     System.out.println("Tile (" + q + ", " + r + ", " + s + "), Ressource Type: "
@@ -138,36 +140,24 @@ public class GameBoard {
                 }
             }
         }
-        assignTileColors();
         initialiseVertices();
         initialiseEdges();
     }
 
-    private void assignTileColors() {
-        tileColors = new HashMap<>();
-        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
-            Tile tile = entry.getValue();
-            int resourceType = tile.getResourceType();
-            switch (resourceType) {
-                case 1:
-                    tileColors.put(tile, Color.GREEN);
-                    break;
-                case 2:
-                    tileColors.put(tile, Color.YELLOW);
-                    break;
-                case 3:
-                    tileColors.put(tile, Color.RED);
-                    break;
-                case 4:
-                    tileColors.put(tile, Color.WHITE);
-                    break;
-                case 5:
-                    tileColors.put(tile, Color.GRAY);
-                    break;
-                default:
-                    tileColors.put(tile, Color.BLACK);
-                    break;
-            }
+    private TileType getTileType(int resourceType) {
+        switch (resourceType) {
+            case 1:
+                return TileType.WOOD;
+            case 2:
+                return TileType.WHEAT;
+            case 3:
+                return TileType.CLAY;
+            case 4:
+                return TileType.WOOL;
+            case 5:
+                return TileType.ORE;
+            default:
+                return TileType.DESERT;
         }
     }
 
@@ -280,8 +270,7 @@ public class GameBoard {
                     (float) centerX - img.getWidth() / 2f,
                     (float) centerY - img.getHeight() / 2f,
                     img.getWidth(),
-                    img.getHeight()
-            );
+                    img.getHeight());
 
             TexturePaint tp = new TexturePaint(img, rect);
             g2d.setPaint(tp);
@@ -305,8 +294,7 @@ public class GameBoard {
             if (edge.getBuilding() != null) {
                 g2d.setColor(edge.getBuilding().getColorInAwt());
                 g2d.setStroke(new BasicStroke(6));
-            }
-            else {
+            } else {
                 g2d.setColor(Color.black);
                 g2d.setStroke(new BasicStroke(2));
             }
