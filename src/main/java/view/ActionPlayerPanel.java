@@ -10,7 +10,12 @@ import java.lang.*;
 
 import java.io.IOException;
 
+import model.App;
 import model.Game;
+import model.cards.DevelopmentCard;
+import model.cards.KnightCard;
+import model.cards.ProgessCard;
+import others.Constants;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
@@ -34,12 +39,23 @@ public class ActionPlayerPanel extends JPanel {
     private ButtonImage card;
 
     private JLabel namePlayer;
+    private App app;
     private Game game;
     private ResourcesPanel resourcesPanel;
 
+    private JPanel cardsPanel;
+    private JPanel cardPanel;
+    private JPanel playersPanel;
 
-    public ActionPlayerPanel(Game game) {
-        this.game = game;
+    private RollingDice dice;
+
+
+    public ActionPlayerPanel(App app) {
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+        this.app = app;
+        game = app.getGame();
+
+
         setLayout(null);
         setOpaque(true);
         try {
@@ -47,6 +63,11 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        dice = new RollingDice(game.getCurrentPlayer());
+        add(dice);
+
+        createPlayerPanel();
 
         Animation animate = new Animation();
         int xCoord = Resolution.calculateResolution(200, 650)[0];
@@ -90,7 +111,7 @@ public class ActionPlayerPanel extends JPanel {
 //             600, 550, 2, null);
 
         card = new ButtonImage(basePath + "card.png", basePath + "card.png",
-        770, 560, 3, null, null);
+        770, 560, 3, this::addcardsPanel, null);
 
 
         city = new ButtonImage(basePath + "building/city.png", basePath + "building/city.png",
@@ -100,8 +121,8 @@ public class ActionPlayerPanel extends JPanel {
         road = new ButtonImage(basePath + "building/road.png", basePath + "building/road.png",
         1150, 220, 2, null, null);
 
-        plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
-        1160, 310, 8, this::buy, null);
+        plus = new ButtonImage(basePath + "card.png", basePath + "card.png",
+        1170, 310, 5, this::drawCard, null);
 
 //        add(wood);
 //        add(wool);
@@ -125,27 +146,84 @@ public class ActionPlayerPanel extends JPanel {
         update();
     }
 
-    private void update() {
-        namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
-        try {
-            String src = "src/main/resources/pion/pion";
-            String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
-            Image origiImg = ImageIO.read(new File(imagePath));
-            Image buttonImage = origiImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-            namePlayer.setIcon(new ImageIcon(buttonImage));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        repaint();
-    }
-
     private void trade() {
         // TODO : A remplir
     }
 
-    private void buy() {
-        game.getCurrentPlayer().createOrBuy();
-        // TODO : à remplir
+    private void addcardsPanel() {
+        if (cardsPanel != null) {
+            remove(cardsPanel);
+        }
+        cardsPanel = new JPanel();
+        cardsPanel.setLayout(null);
+        cardsPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+        String basePath = "src/main/resources/";
+        for (int i = 0; i < game.getCurrentPlayer().getCardsDev().size(); i++) {
+            String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(i));
+            ButtonImage b = new ButtonImage(basePath + card, basePath + card,
+                300 + i * 100, 250, 1.5, this::useCard, null);
+            cardsPanel.add(b);
+        }
+        JPanel self = this;
+        cardsPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                self.remove(cardsPanel);
+                cardsPanel = null;
+                repaint();
+                revalidate();
+            }
+        });
+        cardsPanel.setOpaque(false);
+        add(cardsPanel, 10);
+        repaint();
+        revalidate();
+
+    }
+
+    private void useCard() {
+        // TODO :
+    }
+
+    private String cardImageUrl(DevelopmentCard card) {
+        if (card instanceof KnightCard) {
+            return "cards/knight.png";
+        } else if (card instanceof ProgessCard) {
+            return "cards/progress.png";
+        } else {
+            return "cards/point.png";
+        }
+    }
+
+    private void drawCard() {
+        game.getCurrentPlayer().drawCard(game.getStack());
+        if (cardPanel != null) {
+            remove(cardPanel);
+        }
+        cardPanel = new JPanel();
+        cardPanel.setLayout(null);
+        cardPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+        String basePath = "src/main/resources/";
+        int last = game.getCurrentPlayer().getCardsDev().size();
+        String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(last - 1));
+        ButtonImage b = new ButtonImage(basePath + card, basePath + card,
+            600, 250, 1.5, this::useCard, null);
+        cardPanel.add(b);
+        JPanel self = this;
+        cardPanel.addMouseListener(new MouseAdapter() {
+            @Override
+
+            public void mouseClicked(MouseEvent e) {
+                self.remove(cardPanel);
+                cardPanel = null;
+                repaint();
+                revalidate();
+            }
+        });
+        cardPanel.setOpaque(false);
+        add(cardPanel, 10);
+        repaint();
+        revalidate();
     }
 
     private void createNamePlayer() throws IOException {
@@ -165,4 +243,60 @@ public class ActionPlayerPanel extends JPanel {
         namePlayer.setBounds((int) x, (int) y, (int) (scale * 10), (int) (scale * 1.2));
         add(namePlayer);
     }
+
+    private void createPlayerPanel() {
+        playersPanel = new JPanel();
+        playersPanel.setLayout(null);
+        int x = Resolution.calculateResolution(30, 10)[0];
+        int y = Resolution.calculateResolution(30, 10)[1];
+        playersPanel.setBounds(x, y, (int) (2000 / Resolution.divider()), (int) (100 / Resolution.divider()));
+        for (int i = 0; i < game.getPlayers().size(); i++) {
+            JLabel panel = new JLabel();
+            try {
+                String src = "src/main/resources/pion/pion";
+                String imagePath = src + game.getPlayers().get(i).getColorString() + ".png";
+                Image origiImg = ImageIO.read(new File(imagePath));
+                int scale = (int) (40 / Resolution.divider());
+                Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
+                String text = game.getPlayers().get(i).getName().toUpperCase();
+                Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
+                String textUnderligne = player ? "<html><u> " + text + "</u></html>"  : " " + text;
+                panel = new JLabel(textUnderligne, new ImageIcon(buttonImage), JLabel.CENTER);
+                panel.setVerticalTextPosition(JLabel.CENTER);
+                panel.setHorizontalTextPosition(JLabel.RIGHT);
+                panel.setFont(new Font("SansSerif", Font.BOLD, scale));
+                double x1 = Resolution.calculateResolution(i * 200, 20)[0];
+                double y1 = Resolution.calculateResolution(i * 200, 20)[1];
+                panel.setBounds((int) x1, (int) y1, (int) (scale * 10), (int) (scale * 1.2));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            playersPanel.add(panel);
+        }
+        add(playersPanel);
+    }
+
+    private void update() {
+        dice.newPlayer(game.getCurrentPlayer());
+
+        namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
+        for (int i = 0; i < game.getPlayers().size(); i++) {
+            String text = game.getPlayers().get(i).getName().toUpperCase();
+            Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
+            String textUnderligne = player ? "<html><u>" + text + "</u></html>"  : " " + text;
+            ((JLabel) playersPanel.getComponents()[i]).setText(textUnderligne);
+        }
+        try {
+            String src = "src/main/resources/pion/pion";
+            String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
+            Image origiImg = ImageIO.read(new File(imagePath));
+            Image buttonImage = origiImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+            namePlayer.setIcon(new ImageIcon(buttonImage));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        revalidate();
+        repaint();
+    }
+
 }

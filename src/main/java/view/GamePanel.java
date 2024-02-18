@@ -2,7 +2,7 @@ package view;
 
 import controler.KeyBoardInputs;
 import controler.MouseInputs;
-import model.Game;
+import model.App;
 import others.Constants;
 
 import javax.swing.*;
@@ -11,12 +11,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GamePanel extends JPanel {
-    private Game game;
+    private App game;
 
     private MouseInputs mouseInputs;
 
 
-    public GamePanel(Game game) {
+    public GamePanel(App game) {
         this.game = game;
 
         mouseInputs = new MouseInputs(game);
