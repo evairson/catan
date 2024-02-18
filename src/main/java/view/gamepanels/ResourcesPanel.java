@@ -1,4 +1,4 @@
-package view;
+package view.gamepanels;
 
 import javax.swing.JPanel;
 import view.utilities.ButtonImage;

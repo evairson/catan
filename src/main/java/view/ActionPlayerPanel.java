@@ -11,6 +11,9 @@ import java.lang.*;
 import java.io.IOException;
 
 import model.Game;
+import view.gamepanels.ResourcesPanel;
+import view.gamepanels.ShopPanel;
+import view.gamepanels.TradePanel;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
@@ -18,13 +21,6 @@ import view.utilities.Resolution;
 public class ActionPlayerPanel extends JPanel {
     private ButtonImage endTurn;
     private ButtonImage tradeButton;
-
-    private ButtonImage wood;
-    private ButtonImage ore;
-    private ButtonImage clay;
-    private ButtonImage wheat;
-    private ButtonImage wool;
-
     private ButtonImage city;
     private ButtonImage colony;
     private ButtonImage road;
@@ -36,6 +32,8 @@ public class ActionPlayerPanel extends JPanel {
     private JLabel namePlayer;
     private Game game;
     private ResourcesPanel resourcesPanel;
+    private ShopPanel shopPanel;
+    private TradePanel tradePanel;
     private Animation animate = new Animation();
 
 
@@ -48,9 +46,32 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        initializeTradePanel();
         initializeResourcesPanel();
+        initializeShopPanel();
         createButton();
+    }
+
+    private void initializeShopPanel() {
+        int xCoord = Resolution.calculateResolution(1250, 20)[0];
+        int yCoord = Resolution.calculateResolution(1250, 20)[1];
+        MouseAdapter animMouse = new MouseAdapter() {
+            private final int length = (int) (200 / Resolution.divider());
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                animate.jPanelXLeft(xCoord, xCoord - length, 2, 1, shopPanel);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                animate.jPanelXRight(xCoord - length, xCoord, 2, 1, shopPanel);
+            }
+        };
+        shopPanel = new ShopPanel(animMouse);
+        shopPanel.setVisible(true);
+        shopPanel.setBounds(xCoord, yCoord, (int) (150 / Resolution.divider()),
+                (int) (710 / Resolution.divider()));
+        shopPanel.addMouseListener(animMouse);
+        add(shopPanel);
     }
     private void initializeResourcesPanel() {
         int xCoord = Resolution.calculateResolution(200, 650)[0];
@@ -74,34 +95,25 @@ public class ActionPlayerPanel extends JPanel {
         add(resourcesPanel);
     }
 
+    private void initializeTradePanel() {
+        int xCoord = Resolution.calculateResolution(50, 560)[0];
+        int yCoord = Resolution.calculateResolution(50, 560)[1];
+
+        tradePanel = new TradePanel(this::trade);
+        tradePanel.setVisible(true);
+        tradePanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
+                (int) (185 / Resolution.divider()));
+        add(tradePanel);
+    }
+
     private void createButton() {
         String basePath = "src/main/resources/";
         endTurn = new ButtonImage(basePath + "endTurn.png", basePath + "endTurn.png",
                 960, 600, 1.5, this::changeTurn, null);
-        tradeButton = new ButtonImage(basePath + "tradeButton.png", basePath + "tradeButton.png",
-                50, 560, 5, this::trade, null);
 
         card = new ButtonImage(basePath + "card.png", basePath + "card.png",
         770, 560, 3, null, null);
 
-
-        city = new ButtonImage(basePath + "building/city.png", basePath + "building/city.png",
-        1150, 20, 2, null, null);
-        colony = new ButtonImage(basePath + "building/colony.png", basePath + "building/colony.png",
-        1150, 130, 2, null, null);
-        road = new ButtonImage(basePath + "building/road.png", basePath + "building/road.png",
-        1150, 220, 2, null, null);
-
-        plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
-        1160, 310, 8, null, null);
-
-        add(city);
-        add(colony);
-        add(road);
-
-        add(plus);
-
-        add(tradeButton);
         add(endTurn);
         add(card);
     }
