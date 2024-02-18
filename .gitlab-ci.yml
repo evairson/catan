@@ -7,7 +7,7 @@ stages:
 lint:
   stage: lint
   script:
-    - wget https://github.com/checkstyle/checkstyle/releases/download/checkstyle-8.41/checkstyle-8.41-all.jar
+    - curl -L -o checkstyle-8.41-all.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-8.41/checkstyle-8.41-all.jar
     - java -jar checkstyle-8.41-all.jar -c /google_checks.xml src/
     - find src/ -name "*.java" -exec checkstyle -c ./checkstyle.xml {} \; > checkstyle_report.txt
     - cat checkstyle_report.txt
