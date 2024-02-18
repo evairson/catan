@@ -22,7 +22,7 @@ public class Player {
     private int dice1;
     private int dice2;
     private String name;
-    // private Coordonnee cord;
+    private Boolean hasThrowDices;
     private ArrayList<Resources> resources;
 
 
@@ -63,6 +63,14 @@ public class Player {
 
     public void setColor(Color c) {
         color = c;
+    }
+
+    public boolean hasThrowDices() {
+        return hasThrowDices;
+    }
+
+    public void setHasTrowDices(Boolean b) {
+        hasThrowDices = b;
     }
 
     public Boolean isTurn() {

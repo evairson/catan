@@ -70,6 +70,7 @@ public class RollingDice extends JPanel {
 
                 }
                 System.out.println(player.getDies());
+                player.setHasTrowDices(true);
             } catch (InterruptedException e) {
                 System.out.println("Threading Error in class RollingDice " + e);
             }
@@ -78,6 +79,7 @@ public class RollingDice extends JPanel {
     }
 
     public void newPlayer(Player player) {
+        player.setHasTrowDices(false);
         this.player = player;
         rollButton.setEnabled(true);
     }
