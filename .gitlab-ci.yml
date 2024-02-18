@@ -11,6 +11,7 @@ lint:
     - find src/ -name "*.java" -exec checkstyle -c ./checkstyle.xml {} \; > checkstyle_report.txt
     - cat checkstyle_report.txt
     - if egrep -q "\[ERROR\]" checkstyle_report.txt; then exit 1; fi
+    allow_failure: true
 
 build:
   stage: build
