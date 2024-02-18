@@ -6,7 +6,7 @@ public enum TileType {
     WOOD("src/main/resources/wood.png"),
     CLAY("src/main/resources/clay.png"),
     WOOL("src/main/resources/wool.png"),
-    DESERT("src/main/resources/wool.png");
+    DESERT("src/main/resources/desert.png");
 
     private String imagePath;
 

@@ -3,8 +3,6 @@ package view;
 import view.utilities.ImgService;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Random;
 
 public class RollingDice extends JPanel {

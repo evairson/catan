@@ -11,7 +11,6 @@ import java.lang.*;
 import java.io.IOException;
 
 import model.Game;
-import model.GameBoard;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
@@ -96,16 +95,15 @@ public class ActionPlayerPanel extends JPanel {
         Runnable cityRunnable = () -> game.buildCity();
         city = new ButtonImage(basePath + "building/city.png", basePath + "building/city.png",
         1150, 20, 2, cityRunnable, null);
-        
 
         Runnable colonyRunnable = () -> game.buildColony();
         colony = new ButtonImage(basePath + "building/colony.png", basePath + "building/colony.png",
         1150, 130, 2, colonyRunnable, null);
-        
+
         Runnable roadRunnable = () -> game.buildRoad();
         road = new ButtonImage(basePath + "building/road.png", basePath + "building/road.png",
         1150, 220, 2, roadRunnable, null);
-      
+
         plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
         1160, 310, 8, null, null);
 

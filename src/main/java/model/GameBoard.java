@@ -4,16 +4,15 @@ import model.geometry.*;
 import model.geometry.Point;
 import model.tiles.*;
 import others.Constants;
+import view.TileImageLoader;
 import view.TileType;
 import model.geometry.CubeCoordinates;
 
-import javax.imageio.ImageIO;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,6 @@ public class GameBoard {
     private int gridSize = 2;
     private HashMap<Point, TileVertex> verticesMap;
     private HashMap<Point, TileEdge> edgesMap;
-    private HashMap<Tile, Color> tileColors;
     // sert à stocker les coordonnées du sommet le plus proche de la souris
     // peut aller dans une autre classe...
     private Point closestVertex = new Point(0, 0);
@@ -36,8 +34,8 @@ public class GameBoard {
 
     private boolean lookingForVertex = false;
     private boolean lookingForEdge = false;
-    TileVertex closestTileVertex = new TileVertex();
-    TileEdge closestTileEdge = new TileEdge();
+    private TileVertex closestTileVertex = new TileVertex();
+    private TileEdge closestTileEdge = new TileEdge();
 
     public GameBoard(Layout layout) {
         board = new HashMap<CubeCoordinates, Tile>();
@@ -241,20 +239,18 @@ public class GameBoard {
     }
 
     private void drawVertices(Graphics g) {
-        BufferedImage img = null;
-        try {
-            img = ImageIO.read(new File("src/main/resources/wheat.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        img = resizeImage(img, img.getWidth() / 2, img.getHeight() / 2);
+
 
         Graphics2D g2d = (Graphics2D) g;
 
-        for (Map.Entry<Tile, Color> entry : tileColors.entrySet()) {
-            Tile tile = entry.getKey();
-
+        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
+            Tile tile = entry.getValue();
+            TileType resource = tile.getResourceType();
             ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
+
+            Map<TileType, BufferedImage> tileImages = TileImageLoader.loadTileImages();
+            BufferedImage img = tileImages.get(tile.getResourceType());
+            img = resizeImage(img, img.getWidth() / 2, img.getHeight() / 2);
 
             double centerX = 0;
             double centerY = 0;

@@ -19,7 +19,7 @@ public class Colony extends Building {
 
     }
 
-    public Colony(Player player,Boolean isCity, boolean isPort) {
+    public Colony(Player player, Boolean isCity, boolean isPort) {
         super(player);
         this.isCity = isCity;
         this.isPort = isPort;

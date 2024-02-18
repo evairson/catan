@@ -31,9 +31,10 @@ public abstract class Building {
     public String toString() {
         if (this instanceof Road) {
             return ((Road) this).getEdge().getStart() + " // " + ((Road) this).getEdge().getEnd();
+        } else {
+            return "";
         }
-            else return "";
-        }
+    }
 
     public Color getColorInAwt() {
         switch (owner.getColor()) {
