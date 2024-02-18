@@ -9,7 +9,7 @@ public class CardStack {
     public static final int NB_POINT = 5;
 
     private Stack<DevelopmentCard> cardStack;
-        private ArrayList<DevelopmentCard> cardToMix;
+    private ArrayList<DevelopmentCard> cardToMix;
 
     public CardStack() {
         cardStack = new Stack<>();
