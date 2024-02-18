@@ -18,7 +18,6 @@ public class TileEdge {
         start = new Point(0, 0);
         end = new Point(0, 0);
         tiles = new HashSet<>();
-        System.out.println("TileEdge created");
 
     }
 
@@ -26,14 +25,12 @@ public class TileEdge {
         this.start = start;
         this.end = end;
         tiles = new HashSet<>();
-        System.out.println("TileEdge created");
     }
 
     public TileEdge(Point start, Point end, Set<Tile> tiles) {
         this.start = start;
         this.end = end;
         this.tiles = tiles;
-        System.out.println("TileEdge created");
     }
 
     public Point getStart() {

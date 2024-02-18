@@ -28,6 +28,13 @@ public abstract class Building {
         return true;
     }
 
+    public String toString() {
+        if (this instanceof Road) {
+            return ((Road) this).getEdge().getStart() + " // " + ((Road) this).getEdge().getEnd();
+        }
+            else return "";
+        }
+
     public Color getColorInAwt() {
         switch (owner.getColor()) {
             case RED:

@@ -18,6 +18,10 @@ public class Road extends Building {
         this.edge = edge;
     }
 
+    public TileEdge getEdge() {
+        return this.edge;
+    }
+
     public ArrayList<Resources> getCost() {
         return cost;
     }

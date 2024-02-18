@@ -1,21 +1,21 @@
 package model;
 
 import model.geometry.*;
+import model.geometry.Point;
 import model.tiles.*;
 import others.Constants;
 import model.geometry.CubeCoordinates;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.awt.BasicStroke;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Polygon;
 
 public class GameBoard {
     private HashMap<CubeCoordinates, Tile> board;
@@ -239,16 +239,52 @@ public class GameBoard {
                 && Math.abs(p1.getY() - p2.getY()) < epsilon;
     }
 
+    public BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
+        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2d = outputImage.createGraphics();
+        g2d.drawImage(resultingImage, 0, 0, null);
+        g2d.dispose();
+
+        return outputImage;
+    }
+
     private void drawVertices(Graphics g) {
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File("src/main/resources/wheat.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        img = resizeImage(img, img.getWidth() / 2, img.getHeight() / 2);
+
         Graphics2D g2d = (Graphics2D) g;
 
         for (Map.Entry<Tile, Color> entry : tileColors.entrySet()) {
             Tile tile = entry.getKey();
-            Color color = entry.getValue();
-            CubeCoordinates cubeCoord = tile.getCoordinates();
+
             ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
 
-            g2d.setColor(color);
+            double centerX = 0;
+            double centerY = 0;
+            for (Point vertex : hexagonVertices) {
+                centerX += vertex.getX();
+                centerY += vertex.getY();
+            }
+
+            centerX /= hexagonVertices.size();
+            centerY /= hexagonVertices.size();
+
+            Rectangle2D.Float rect = new Rectangle2D.Float(
+                    (float) centerX - img.getWidth() / 2f,
+                    (float) centerY - img.getHeight() / 2f,
+                    img.getWidth(),
+                    img.getHeight()
+            );
+
+            TexturePaint tp = new TexturePaint(img, rect);
+            g2d.setPaint(tp);
             Polygon hexagon = new Polygon();
             for (Point vertex : hexagonVertices) {
                 hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
@@ -269,6 +305,10 @@ public class GameBoard {
             if (edge.getBuilding() != null) {
                 g2d.setColor(edge.getBuilding().getColorInAwt());
                 g2d.setStroke(new BasicStroke(6));
+            }
+            else {
+                g2d.setColor(Color.black);
+                g2d.setStroke(new BasicStroke(2));
             }
             g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
                     (int) edge.getEnd().getX(),

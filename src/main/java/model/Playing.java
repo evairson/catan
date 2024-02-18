@@ -14,7 +14,7 @@ public class Playing implements StateMethods {
 
     Playing() {
         Point point1 = new Point(400, 400);
-        Point point2 = new Point(50, 50);
+        Point point2 = new Point(70, 70);
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
         board = new GameBoard(layout);
 
@@ -50,6 +50,7 @@ public class Playing implements StateMethods {
         if (board.isLookingForEdge()) {
             System.out.println("Looking for edge and clicked");
             game.getCurrentPlayer().buildRoad(board.getClosestTileEdge());
+            game.getCurrentPlayer().printBuildings();
         }
     }
 

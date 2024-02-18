@@ -35,6 +35,12 @@ public class Player {
         buildings = new ArrayList<>();
     }
 
+    public void printBuildings() {
+        for (Building b : buildings) {
+            System.out.println(b);
+        }
+    }
+
     // Getter / Setter : ---------------
 
     public String getName() {
@@ -109,7 +115,9 @@ public class Player {
 
     public void buildRoad(TileEdge edge) {
         if (edge.getBuilding() == null) {
-            edge.setBuilding(new Road(this, edge, color));
+            Road r = new Road(this, edge, color);
+            edge.setBuilding(r);
+            this.buildings.add(r);
             System.out.println("Road built");
         }
     }
