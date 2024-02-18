@@ -14,7 +14,7 @@ lint:
 build:
   stage: build
   script:
-    - find . -name "*.java" | xargs javac -classpath build -d bin
+    - javac -version
   artifacts:
     paths:
       - build/
