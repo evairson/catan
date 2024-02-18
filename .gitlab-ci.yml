@@ -8,7 +8,7 @@ lint:
   stage: lint
   script:
     - curl -L -o checkstyle-8.41-all.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-8.41/checkstyle-8.41-all.jar
-    - java -jar checkstyle-8.41-all.jar -c /checkstyle.xml src/
+    - java -jar checkstyle-8.41-all.jar -c ./checkstyle.xml src/
   allow_failure: true
 
 build:
