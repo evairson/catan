@@ -51,7 +51,7 @@ public class Game implements StateMethods {
     }
 
     public void mouseMoved(MouseEvent e) {
-        board.mouseMoved(e);
+        board.mouseMovd(e);
     }
 
     @Override
