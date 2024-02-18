@@ -4,27 +4,25 @@ import view.utilities.ImgService;
 
 import javax.swing.*;
 
+import model.Player;
 import others.Constants;
 
-import java.util.Random;
-
 public class RollingDice extends JPanel {
-    private int diceOne;
-    private int diceTwo;
+    private Player player;
     private JButton rollButton;
-    private Random rand;
     private JLabel diceOneImg;
     private JLabel diceTwoImg;
 
     public int getDiceOne() {
-        return diceOne;
+        return player.getDice1();
     }
 
     public int getDiceTwo() {
-        return diceTwo;
+        return player.getDice2();
     }
 
-    public RollingDice() {
+    public RollingDice(Player player) {
+        this.player = player;
         setLayout(null);
         setOpaque(true);
         setSize(500, 500);
@@ -38,8 +36,6 @@ public class RollingDice extends JPanel {
 
         setBounds(Constants.Game.WIDTH - 230, Constants.Game.HEIGHT - 400, 250, 250);
 
-
-        rand = new Random();
         rollButton = new JButton("Roll!");
         rollButton.setBounds(26, 135, 100, 25);
         rollButton.addActionListener(actionEvent -> roll());
@@ -57,12 +53,11 @@ public class RollingDice extends JPanel {
                 while ((endTime - startTime) / 1000F < 3) {
                     //roll dice
 
-                    diceOne = rand.nextInt(1, 7);
-                    diceTwo = rand.nextInt(1, 7);
+                    player.throwDices();
 
                     //update dice images
-                    ImgService.updateImage(diceOneImg, "/view/dice/d" + diceOne + "b.png");
-                    ImgService.updateImage(diceTwoImg, "/view/dice/d" + diceTwo + "r.png");
+                    ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png");
+                    ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png");
 
                     repaint();
                     revalidate();
@@ -74,12 +69,16 @@ public class RollingDice extends JPanel {
                     endTime = System.currentTimeMillis();
 
                 }
-                System.out.println(diceOne + diceTwo);
-                rollButton.setEnabled(true);
+                System.out.println(player.getDies());
             } catch (InterruptedException e) {
                 System.out.println("Threading Error in class RollingDice " + e);
             }
         });
         rollThread.start();
+    }
+
+    public void newPlayer(Player player) {
+        this.player = player;
+        rollButton.setEnabled(true);
     }
 }

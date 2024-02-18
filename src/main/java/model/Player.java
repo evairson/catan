@@ -8,7 +8,7 @@ import model.cards.DevelopmentCard;
 import model.resources.Resources;
 
 public class Player {
-    static final int NUMBER_DICE = 7;
+    static final int NUMBER_DICE = 6;
 
     public enum Color {
         RED,
@@ -77,6 +77,14 @@ public class Player {
         return dice1 + dice2;
     }
 
+    public int getDice1() {
+        return dice1;
+    }
+
+    public int getDice2() {
+        return dice2;
+    }
+
     public ArrayList<Building> getBuildings() {
         return buildings;
     }
@@ -97,11 +105,11 @@ public class Player {
 
 
     public void throwDice1() {
-        dice1 = (int) (Math.random() * NUMBER_DICE); // (max-min+1)*min
+        dice1 = (int) ((Math.random() * NUMBER_DICE) + 1); // (max-min+1)*min
     }
 
     public void throwDice2() {
-        dice2 = (int) (Math.random() * NUMBER_DICE);
+        dice2 = (int) ((Math.random() * NUMBER_DICE) + 1);
     }
 
     public void throwDices() {

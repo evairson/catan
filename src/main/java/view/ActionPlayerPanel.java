@@ -47,6 +47,8 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel cardPanel;
     private JPanel playersPanel;
 
+    private RollingDice dice;
+
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -61,6 +63,9 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        dice = new RollingDice(game.getCurrentPlayer());
+        add(dice);
 
         createPlayerPanel();
 
@@ -272,6 +277,8 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void update() {
+        dice.newPlayer(game.getCurrentPlayer());
+
         namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
         for (int i = 0; i < game.getPlayers().size(); i++) {
             String text = game.getPlayers().get(i).getName().toUpperCase();
