@@ -38,6 +38,6 @@ public class ResourcesPanel extends JPanel {
         add(ore);
         add(clay);
         add(wheat);
-        add(wool);
+                add(wool);
     }
 }
