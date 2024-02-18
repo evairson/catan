@@ -9,6 +9,8 @@ import view.GameWindow;
 import view.menu.MainMenu;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.awt.*;
 
@@ -54,13 +56,22 @@ public class Game implements Runnable {
 
         playing = new Playing();
         board = playing.getBoard();
-
+        playing.setGame(this);
         mainMenu.requestFocus();
+        //add a mouse click listener to the gamePanel
+        gamePanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                playing.mouseClicked(e);
+            }
+        });
 
         startGameLoop();
     }
 
     public void buildCity() {
+        if (board.isLookingForEdge())
+            board.setLookingForEdge(!board.isLookingForEdge());
         board.setLookingForVertex(!board.isLookingForVertex());
         if (board.isLookingForVertex()) {
             TileVertex cVertex = board.getClosestTileVertex();
@@ -69,9 +80,11 @@ public class Game implements Runnable {
     }
 
     public void buildColony() {
+        if (board.isLookingForEdge())
+            board.setLookingForEdge(!board.isLookingForEdge());
         board.setLookingForVertex(!board.isLookingForVertex());
         if (board.isLookingForVertex()) {
-            
+
             TileVertex cVertex = board.getClosestTileVertex();
             getCurrentPlayer().buildColony(cVertex);
         }
@@ -81,10 +94,9 @@ public class Game implements Runnable {
         if (board.isLookingForVertex())
             board.setLookingForVertex(!board.isLookingForVertex());
         board.setLookingForEdge(!board.isLookingForEdge());
-        if (board.isLookingForEdge()) {
-            TileEdge cEdge = board.getClosestTileEdge();
-            getCurrentPlayer().buildRoad(cEdge);
-        }
+        
+       
+        
     }
 
     public Playing getPlaying() {

@@ -6,13 +6,15 @@ import model.resources.Resources;
 import java.awt.*;
 import java.util.ArrayList;
 import model.tiles.TileEdge;
+
 public class Road extends Building {
 
     private TileEdge edge;
     private Player.Color playerColor;
-    private ArrayList<Resources> cost; //dans l'ordre encore ^^^^^^
+    private ArrayList<Resources> cost; // dans l'ordre encore ^^^^^^
 
-    public Road(TileEdge edge, Player.Color playerColor) {
+    public Road(Player owner, TileEdge edge, Player.Color playerColor) {
+        super(owner);
         this.edge = edge;
     }
 
@@ -24,11 +26,9 @@ public class Road extends Building {
         this.cost = cost;
     }
 
-   
-
     public boolean buyAndPlace(Player player, TileEdge edge, ArrayList<Resources> cost) {
         if (super.buy(player, cost)) {
-            Road road = new Road(edge, player.getColor());
+            Road road = new Road(player, edge, player.getColor());
             player.getBuildings().add(road);
             return true;
         }

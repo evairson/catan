@@ -10,6 +10,7 @@ import others.Constants;
 
 public class Playing implements StateMethods {
     private static GameBoard board;
+    private Game game;
 
     Playing() {
         Point point1 = new Point(400, 400);
@@ -17,6 +18,10 @@ public class Playing implements StateMethods {
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
         board = new GameBoard(layout);
 
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     public GameBoard getBoard() {
@@ -41,8 +46,10 @@ public class Playing implements StateMethods {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (board.isLookingForVertex()) {
-            
+        System.out.println("Mouse clicked");
+        if (board.isLookingForEdge()) {
+            System.out.println("Looking for edge and clicked");
+            game.getCurrentPlayer().buildRoad(board.getClosestTileEdge());
         }
     }
 

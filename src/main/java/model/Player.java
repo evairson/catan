@@ -109,7 +109,8 @@ public class Player {
 
     public void buildRoad(TileEdge edge) {
         if (edge.getBuilding() == null) {
-            edge.setBuilding(new Road(edge, color));
+            edge.setBuilding(new Road(this, edge, color));
+            System.out.println("Road built");
         }
     }
 

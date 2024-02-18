@@ -9,6 +9,10 @@ import java.awt.*;
 public abstract class Building {
     private Player owner;
 
+    public Building(Player owner) {
+        this.owner = owner;
+    }
+
     public boolean buyable(Player player, ArrayList<Resources> cost) {
         for (Resources value : cost) {
             for (Resources resource : player.getResources()) {
