@@ -8,10 +8,10 @@ lint:
   stage: lint
   script:
     - apt-get update && apt-get install -y checkstyle
-    - find src/ -name "*.java" -exec checkstyle -c ./checkstyle.xml {} \; > checkstyle_report.txt
+    - /usr/bin/find src/ -name "*.java" -exec checkstyle -c ./checkstyle.xml {} \; > checkstyle_report.txt
     - cat checkstyle_report.txt
     - if egrep -q "\[ERROR\]" checkstyle_report.txt; then exit 1; fi
-    allow_failure: true
+  allow_failure: true
 
 build:
   stage: build
