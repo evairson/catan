@@ -15,6 +15,3 @@ build:
   stage: build
   script:
     - javac src/main/java/*/*.java src/main/java/*/*/*.java
-  artifacts:
-    paths:
-      - build/
