@@ -53,44 +53,65 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeShopPanel() {
-        int xCoord = Resolution.calculateResolution(1250, 20)[0];
-        int yCoord = Resolution.calculateResolution(1250, 20)[1];
+        int xCoord = Resolution.calculateResolution(1220, 20)[0];
+        int yCoord = Resolution.calculateResolution(1220, 20)[1];
+        shopPanel = new ShopPanel();
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
             @Override
             public void mouseEntered(MouseEvent e) {
-                animate.jPanelXLeft(xCoord, xCoord - length, 2, 1, shopPanel);
+                if (!resourcesPanel.isMouseInside()) {
+                    animate.jPanelXLeft(xCoord, xCoord - length, 2, 1, shopPanel);
+                    resourcesPanel.setMouseInside(true);
+                }
             }
             @Override
             public void mouseExited(MouseEvent e) {
-                animate.jPanelXRight(xCoord - length, xCoord, 2, 1, shopPanel);
+                SwingUtilities.invokeLater(() -> {
+                    Point mousePos = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), shopPanel);
+                    if (!resourcesPanel.contains(mousePos)) {
+                        animate.jPanelXRight(xCoord - length, xCoord, 2, 1, shopPanel);
+                        resourcesPanel.setMouseInside(false);
+                    }
+                });
             }
         };
-        shopPanel = new ShopPanel(animMouse);
+        shopPanel.setAnimMouse(animMouse);
         shopPanel.setVisible(true);
-        shopPanel.setBounds(xCoord, yCoord, (int) (150 / Resolution.divider()),
+        shopPanel.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
                 (int) (710 / Resolution.divider()));
         shopPanel.addMouseListener(animMouse);
         add(shopPanel);
     }
     private void initializeResourcesPanel() {
-        int xCoord = Resolution.calculateResolution(200, 650)[0];
-        int yCoord = Resolution.calculateResolution(200, 650)[1];
+        int xCoord = Resolution.calculateResolution(180, 640)[0];
+        int yCoord = Resolution.calculateResolution(180, 640)[1];
+        resourcesPanel = new ResourcesPanel();
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
             @Override
             public void mouseEntered(MouseEvent e) {
-                animate.jPanelYUp(yCoord, yCoord - length, 2, 1, resourcesPanel);
+                if (!resourcesPanel.isMouseInside()) {
+                    animate.jPanelYUp(yCoord, yCoord - length, 2, 1, resourcesPanel);
+                    resourcesPanel.setMouseInside(true);
+                }
             }
             @Override
             public void mouseExited(MouseEvent e) {
-                animate.jPanelYDown(yCoord - length, yCoord, 2, 1, resourcesPanel);
+                SwingUtilities.invokeLater(() -> {
+                    Point mousePos = SwingUtilities.convertPoint(e.getComponent(),
+                            e.getPoint(), resourcesPanel);
+                    if (!resourcesPanel.contains(mousePos)) {
+                        animate.jPanelYDown(yCoord - length, yCoord, 2, 1, resourcesPanel);
+                        resourcesPanel.setMouseInside(false);
+                    }
+                });
             }
         };
-        resourcesPanel = new ResourcesPanel(animMouse);
+        resourcesPanel.setAnimMouse(animMouse);
         resourcesPanel.setVisible(true);
-        resourcesPanel.setBounds(xCoord, yCoord, (int) (975 / Resolution.divider()),
-                (int) (210 / Resolution.divider()));
+        resourcesPanel.setBounds(xCoord, yCoord, (int) (1040 / Resolution.divider()),
+                (int) (500 / Resolution.divider()));
         resourcesPanel.addMouseListener(animMouse);
         add(resourcesPanel);
     }
