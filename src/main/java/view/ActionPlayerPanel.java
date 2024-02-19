@@ -25,12 +25,6 @@ import view.utilities.Resolution;
 
 public class ActionPlayerPanel extends JPanel {
     private ButtonImage endTurn;
-    private ButtonImage tradeButton;
-    private ButtonImage city;
-    private ButtonImage colony;
-    private ButtonImage road;
-
-    private ButtonImage plus;
 
     private ButtonImage card;
 
@@ -71,7 +65,7 @@ public class ActionPlayerPanel extends JPanel {
     private void initializeShopPanel() {
         int xCoord = Resolution.calculateResolution(1220, 20)[0];
         int yCoord = Resolution.calculateResolution(1220, 20)[1];
-        shopPanel = new ShopPanel();
+        shopPanel = new ShopPanel(this::drawCard);
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
             @Override
@@ -95,7 +89,7 @@ public class ActionPlayerPanel extends JPanel {
         shopPanel.setAnimMouse(animMouse);
         shopPanel.setVisible(true);
         shopPanel.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
-                (int) (740 / Resolution.divider()));
+                (int) (840 / Resolution.divider()));
         shopPanel.addMouseListener(animMouse);
         add(shopPanel);
     }
@@ -135,7 +129,6 @@ public class ActionPlayerPanel extends JPanel {
         resourcesPanel.addMouseListener(animMouse);
         add(resourcesPanel);
     }
-
     private void initializeTradePanel() {
         int xCoord = Resolution.calculateResolution(50, 560)[0];
         int yCoord = Resolution.calculateResolution(50, 560)[1];
@@ -152,8 +145,8 @@ public class ActionPlayerPanel extends JPanel {
         endTurn = new ButtonImage(basePath + "endTurn.png", basePath + "endTurn.png",
                 960, 600, 1.5, this::changeTurn, null);
 
-        card = new ButtonImage(basePath + "card.png", basePath + "card.png",
-        770, 560, 3, this::addcardsPanel, null);
+        card = new ButtonImage(basePath + "card.png", basePath + "cardHover.png",
+        770, 560, 3, this::addCardsPanel, null);
         add(endTurn);
         add(card);
     }
@@ -167,7 +160,7 @@ public class ActionPlayerPanel extends JPanel {
         // TODO : A remplir
     }
 
-    private void addcardsPanel() {
+    private void addCardsPanel() {
         if (cardsPanel != null) {
             remove(cardsPanel);
         }
@@ -192,10 +185,9 @@ public class ActionPlayerPanel extends JPanel {
             }
         });
         cardsPanel.setOpaque(false);
-        add(cardsPanel, 10);
+        add(cardsPanel, 0);
         repaint();
         revalidate();
-
     }
 
     private void useCard() {
@@ -238,7 +230,7 @@ public class ActionPlayerPanel extends JPanel {
             }
         });
         cardPanel.setOpaque(false);
-        add(cardPanel, 10);
+        add(cardPanel);
         repaint();
         revalidate();
     }

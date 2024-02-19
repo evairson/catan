@@ -3,15 +3,15 @@ package view.gamepanels;
 import view.utilities.ButtonImage;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 
 public class ShopPanel extends JPanel {
     private ButtonImage colony;
     private ButtonImage city;
     private ButtonImage road;
-    private ButtonImage plus;
+    private ButtonImage card;
     private MouseAdapter animMouse;
+    private Runnable cardAction;
     private boolean isMouseInside = false;
 
     public boolean isMouseInside() {
@@ -25,7 +25,9 @@ public class ShopPanel extends JPanel {
         this.animMouse = animMouse;
     }
 
-    public ShopPanel() {
+    public ShopPanel(Runnable cardAction) {
+//        setBackground(Color.RED);
+        this.cardAction = cardAction;
         setLayout(null);
         createShopButton();
     }
@@ -38,13 +40,13 @@ public class ShopPanel extends JPanel {
                 30, 130, 2, null, animMouse);
         road = new ButtonImage(basePath + "building/road.png", basePath + "building/roadHover.png",
                 30, 220, 2, null, animMouse);
-        plus = new ButtonImage(basePath + "plus.png", basePath + "plusHover.png",
-                45, 310, 8, null, animMouse);
+        card = new ButtonImage(basePath + "card.png", basePath + "shopCardHover.png",
+                40, 310, 3, cardAction, null);
 
         add(city);
         add(colony);
         add(road);
-        add(plus);
+        add(card);
     }
 
 }
