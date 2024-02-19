@@ -3,7 +3,6 @@ package model;
 import model.geometry.*;
 import model.tiles.*;
 import others.Constants;
-import model.geometry.CubeCoordinates;
 
 import java.awt.event.MouseEvent;
 import java.awt.Graphics;
@@ -31,8 +30,11 @@ public class GameBoard {
     private double minDistanceToEdge;
     private Point mousePosition;
     private double minDistanceToVertex;
+    private double minDistanceToCenterTile;
     private Thief thief;
     private boolean thiefMode;
+
+    private Tile highlightedTile;
 
     public GameBoard(Layout layout, Thief thief) {
         this.thief = thief;
@@ -227,6 +229,9 @@ public class GameBoard {
             ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
 
             g2d.setColor(color);
+            if (thiefMode && highlightedTile == entry.getKey()) {
+                g2d.setColor(Color.blue);
+            }
             Polygon hexagon = new Polygon();
             for (Point vertex : hexagonVertices) {
                 hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
@@ -283,24 +288,36 @@ public class GameBoard {
         mousePosition = new Point(e.getX(), e.getY());
         minDistanceToVertex = Double.MAX_VALUE;
         minDistanceToEdge = Double.MAX_VALUE;
+        minDistanceToCenterTile = Double.MAX_VALUE;
         closestVertex = null;
         closestEdge = null;
-        for (Point vertex : this.verticesMap.keySet()) {
-            double distance = vertex.distance(mousePosition);
-            if (distance < minDistanceToVertex) {
-                minDistanceToVertex = distance;
-                closestVertex = vertex;
-                this.closestVertex = closestVertex;
+        if (thiefMode) {
+            for (CubeCoordinates coordinatesTile : this.board.keySet()) {
+                double distance = layout.cubeToPixel(layout, coordinatesTile).distance(mousePosition);
+                if (distance < minDistanceToCenterTile) {
+                    minDistanceToCenterTile = distance;
+                    highlightedTile = board.get(coordinatesTile);
+                }
+            }
+        } else {
+            for (Point vertex : this.verticesMap.keySet()) {
+                double distance = vertex.distance(mousePosition);
+                if (distance < minDistanceToVertex) {
+                    minDistanceToVertex = distance;
+                    closestVertex = vertex;
+                    this.closestVertex = closestVertex;
+                }
+            }
+            for (Point edge : this.edgesMap.keySet()) {
+                double distance = edge.distance(mousePosition);
+                if (distance < minDistanceToEdge) {
+                    minDistanceToEdge = distance;
+                    closestEdge = edge;
+                    this.closestEdge = closestEdge;
+                }
             }
         }
-        for (Point edge : this.edgesMap.keySet()) {
-            double distance = edge.distance(mousePosition);
-            if (distance < minDistanceToEdge) {
-                minDistanceToEdge = distance;
-                closestEdge = edge;
-                this.closestEdge = closestEdge;
-            }
-        }
+
     }
 
     private void drawText(Graphics g, String text, Point center) {

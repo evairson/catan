@@ -4,10 +4,12 @@ import view.utilities.ImgService;
 
 import javax.swing.*;
 
+import model.Game;
 import model.Player;
 import others.Constants;
 
 public class RollingDice extends JPanel {
+    private Game game;
     private Player player;
     private JButton rollButton;
     private JLabel diceOneImg;
@@ -21,8 +23,9 @@ public class RollingDice extends JPanel {
         return player.getDice2();
     }
 
-    public RollingDice(Player player) {
-        this.player = player;
+    public RollingDice(Game game) {
+        this.game = game;
+        this.player = game.getCurrentPlayer();
         setLayout(null);
         setOpaque(true);
         setSize(500, 500);
@@ -76,6 +79,7 @@ public class RollingDice extends JPanel {
             }
         });
         rollThread.start();
+        game.setThiefMode(true);
     }
 
     public void newPlayer(Player player) {

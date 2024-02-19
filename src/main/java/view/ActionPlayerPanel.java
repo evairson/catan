@@ -64,7 +64,7 @@ public class ActionPlayerPanel extends JPanel {
             e.printStackTrace();
         }
 
-        dice = new RollingDice(game.getCurrentPlayer());
+        dice = new RollingDice(game);
         add(dice);
 
         createPlayerPanel();
