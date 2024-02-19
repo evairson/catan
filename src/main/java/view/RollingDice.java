@@ -7,6 +7,8 @@ import javax.swing.*;
 import model.Player;
 import others.Constants;
 
+import java.awt.*;
+
 public class RollingDice extends JPanel {
     private Player player;
     private JButton rollButton;
@@ -34,7 +36,7 @@ public class RollingDice extends JPanel {
         diceTwoImg.setBounds(90, 45, 64, 64);
         this.add(diceTwoImg);
 
-        setBounds(Constants.Game.WIDTH - 230, Constants.Game.HEIGHT - 400, 250, 250);
+//        setBounds(Constants.Game.WIDTH - 230, Constants.Game.HEIGHT - 400, 250, 250);
 
         rollButton = new JButton("Roll!");
         rollButton.setBounds(26, 135, 100, 25);
