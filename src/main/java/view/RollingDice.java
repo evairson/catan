@@ -5,10 +5,6 @@ import view.utilities.ImgService;
 import javax.swing.*;
 
 import model.Player;
-import others.Constants;
-
-import java.awt.*;
-
 public class RollingDice extends JPanel {
     private Player player;
     private JButton rollButton;
