@@ -15,7 +15,7 @@ public class Game implements StateMethods {
     private ListPlayers players; // ListPlayers extends ArrayList
     private CardStack stack;
 
-    Game() {
+    public Game() {
         Player player1 = new Player(Player.Color.RED, "Player1");
         Player player2 = new Player(Player.Color.YELLOW, "Player2");
         Player player3 = new Player(Player.Color.BLUE, "Player3");

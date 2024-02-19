@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import model.buildings.Building;
 import model.cards.CardStack;
 import model.cards.DevelopmentCard;
-import model.resources.Resources;
+import model.resources.*;
 
 public class Player {
     static final int NUMBER_DICE = 6;
@@ -33,6 +33,11 @@ public class Player {
         color = c;
         this.name = name;
         resources = new ArrayList<>();
+        resources.add(new Clay());
+        resources.add(new Sheep());
+        resources.add(new Stone());
+        resources.add(new Wheat());
+        resources.add(new Wood());
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
     }
@@ -100,6 +105,15 @@ public class Player {
     public ArrayList<Resources> getResources() {
         return resources;
     }
+    public int[] getResourcesAmounts() {
+        int[] retour = new int[5];
+        retour[0] = this.resources.get(0).getAmount();
+        retour[1] = this.resources.get(1).getAmount();
+        retour[2] = this.resources.get(2).getAmount();
+        retour[3] = this.resources.get(3).getAmount();
+        retour[4] = this.resources.get(4).getAmount();
+        return retour;
+    }
 
     public ArrayList<DevelopmentCard> getCardsDev() {
         return cardsDev;
@@ -141,4 +155,38 @@ public class Player {
         cardsDev.add(stack.getCardStack().pop());
     }
 
+    /**
+     * This method checks if we have enough amounts of resources to match those of the resourcesToGive array.
+     * @param resourcesToGive The amounts of the resources we want to give
+     * @return true if we have enough, false if we don't
+     */
+    public boolean hasEnough(int[] resourcesToGive) {
+        int[] ourResources = this.getResourcesAmounts();
+        for (int i = 0; i < 5; i++) {
+            if (resourcesToGive[i] > ourResources[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * This method adds the amounts of resources contained in the resourcesAmountsToAdd array.
+     * @param resourceAmountsToAdd The amounts of resources we add
+     */
+    public void addResourceAmount(int[] resourceAmountsToAdd) {
+        for (int i = 0; i < 5; i++) {
+            this.resources.get(i).addAmount(resourceAmountsToAdd[i]);
+        }
+    }
+
+    /**
+     * This method removes the amount of resources contained in the resourcesAmountsToRemove array.
+     * @param resourceAmountsToRemove The amounts of resources we remove
+     */
+    public void removeResourceAmount(int[] resourceAmountsToRemove) {
+        for (int i = 0; i < 5; i++) {
+            this.resources.get(i).payAmount(resourceAmountsToRemove[i]);
+        }
+    }
 }
