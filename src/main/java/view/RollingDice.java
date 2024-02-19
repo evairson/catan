@@ -69,7 +69,6 @@ public class RollingDice extends JPanel {
                     endTime = System.currentTimeMillis();
 
                 }
-                System.out.println(player.getDies());
                 player.setHasTrowDices(true);
             } catch (InterruptedException e) {
                 System.out.println("Threading Error in class RollingDice " + e);

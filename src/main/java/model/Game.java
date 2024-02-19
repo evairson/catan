@@ -4,9 +4,12 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import model.buildings.Building;
+import model.buildings.Colony;
 import model.cards.CardStack;
 import model.geometry.Layout;
 import model.geometry.Point;
+import model.tiles.Tile;
 import others.Constants;
 import others.ListPlayers;
 
@@ -14,8 +17,10 @@ public class Game implements StateMethods {
     private static GameBoard board;
     private ListPlayers players; // ListPlayers extends ArrayList
     private CardStack stack;
+    private boolean resourcesGiven;
 
     Game() {
+        resourcesGiven = false;
         Player player1 = new Player(Player.Color.RED, "Player1");
         Player player2 = new Player(Player.Color.YELLOW, "Player2");
         Player player3 = new Player(Player.Color.BLUE, "Player3");
@@ -36,6 +41,7 @@ public class Game implements StateMethods {
 
     public void endTurn() {
         players.next();
+        resourcesGiven = false;
     }
 
     public Player getCurrentPlayer() {
@@ -56,6 +62,23 @@ public class Game implements StateMethods {
 
     @Override
     public void update() {
+        if (getCurrentPlayer().hasThrowDices() && !resourcesGiven) {
+            for (Player p : players) {
+                for (Building b : p.getBuildings()) {
+                    if (b instanceof Colony) {
+                        for (Tile t : ((Colony) b).getTiles()) {
+                            if (t.getDiceValue() == getCurrentPlayer().getDice()) {
+                                p.getResources().get(t.getResourceType()).addAmount(1); //2 pour ville TODO
+                                System.out.println("Gave 1 "
+                                    +  Constants.BoardConstants.getResources(t.getResourceType())
+                                    + " to " + p.getColorString());
+                            }
+                        }
+                    }
+                }
+            }
+            resourcesGiven = true;
+        }
     }
 
     @Override
