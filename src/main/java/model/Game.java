@@ -60,6 +60,10 @@ public class Game implements StateMethods {
         Game.board = board;
     }
 
+    public void setThiefMode(boolean b) {
+        board.setThiefMode(b);
+    }
+
     public void draw(Graphics g) {
         board.draw(g);
     }

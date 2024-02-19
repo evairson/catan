@@ -32,6 +32,7 @@ public class GameBoard {
     private Point mousePosition;
     private double minDistanceToVertex;
     private Thief thief;
+    private boolean thiefMode;
 
     public GameBoard(Layout layout, Thief thief) {
         this.thief = thief;
@@ -40,6 +41,14 @@ public class GameBoard {
         this.initialiseBoard();
         // rendre la centre et la taille de la grille dynamique
 
+    }
+
+    public void setThiefMode(boolean b) {
+        thiefMode = b;
+    }
+
+    public boolean getThiefMode() {
+        return thiefMode;
     }
 
     public Layout getLayout() {
