@@ -33,6 +33,11 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        switch (GameState.getState()) {
+            case Playing: app.getGame().mouseClicked(e);
+            default:
+                break;
+        }
     }
 
     @Override

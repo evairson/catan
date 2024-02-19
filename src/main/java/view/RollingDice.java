@@ -74,12 +74,12 @@ public class RollingDice extends JPanel {
                 }
                 System.out.println(player.getDies());
                 player.setHasTrowDices(true);
+                game.setThiefMode(true);
             } catch (InterruptedException e) {
                 System.out.println("Threading Error in class RollingDice " + e);
             }
         });
         rollThread.start();
-        game.setThiefMode(true);
     }
 
     public void newPlayer(Player player) {

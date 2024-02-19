@@ -282,6 +282,14 @@ public class GameBoard {
                     (int) edge.getEnd().getY());
         } catch (Exception e) { // null seulement la première fois qu'on survole un hexagone
         }
+        drawThief(g);
+    }
+
+    public void drawThief(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        Point p = layout.cubeToPixel(layout, thief.getTile().getCoordinates());
+        g2d.setColor(Color.white);
+        g2d.fillOval((int) p.getX() - 10, (int) p.getY() - 10, 20, 20);
     }
 
     public void mouseMoved(MouseEvent e) {
@@ -318,6 +326,13 @@ public class GameBoard {
             }
         }
 
+    }
+
+    public void mouseCliqued(MouseEvent e) {
+        if (thiefMode) {
+            thief.setTile(highlightedTile);
+            thiefMode = false;
+        }
     }
 
     private void drawText(Graphics g, String text, Point center) {

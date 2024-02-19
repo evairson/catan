@@ -4,7 +4,6 @@ import others.Constants;
 import view.ActionPlayerPanel;
 import view.GamePanel;
 import view.GameWindow;
-import view.ThiefPanel;
 import view.menu.MainMenu;
 
 import java.awt.*;
@@ -55,8 +54,6 @@ public class App implements Runnable {
 
     public void addPanels() {
         actionPlayer.add(gamePanel);
-        ThiefPanel thief = new ThiefPanel(game);
-        actionPlayer.add(thief, 8);
         gameWindow.add(actionPlayer);
     }
 

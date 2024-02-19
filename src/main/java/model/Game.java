@@ -82,6 +82,7 @@ public class Game implements StateMethods {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        board.mouseCliqued(e);
     }
 
     @Override

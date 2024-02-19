@@ -6,16 +6,8 @@ public class Thief {
     private Tile tile;
     private boolean onDesert;
 
-    Thief() {
-        onDesert = true;
-    }
-
-    public void setOnDesert(boolean b) {
-        onDesert = b;
-    }
-
     public boolean isOnDesert() {
-        return onDesert;
+        return tile.getResourceType() == 0;
     }
 
     public Tile getTile() {
