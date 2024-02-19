@@ -30,7 +30,7 @@ public class GameBoard {
     private double minDistanceToEdge;
     private Point mousePosition;
     private double minDistanceToVertex;
-    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages();
+    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadTileImages();
 
     private boolean lookingForVertex = false;
     private boolean lookingForEdge = false;
