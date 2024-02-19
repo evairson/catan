@@ -33,7 +33,6 @@ public class ResourcesPanel extends JPanel {
     }
 
     public ResourcesPanel() {
-        setBackground(Color.red);
         setLayout(null);
         createResourceButtons();
     }
@@ -41,41 +40,31 @@ public class ResourcesPanel extends JPanel {
     private void createResourceButtons() {
         String basePath = "src/main/resources/resources/";
         wood = new ButtonImage(basePath + "wood.png", basePath + "wood.png",
-                20, 10, 2, null, animMouse); // 200 - 550
+                20, 30, 2, null, animMouse); // 200 - 550
         ore = new ButtonImage(basePath + "ore.png", basePath + "ore.png",
-                120, 10, 2, null, animMouse); // 300 - 550
+                120, 30, 2, null, animMouse); // 300 - 550
         clay = new ButtonImage(basePath + "clay.png", basePath + "clay.png",
-                220, 10, 2, null, animMouse); // 400
+                220, 30, 2, null, animMouse); // 400
         wheat = new ButtonImage(basePath + "wheat.png", basePath + "wheat.png",
-                320, 10, 2, null, animMouse); // 500
+                320, 30, 2, null, animMouse); // 500
         wool = new ButtonImage(basePath + "wool.png", basePath + "wool.png",
-                420, 10, 2, null, animMouse); // 600
+                420, 30, 2, null, animMouse); // 600
 
         woodLabel = new JLabel("0", SwingConstants.CENTER);
-        woodLabel.setBounds(30, 180, wood.getWidth(), 20);
+        woodLabel.setBounds(30, 200, wood.getWidth(), 20);
         oreLabel = new JLabel("0", SwingConstants.CENTER);
-        oreLabel.setBounds(180, 180, ore.getWidth(), 20);
+        oreLabel.setBounds(180, 200, ore.getWidth(), 20);
         clayLabel = new JLabel("0", SwingConstants.CENTER);
-        clayLabel.setBounds(330, 180, clay.getWidth(), 20);
+        clayLabel.setBounds(330, 200, clay.getWidth(), 20);
         wheatLabel = new JLabel("0", SwingConstants.CENTER);
-        wheatLabel.setBounds(485, 180, wheat.getWidth(), 20);
+        wheatLabel.setBounds(485, 200, wheat.getWidth(), 20);
         woolLabel = new JLabel("0", SwingConstants.CENTER);
-        woolLabel.setBounds(630, 180, wool.getWidth(), 20);
+        woolLabel.setBounds(630, 200, wool.getWidth(), 20);
         add(woodLabel);
         add(oreLabel);
         add(clayLabel);
         add(wheatLabel);
         add(woolLabel);
-        wood.setBackground(Color.CYAN);
-        ore.setBackground(Color.CYAN);
-        clay.setBackground(Color.CYAN);
-        wheat.setBackground(Color.CYAN);
-        wool.setBackground(Color.CYAN);
-        wood.setOpaque(true);
-        ore.setOpaque(true);
-        clay.setOpaque(true);
-        wheat.setOpaque(true);
-        wool.setOpaque(true);
         add(wood);
         add(ore);
         add(clay);

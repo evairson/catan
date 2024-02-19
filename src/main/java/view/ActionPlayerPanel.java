@@ -60,18 +60,18 @@ public class ActionPlayerPanel extends JPanel {
             private final int length = (int) (200 / Resolution.divider());
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (!resourcesPanel.isMouseInside()) {
+                if (!shopPanel.isMouseInside()) {
                     animate.jPanelXLeft(xCoord, xCoord - length, 2, 1, shopPanel);
-                    resourcesPanel.setMouseInside(true);
+                    shopPanel.setMouseInside(true);
                 }
             }
             @Override
             public void mouseExited(MouseEvent e) {
                 SwingUtilities.invokeLater(() -> {
                     Point mousePos = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), shopPanel);
-                    if (!resourcesPanel.contains(mousePos)) {
+                    if (!shopPanel.contains(mousePos)) {
                         animate.jPanelXRight(xCoord - length, xCoord, 2, 1, shopPanel);
-                        resourcesPanel.setMouseInside(false);
+                        shopPanel.setMouseInside(false);
                     }
                 });
             }
@@ -79,13 +79,13 @@ public class ActionPlayerPanel extends JPanel {
         shopPanel.setAnimMouse(animMouse);
         shopPanel.setVisible(true);
         shopPanel.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
-                (int) (710 / Resolution.divider()));
+                (int) (740 / Resolution.divider()));
         shopPanel.addMouseListener(animMouse);
         add(shopPanel);
     }
     private void initializeResourcesPanel() {
-        int xCoord = Resolution.calculateResolution(180, 640)[0];
-        int yCoord = Resolution.calculateResolution(180, 640)[1];
+        int xCoord = Resolution.calculateResolution(180, 620)[0];
+        int yCoord = Resolution.calculateResolution(180, 620)[1];
         resourcesPanel = new ResourcesPanel();
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
