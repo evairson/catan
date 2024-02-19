@@ -1,1 +1,5 @@
+/**.
+ *
+ */
+
 package view.gamepanels;
