@@ -11,7 +11,6 @@ import model.geometry.CubeCoordinates;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +30,7 @@ public class GameBoard {
     private double minDistanceToEdge;
     private Point mousePosition;
     private double minDistanceToVertex;
+    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages();
 
     private boolean lookingForVertex = false;
     private boolean lookingForEdge = false;
@@ -239,8 +239,6 @@ public class GameBoard {
     }
 
     private void drawVertices(Graphics g) {
-
-
         Graphics2D g2d = (Graphics2D) g;
 
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
@@ -248,33 +246,19 @@ public class GameBoard {
             TileType resource = tile.getResourceType();
             ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
 
-            Map<TileType, BufferedImage> tileImages = TileImageLoader.loadTileImages();
             BufferedImage img = tileImages.get(tile.getResourceType());
-            img = resizeImage(img, img.getWidth() / 2, img.getHeight() / 2);
 
-            double centerX = 0;
-            double centerY = 0;
-            for (Point vertex : hexagonVertices) {
-                centerX += vertex.getX();
-                centerY += vertex.getY();
-            }
-
-            centerX /= hexagonVertices.size();
-            centerY /= hexagonVertices.size();
-
-            Rectangle2D.Float rect = new Rectangle2D.Float(
-                    (float) centerX - img.getWidth() / 2f,
-                    (float) centerY - img.getHeight() / 2f,
-                    img.getWidth(),
-                    img.getHeight());
-
-            TexturePaint tp = new TexturePaint(img, rect);
-            g2d.setPaint(tp);
             Polygon hexagon = new Polygon();
             for (Point vertex : hexagonVertices) {
                 hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
             }
-            g2d.fillPolygon(hexagon);
+            Rectangle bounds = hexagon.getBounds();
+            Image scaledImg = img.getScaledInstance(bounds.width / 2, bounds.height / 2, Image.SCALE_SMOOTH);
+
+            int imgX = bounds.x + (bounds.width - scaledImg.getWidth(null)) / 2;
+            int imgY = bounds.y + (bounds.height - scaledImg.getHeight(null)) / 2;
+
+            g2d.drawImage(scaledImg, imgX, imgY, null);
         }
         // Draw the vertices
         g2d.setColor(Color.BLACK); // Color for the vertices
@@ -302,7 +286,6 @@ public class GameBoard {
 
     public void drawBoard(Graphics g) {
 
-        drawVertices(g);
         drawEdges(g);
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
@@ -311,6 +294,7 @@ public class GameBoard {
     }
 
     public void draw(Graphics g) {
+        System.out.println("derchos");
         drawBoard(g);
         if (minDistanceToVertex < 20) {
             g.setColor(Color.RED);

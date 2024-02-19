@@ -78,17 +78,6 @@ public class ActionPlayerPanel extends JPanel {
         tradeButton = new ButtonImage(basePath + "tradeButton.png", basePath + "tradeButton.png",
                 50, 560, 5, this::trade, null);
 
-//        wood = new ButtonImage(basePath + "resources/wood.png", basePath + "resources/wood.png",
-//                200, 550, 2, null);
-//        ore = new ButtonImage(basePath + "resources/ore.png", basePath + "resources/ore.png",
-//                300, 550, 2, null);
-//        clay = new ButtonImage(basePath + "resources/clay.png", basePath + "resources/clay.png",
-//                400, 550, 2, null);
-//        wheat = new ButtonImage(basePath + "resources/wheat.png", basePath + "resources/wheat.png",
-//                500, 550, 2, null);
-//        wool = new ButtonImage(basePath + "resources/wool.png", basePath + "resources/wool.png",
-//             600, 550, 2, null);
-
         card = new ButtonImage(basePath + "card.png", basePath + "card.png",
         770, 560, 3, null, null);
 
@@ -106,12 +95,6 @@ public class ActionPlayerPanel extends JPanel {
 
         plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
         1160, 310, 8, null, null);
-
-//        add(wood);
-//        add(wool);
-//        add(ore);
-//        add(clay);
-//        add(wheat);
 
         add(city);
         add(colony);
