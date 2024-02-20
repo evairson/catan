@@ -3,6 +3,7 @@ package view;
 import controler.KeyBoardInputs;
 import controler.MouseInputs;
 import model.App;
+import others.Constants;
 import view.utilities.Resolution;
 
 import javax.swing.*;
@@ -29,7 +30,8 @@ public class GamePanel extends JPanel {
         int[] coords = Resolution.calculateResolution(100, 50);
         int xCoord = coords[0];
         int yCoord = coords[1];
-        setBounds(xCoord, yCoord, (int) (1150 / Resolution.divider()), (int) (900 / Resolution.divider()));
+//        setBounds(xCoord, yCoord, (int) (1150 / Resolution.divider()), (int) (900 / Resolution.divider()));
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
     }
 
     private void setPanelSize() {
