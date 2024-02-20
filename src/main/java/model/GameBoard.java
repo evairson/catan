@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import view.TileType.*;
 
-public class GameBoard {
+public class  GameBoard {
     private HashMap<CubeCoordinates, Tile> board;
     private Layout layout;
     private int gridSize = 2;
@@ -30,7 +30,7 @@ public class GameBoard {
     private double minDistanceToEdge;
     private Point mousePosition;
     private double minDistanceToVertex;
-    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadTileImages();
+    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages();
 
     private boolean lookingForVertex = false;
     private boolean lookingForEdge = false;
@@ -243,22 +243,18 @@ public class GameBoard {
 
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             Tile tile = entry.getValue();
-            TileType resource = tile.getResourceType();
-            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
-
-            BufferedImage img = tileImages.get(tile.getResourceType());
-
             Polygon hexagon = new Polygon();
+            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
             for (Point vertex : hexagonVertices) {
                 hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
             }
             Rectangle bounds = hexagon.getBounds();
-            Image scaledImg = img.getScaledInstance(bounds.width / 2, bounds.height / 2, Image.SCALE_SMOOTH);
+            BufferedImage img = tileImages.get(tile.getResourceType());
 
-            int imgX = bounds.x + (bounds.width - scaledImg.getWidth(null)) / 2;
-            int imgY = bounds.y + (bounds.height - scaledImg.getHeight(null)) / 2;
+            int imgX = bounds.x + (bounds.width - img.getWidth()) / 2;
+            int imgY = bounds.y + (bounds.height - img.getHeight()) / 2;
 
-            g2d.drawImage(scaledImg, imgX, imgY, null);
+            g2d.drawImage(img, imgX, imgY, null);
         }
         // Draw the vertices
         g2d.setColor(Color.BLACK); // Color for the vertices
@@ -285,7 +281,7 @@ public class GameBoard {
     }
 
     public void drawBoard(Graphics g) {
-
+        drawVertices(g);
         drawEdges(g);
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
@@ -294,7 +290,6 @@ public class GameBoard {
     }
 
     public void draw(Graphics g) {
-        System.out.println("derchos");
         drawBoard(g);
         if (minDistanceToVertex < 20) {
             g.setColor(Color.RED);

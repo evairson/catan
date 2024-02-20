@@ -19,12 +19,6 @@ public class ActionPlayerPanel extends JPanel {
     private ButtonImage endTurn;
     private ButtonImage tradeButton;
 
-    private ButtonImage wood;
-    private ButtonImage ore;
-    private ButtonImage clay;
-    private ButtonImage wheat;
-    private ButtonImage wool;
-
     private ButtonImage city;
     private ButtonImage colony;
     private ButtonImage road;
