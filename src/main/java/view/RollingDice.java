@@ -87,8 +87,8 @@ public class RollingDice extends JPanel {
                     player.throwDices();
 
                     //update dice images
-                    ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png");
-                    ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png");
+                    ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
+                    ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
 
                     repaint();
                     revalidate();
