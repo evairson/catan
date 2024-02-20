@@ -72,7 +72,7 @@ public class ActionPlayerPanel extends JPanel {
         dice.setBounds(xCoord, yCoord, (int) (205 / Resolution.divider()),
                 (int) (150 / Resolution.divider()));
         add(dice);
-
+        dice.setOpaque(false);
     }
     private void initializeDeckPanel() {
         int xCoord = Resolution.calculateResolution(750, 620)[0];
@@ -100,6 +100,7 @@ public class ActionPlayerPanel extends JPanel {
                 });
             }
         };
+        deckPanel.setOpaque(false);
         deckPanel.setAnimMouse(animMouse);
         deckPanel.setVisible(true);
         deckPanel.setBounds(xCoord, yCoord, (int) (195 / Resolution.divider()),
@@ -131,6 +132,7 @@ public class ActionPlayerPanel extends JPanel {
                 });
             }
         };
+        shopPanel.setOpaque(false);
         shopPanel.setAnimMouse(animMouse);
         shopPanel.setVisible(true);
         shopPanel.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
@@ -164,6 +166,7 @@ public class ActionPlayerPanel extends JPanel {
                 });
             }
         };
+        resourcesPanel.setOpaque(false);
         resourcesPanel.setAnimMouse(animMouse);
         resourcesPanel.setVisible(true);
         resourcesPanel.setBounds(xCoord, yCoord, (int) (1040 / Resolution.divider()),
@@ -174,12 +177,12 @@ public class ActionPlayerPanel extends JPanel {
     private void initializeTradePanel() {
         int xCoord = Resolution.calculateResolution(50, 560)[0];
         int yCoord = Resolution.calculateResolution(50, 560)[1];
-
         tradePanel = new TradePanel(this::trade);
         tradePanel.setVisible(true);
         tradePanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
                 (int) (185 / Resolution.divider()));
         add(tradePanel);
+        tradePanel.setOpaque(false);
     }
 
     private void createButton() {
