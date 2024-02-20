@@ -3,8 +3,8 @@ package view.gamepanels;
 import javax.swing.*;
 
 import view.utilities.ButtonImage;
+import view.utilities.Resolution;
 
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 
 public class ResourcesPanel extends JPanel {
@@ -50,26 +50,30 @@ public class ResourcesPanel extends JPanel {
         wool = new ButtonImage(basePath + "wool.png", basePath + "wool.png",
                 420, 30, 2, null, animMouse); // 600
 
-        woodLabel = new JLabel("0", SwingConstants.CENTER);
-        woodLabel.setBounds(30, 200, wood.getWidth(), 20);
-        oreLabel = new JLabel("0", SwingConstants.CENTER);
-        oreLabel.setBounds(180, 200, ore.getWidth(), 20);
-        clayLabel = new JLabel("0", SwingConstants.CENTER);
-        clayLabel.setBounds(330, 200, clay.getWidth(), 20);
-        wheatLabel = new JLabel("0", SwingConstants.CENTER);
-        wheatLabel.setBounds(485, 200, wheat.getWidth(), 20);
-        woolLabel = new JLabel("0", SwingConstants.CENTER);
-        woolLabel.setBounds(630, 200, wool.getWidth(), 20);
+        woodLabel = createResourceLabel(20, 133, wood.getWidth());
+        oreLabel = createResourceLabel(120, 133, ore.getWidth());
+        clayLabel = createResourceLabel(220, 133, clay.getWidth());
+        wheatLabel = createResourceLabel(323, 133, wheat.getWidth());
+        woolLabel = createResourceLabel(420, 133, wool.getWidth());
+
         add(woodLabel);
         add(oreLabel);
         add(clayLabel);
         add(wheatLabel);
         add(woolLabel);
+
         add(wood);
         add(ore);
         add(clay);
         add(wheat);
         add(wool);
+    }
+
+    private JLabel createResourceLabel(int x, int y, int width) {
+        int[] coords = Resolution.calculateResolution(x, y);
+        JLabel label = new JLabel("0", SwingConstants.CENTER);
+        label.setBounds(coords[0], coords[1], width, 20);
+        return label;
     }
 
     public void updateResourceLabels(int woodAmount, int oreAmount, int clayAmount,
