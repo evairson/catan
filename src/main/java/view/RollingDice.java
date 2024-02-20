@@ -5,6 +5,10 @@ import view.utilities.ImgService;
 import javax.swing.*;
 
 import model.Player;
+import view.utilities.Resolution;
+
+import java.awt.*;
+
 public class RollingDice extends JPanel {
     private Player player;
     private JButton rollButton;
@@ -25,17 +29,17 @@ public class RollingDice extends JPanel {
         setOpaque(true);
         setSize(500, 500);
         diceOneImg = ImgService.loadImage("/view/dice/d1b.png");
-        diceOneImg.setBounds(0, 45, 64, 64);
+        diceOneImg.setBounds(0, 45, (int) (85 / Resolution.divider()), (int) (85 / Resolution.divider()));
         this.add(diceOneImg);
 
         diceTwoImg = ImgService.loadImage("/view/dice/d1r.png");
-        diceTwoImg.setBounds(90, 45, 64, 64);
+        diceTwoImg.setBounds(90, 45, (int) (85 / Resolution.divider()), (int) (85 / Resolution.divider()));
         this.add(diceTwoImg);
-
+        setBackground(Color.red);
 //        setBounds(Constants.Game.WIDTH - 230, Constants.Game.HEIGHT - 400, 250, 250);
 
         rollButton = new JButton("Roll!");
-        rollButton.setBounds(26, 135, 100, 25);
+        rollButton.setBounds(26, 135, (int) (133 / Resolution.divider()), (int) (33 / Resolution.divider()));
         rollButton.addActionListener(actionEvent -> roll());
         this.add(rollButton);
     }
