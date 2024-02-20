@@ -28,13 +28,33 @@ public class RollingDice extends JPanel {
         this.player = player;
         setLayout(null);
         setOpaque(true);
-        diceOneImg = ImgService.loadImage("/view/dice/d1b.png");
+        ImageIcon icon = new ImageIcon(getClass().getResource("/view/dice/d1b.png"));
+        Image originalImage = icon.getImage();
+
+        double divider = 0.75 * Resolution.divider(); // Obtenir le facteur de division
+
+        int scaledWidth = (int) (originalImage.getWidth(null) / divider);
+        int scaledHeight = (int) (originalImage.getHeight(null) / divider);
+
+        Image resizedImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+        ImageIcon resizedIcon = new ImageIcon(resizedImage);
+        diceOneImg = new JLabel(resizedIcon);
         int xCoord = coords[0];
         int yCoord = coords[1];
         diceOneImg.setBounds(xCoord, yCoord, (int) (85 / Resolution.divider()),
                 (int) (85 / Resolution.divider()));
         this.add(diceOneImg);
-        diceTwoImg = ImgService.loadImage("/view/dice/d1r.png");
+        icon = new ImageIcon(getClass().getResource("/view/dice/d1r.png"));
+        originalImage = icon.getImage();
+
+        divider = 0.75 * Resolution.divider(); // Obtenir le facteur de division
+
+        scaledWidth = (int) (originalImage.getWidth(null) / divider);
+        scaledHeight = (int) (originalImage.getHeight(null) / divider);
+
+        resizedImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+        resizedIcon = new ImageIcon(resizedImage);
+        diceTwoImg = new JLabel(resizedIcon);
 
         coords = Resolution.calculateResolution(60, 0);
         xCoord = coords[0];
