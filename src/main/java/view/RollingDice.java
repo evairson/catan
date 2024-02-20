@@ -24,22 +24,31 @@ public class RollingDice extends JPanel {
     }
 
     public RollingDice(Player player) {
+        int[] coords = Resolution.calculateResolution(0, 0);
         this.player = player;
         setLayout(null);
         setOpaque(true);
-        setSize(500, 500);
         diceOneImg = ImgService.loadImage("/view/dice/d1b.png");
-        diceOneImg.setBounds(0, 45, (int) (85 / Resolution.divider()), (int) (85 / Resolution.divider()));
+        int xCoord = coords[0];
+        int yCoord = coords[1];
+        diceOneImg.setBounds(xCoord, yCoord, (int) (85 / Resolution.divider()),
+                (int) (85 / Resolution.divider()));
         this.add(diceOneImg);
-
         diceTwoImg = ImgService.loadImage("/view/dice/d1r.png");
-        diceTwoImg.setBounds(90, 45, (int) (85 / Resolution.divider()), (int) (85 / Resolution.divider()));
-        this.add(diceTwoImg);
-        setBackground(Color.red);
-//        setBounds(Constants.Game.WIDTH - 230, Constants.Game.HEIGHT - 400, 250, 250);
 
+        coords = Resolution.calculateResolution(60, 0);
+        xCoord = coords[0];
+        yCoord = coords[1];
+        diceTwoImg.setBounds(xCoord, yCoord, (int) (85 / Resolution.divider()),
+                (int) (85 / Resolution.divider()));
+        this.add(diceTwoImg);
         rollButton = new JButton("Roll!");
-        rollButton.setBounds(26, 135, (int) (133 / Resolution.divider()), (int) (33 / Resolution.divider()));
+
+        coords = Resolution.calculateResolution(17, 50);
+        xCoord = coords[0];
+        yCoord = coords[1];
+        rollButton.setBounds(xCoord, yCoord, (int) (133 / Resolution.divider()),
+                (int) (33 / Resolution.divider()));
         rollButton.addActionListener(actionEvent -> roll());
         this.add(rollButton);
     }
