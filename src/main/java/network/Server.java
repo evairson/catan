@@ -6,7 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashSet;
 
-import model.Player;
 import network.NetworkObject.TypeObject;
 
 public class Server {

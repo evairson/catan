@@ -5,7 +5,6 @@ import network.PlayerClient;
 import network.Server;
 
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.Scanner;
 
 import javax.swing.*;

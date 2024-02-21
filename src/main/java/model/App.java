@@ -7,7 +7,6 @@ import view.GameWindow;
 import view.menu.MainMenu;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.HashSet;
 
 import network.NetworkObject;
