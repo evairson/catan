@@ -6,14 +6,12 @@ import java.awt.event.MouseMotionListener;
 
 import model.App;
 import view.GameState;
-
-
-
+import model.Game;
 
 public class MouseInputs implements MouseListener, MouseMotionListener {
 
     private App app;
-
+   
     public MouseInputs(App app) {
         this.app = app;
     }
@@ -25,7 +23,8 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
     @Override
     public void mouseMoved(MouseEvent e) {
         switch (GameState.getState()) {
-            case Playing: app.getGame().mouseMoved(e);
+            case Playing:
+                app.getGame().mouseMoved(e);
             default:
                 break;
         }
@@ -33,6 +32,7 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        app.getGame().mouseClicked(e);
     }
 
     @Override

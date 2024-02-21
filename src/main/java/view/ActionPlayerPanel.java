@@ -51,12 +51,10 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel playersPanel;
     private RollingDice dice;
 
-
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         this.app = app;
         game = app.getGame();
-
 
         setLayout(null);
         setOpaque(true);
@@ -68,10 +66,12 @@ public class ActionPlayerPanel extends JPanel {
         initializeRollingDicePanel();
         initializeTradePanel();
         initializeResourcesPanel();
-        initializeShopPanel();
+        initializeShopPanel(game);
         initializeDeckPanel();
         createButton();
+
     }
+
     private void initializeRollingDicePanel() {
         int xCoord = Resolution.calculateResolution(1108, 440)[0];
         int yCoord = Resolution.calculateResolution(1108, 440)[1];
@@ -82,6 +82,7 @@ public class ActionPlayerPanel extends JPanel {
         add(dice);
         dice.setOpaque(false);
     }
+
     private void initializeDeckPanel() {
         int xCoord = Resolution.calculateResolution(750, 620)[0];
         int yCoord = Resolution.calculateResolution(750, 620)[1];
@@ -89,6 +90,7 @@ public class ActionPlayerPanel extends JPanel {
         deckPanel = new DeckPanel(this::addCardsPanel);
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (!deckPanel.isMouseInside()) {
@@ -96,6 +98,7 @@ public class ActionPlayerPanel extends JPanel {
                     deckPanel.setMouseInside(true);
                 }
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 SwingUtilities.invokeLater(() -> {
@@ -116,12 +119,14 @@ public class ActionPlayerPanel extends JPanel {
         deckPanel.addMouseListener(animMouse);
         add(deckPanel);
     }
-    private void initializeShopPanel() {
+
+    private void initializeShopPanel(Game game) {
         int xCoord = Resolution.calculateResolution(1220, 20)[0];
         int yCoord = Resolution.calculateResolution(1220, 20)[1];
-        shopPanel = new ShopPanel(this::drawCard);
+        shopPanel = new ShopPanel(this::drawCard, game);
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (!shopPanel.isMouseInside()) {
@@ -129,6 +134,7 @@ public class ActionPlayerPanel extends JPanel {
                     shopPanel.setMouseInside(true);
                 }
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 SwingUtilities.invokeLater(() -> {
@@ -148,6 +154,7 @@ public class ActionPlayerPanel extends JPanel {
         shopPanel.addMouseListener(animMouse);
         add(shopPanel);
     }
+
     private void initializeResourcesPanel() {
         int xCoord = Resolution.calculateResolution(180, 620)[0];
         int yCoord = Resolution.calculateResolution(180, 620)[1];
@@ -155,6 +162,7 @@ public class ActionPlayerPanel extends JPanel {
         createPlayerPanel();
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (!resourcesPanel.isMouseInside()) {
@@ -162,6 +170,7 @@ public class ActionPlayerPanel extends JPanel {
                     resourcesPanel.setMouseInside(true);
                 }
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 SwingUtilities.invokeLater(() -> {
@@ -182,6 +191,7 @@ public class ActionPlayerPanel extends JPanel {
         resourcesPanel.addMouseListener(animMouse);
         add(resourcesPanel);
     }
+
     private void initializeTradePanel() {
         int xCoord = Resolution.calculateResolution(50, 560)[0];
         int yCoord = Resolution.calculateResolution(50, 560)[1];
@@ -201,33 +211,37 @@ public class ActionPlayerPanel extends JPanel {
                 50, 560, 5, this::trade, null);
 
         card = new ButtonImage(basePath + "card.png", basePath + "card.png",
-        770, 560, 3, null, null);
+                770, 560, 3, null, null);
 
-//        Runnable cityRunnable = () -> game.buildCityButtonAction();
-//        city = new ButtonImage(basePath + "building/city.png", basePath + "building/city.png",
-//        1150, 20, 2, cityRunnable, null);
-//
-//        Runnable colonyRunnable = () -> game.buildColonyButtonAction();
-//        colony = new ButtonImage(basePath + "building/colony.png", basePath + "building/colony.png",
-//        1150, 130, 2, colonyRunnable, null);
-//
-//        Runnable roadRunnable = () -> game.buildRoadButtonAction();
-//        road = new ButtonImage(basePath + "building/road.png", basePath + "building/road.png",
-//        1150, 220, 2, roadRunnable, null);
+        //
+        // city = new ButtonImage(basePath + "building/city.png", basePath +
+        // "building/city.png",
+        // 1150, 20, 2, cityRunnable, null);
+        //
+        //
+        // colony = new ButtonImage(basePath + "building/colony.png", basePath +
+        // "building/colony.png",
+        // 1150, 130, 2, colonyRunnable, null);
+        //
+        //
+        // road = new ButtonImage(basePath + "building/road.png", basePath +
+        // "building/road.png",
+        // 1150, 220, 2, roadRunnable, null);
 
-        /*plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
-        1160, 310, 8, null, null);
-        */
+        /*
+         * plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
+         * 1160, 310, 8, null, null);
+         */
 
-//        add(city);
-//        add(colony);
-//        add(road);
+        // add(city);
+        // add(colony);
+        // add(road);
 
-        //add(plus);
+        // add(plus);
 
         add(tradeButton);
         add(endTurn);
-//        add(card);
+        // add(card);
     }
 
     private void changeTurn() {
@@ -250,7 +264,7 @@ public class ActionPlayerPanel extends JPanel {
         for (int i = 0; i < game.getCurrentPlayer().getCardsDev().size(); i++) {
             String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(i));
             ButtonImage b = new ButtonImage(basePath + card, basePath + card,
-                300 + i * 100, 250, 1.5, this::useCard, null);
+                    300 + i * 100, 250, 1.5, this::useCard, null);
             cardsPanel.add(b);
         }
         JPanel self = this;
@@ -295,7 +309,7 @@ public class ActionPlayerPanel extends JPanel {
         int last = game.getCurrentPlayer().getCardsDev().size();
         String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(last - 1));
         ButtonImage b = new ButtonImage(basePath + card, basePath + card,
-            600, 250, 1.5, this::useCard, null);
+                600, 250, 1.5, this::useCard, null);
         cardPanel.add(b);
         JPanel self = this;
         cardPanel.addMouseListener(new MouseAdapter() {
@@ -348,7 +362,7 @@ public class ActionPlayerPanel extends JPanel {
                 Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
                 String text = game.getPlayers().get(i).getName().toUpperCase();
                 Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
-                String textUnderligne = player ? "<html><u> " + text + "</u></html>"  : " " + text;
+                String textUnderligne = player ? "<html><u> " + text + "</u></html>" : " " + text;
                 panel = new JLabel(textUnderligne, new ImageIcon(buttonImage), JLabel.CENTER);
                 panel.setVerticalTextPosition(JLabel.CENTER);
                 panel.setHorizontalTextPosition(JLabel.RIGHT);
@@ -373,7 +387,7 @@ public class ActionPlayerPanel extends JPanel {
         for (int i = 0; i < game.getPlayers().size(); i++) {
             String text = game.getPlayers().get(i).getName().toUpperCase();
             Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
-            String textUnderligne = player ? "<html><u>" + text + "</u></html>"  : " " + text;
+            String textUnderligne = player ? "<html><u>" + text + "</u></html>" : " " + text;
             ((JLabel) playersPanel.getComponents()[i]).setText(textUnderligne);
         }
         try {
