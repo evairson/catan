@@ -3,9 +3,10 @@ package model.buildings;
 import model.Player;
 import model.resources.Resources;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Building {
+public abstract class Building implements Serializable {
     private Player owner;
 
     public boolean buyable(Player player, ArrayList<Resources> cost) {

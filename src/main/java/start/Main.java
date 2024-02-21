@@ -14,6 +14,8 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+        System.out.println("Quel est votre nom ?");
+        String name = sc.nextLine();
         System.out.println("1 : créer serveur 2 : se connecter à un existant");
         if (Integer.parseInt(sc.nextLine()) == 1) {
             new Thread(() -> {
@@ -26,7 +28,7 @@ public class Main {
             try {
                 InetAddress address = InetAddress.getByName("localhost");
                 System.out.println(address);
-                PlayerClient player = new PlayerClient(address, 8000);
+                PlayerClient player = new PlayerClient(name, address, 8000);
                 System.out.println("yeaaah");
                 SwingUtilities.invokeLater(() -> {
                     System.out.println("launching game");
@@ -39,7 +41,7 @@ public class Main {
             System.out.println("Entrez l'adresse IP du serveur :");
             try {
                 InetAddress address = InetAddress.getByName(sc.nextLine());
-                PlayerClient player = new PlayerClient(address, 8000);
+                PlayerClient player = new PlayerClient(name, address, 8000);
                 System.out.println("yeaaah2");
                 SwingUtilities.invokeLater(() -> {
                     System.out.println("launching game");

@@ -2,12 +2,22 @@ package network;
 
 import java.io.Serializable;
 
-public class NetworkObjet implements Serializable {
+public class NetworkObject implements Serializable {
     private String message;
     private int id;
-    private Object object;
+    private Serializable object;
+    private TypeObject type;
 
-    public NetworkObjet(String message, int id, Object object) {
+    public enum TypeObject {
+        Message, Game,
+    }
+
+    public TypeObject getType() {
+        return type;
+    }
+
+    public NetworkObject(TypeObject type, String message, int id, Serializable object) {
+        this.type = type;
         this.message = message;
         this.id = id;
         this.object = object;
@@ -28,7 +38,7 @@ public class NetworkObjet implements Serializable {
     public Object getObject() {
         return object;
     }
-    public void setObject(Object object) {
+    public void setObject(Serializable object) {
         this.object = object;
     }
 

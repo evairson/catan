@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import model.buildings.Building;
@@ -7,7 +8,7 @@ import model.cards.CardStack;
 import model.cards.DevelopmentCard;
 import model.resources.Resources;
 
-public class Player {
+public class Player implements Serializable {
     static final int NUMBER_DICE = 6;
 
     public enum Color {
@@ -17,17 +18,17 @@ public class Player {
         GREEN
     }
 
-    private Color color;
-    private Boolean turn;
-    private int dice1;
-    private int dice2;
-    private String name;
-    private Boolean hasThrowDices;
-    private ArrayList<Resources> resources;
+    protected Color color;
+    protected Boolean turn;
+    protected int dice1;
+    protected int dice2;
+    protected String name;
+    protected Boolean hasThrowDices;
+    protected ArrayList<Resources> resources;
 
 
-    private ArrayList<DevelopmentCard> cardsDev;
-    private ArrayList<Building> buildings;
+    protected ArrayList<DevelopmentCard> cardsDev;
+    protected ArrayList<Building> buildings;
 
     public Player(Color c, String name) {
         color = c;

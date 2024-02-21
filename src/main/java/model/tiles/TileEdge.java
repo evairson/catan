@@ -2,10 +2,11 @@ package model.tiles;
 
 import model.geometry.Point;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TileEdge {
+public class TileEdge implements Serializable {
     private Point start;
     private Point end;
     private Set<Tile> tiles;

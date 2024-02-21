@@ -10,17 +10,21 @@ import model.geometry.Point;
 import others.Constants;
 import others.ListPlayers;
 
-public class Game implements StateMethods {
-    private static GameBoard board;
+import java.io.Serializable;
+import java.util.HashSet;
+
+public class Game implements StateMethods, Serializable {
+    private GameBoard board;
     private ListPlayers players; // ListPlayers extends ArrayList
     private CardStack stack;
 
-    Game() {
-        Player player1 = new Player(Player.Color.RED, "Player1");
-        Player player2 = new Player(Player.Color.YELLOW, "Player2");
-        Player player3 = new Player(Player.Color.BLUE, "Player3");
-        Player player4 = new Player(Player.Color.GREEN, "Player4");
-        players = new ListPlayers(0, player1, player2, player3, player4);
+    Game(HashSet<String> names) {
+        HashSet<Player> playersSet = new HashSet<>();
+        for (String name : names) {
+            Player player = new Player(Player.Color.RED, name);
+            playersSet.add(player);
+        }
+        players = new ListPlayers(0, playersSet);
 
         Point point1 = new Point(400, 400);
         Point point2 = new Point(50, 50);
@@ -44,6 +48,10 @@ public class Game implements StateMethods {
 
     public ListPlayers getPlayers() {
         return players;
+    }
+
+    public GameBoard getBoard() {
+        return board;
     }
 
     public void draw(Graphics g) {

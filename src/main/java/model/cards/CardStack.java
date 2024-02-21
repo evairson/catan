@@ -1,9 +1,10 @@
 package model.cards;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class CardStack {
+public class CardStack implements Serializable {
     public static final int NB_KNIGHTS = 14;
     public static final int NB_PROGRESS = 6;
     public static final int NB_POINT = 5;

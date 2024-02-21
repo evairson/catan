@@ -6,17 +6,22 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashSet;
 
+import model.Player;
+import network.NetworkObject.TypeObject;
+
 public class Server {
     private static final int PORT = 8000;
     private static HashSet<ObjectOutputStream> writers = new HashSet<>();
+    private static HashSet<String> players = new HashSet<>();
 
     public Server() throws Exception {
         System.out.println("Le serveur est démarré sur le port " + PORT);
         ServerSocket listener = new ServerSocket(PORT);
-
+        int id = 0;
         try {
             while (true) {
-                new ClientHandler(listener.accept()).start();
+                new ClientHandler(listener.accept(), id).start();
+                id++;
                 System.out.println("Nouveau joueur");
             }
         } finally {
@@ -29,8 +34,10 @@ public class Server {
         private Socket socket;
         private ObjectOutputStream out;
         private ObjectInputStream in;
+        private int id;
 
-        ClientHandler(Socket socket) {
+        ClientHandler(Socket socket, int id) {
+            this.id = id;
             this.socket = socket;
         }
 
@@ -41,6 +48,14 @@ public class Server {
                 // Créer le flux de sortie pour envoyer des messages au client
                 out = new ObjectOutputStream(socket.getOutputStream());
 
+                NetworkObject idPlayer = new NetworkObject(TypeObject.Message, "ID", id, null);
+
+                out.writeUnshared(idPlayer);
+                out.flush();
+
+                NetworkObject name = (NetworkObject) in.readObject();
+                players.add(name.getMessage());
+                System.out.println(name.getMessage() + " est bien connecté(e) au serveur.");
                 // Ajouter le flux de sortie à l'ensemble des écrivains
                 synchronized (writers) {
                     writers.add(out);
@@ -50,10 +65,17 @@ public class Server {
                 Object input;
                 while ((input = in.readObject()) != null) {
                     // Redistribuer le message à tous les clients
-                    synchronized (writers) {
-                        for (ObjectOutputStream writer : writers) {
-                            writer.writeObject(input);
-                            writer.flush();
+                    if (((NetworkObject) input).getMessage().equals("tryStartGame")) {
+                        System.out.println("J'ai recu");
+                        input = new NetworkObject(TypeObject.Message, "NamePlayers", id, players);
+                        out.writeUnshared(input);
+                        out.flush();
+                    } else {
+                        synchronized (writers) {
+                            for (ObjectOutputStream writer : writers) {
+                                writer.writeUnshared(input);
+                                writer.flush();
+                            }
                         }
                     }
                 }

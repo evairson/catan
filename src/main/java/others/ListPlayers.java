@@ -1,6 +1,7 @@
 package others;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import model.Player;
 
@@ -13,7 +14,7 @@ public class ListPlayers extends ArrayList<Player> {
         return currentPlayer;
     }
 
-    public ListPlayers(int start, Player... players) {
+    public ListPlayers(int start, HashSet<Player> players) {
         super();
         for (Player player : players) {
             this.add(player);

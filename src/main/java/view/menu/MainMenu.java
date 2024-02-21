@@ -5,6 +5,7 @@ import view.utilities.ButtonImage;
 import javax.swing.*;
 
 import model.App;
+import model.Game;
 
 import java.awt.*;
 
@@ -51,14 +52,14 @@ public class MainMenu extends JPanel {
     }
 
     public void startAll() {
-        app.startGame();
+        app.tryStartGame();
     }
 
-    public void startapp() {
+    public void startapp(Game game) {
         System.out.println("Lancement du jeu...");
         Container parent = getParent();
         parent.remove(this);
-        app.addPanels();
+        app.addPanels(game);
     }
 
     public void startOptions() {

@@ -1,6 +1,8 @@
 package model;
 
-public class Thief {
+import java.io.Serializable;
+
+public class Thief implements Serializable {
     // private Coordonnee cord;
     private boolean onDesert;
 

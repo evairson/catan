@@ -8,9 +8,11 @@ import view.menu.MainMenu;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.HashSet;
 
-import network.NetworkObjet;
+import network.NetworkObject;
 import network.PlayerClient;
+import network.NetworkObject.TypeObject;
 
 public class App implements Runnable {
     private GamePanel gamePanel;
@@ -38,10 +40,7 @@ public class App implements Runnable {
         player = playerClient;
         player.setApp(this);
         mainMenu = new MainMenu(this);
-        gamePanel = new GamePanel(this);
-        game = new Game();
-        actionPlayer = new ActionPlayerPanel(this);
-        gameWindow = new GameWindow(gamePanel, actionPlayer, mainMenu);
+        gameWindow = new GameWindow(null, null, mainMenu);
 
 
         mainMenu.requestFocus();
@@ -62,17 +61,34 @@ public class App implements Runnable {
         gameThread.start();
     }
 
-    public void startGame() {
-        NetworkObjet object = new NetworkObjet("start", 1, null);
+    public void tryStartGame() {
         try {
-            player.getOut().writeObject(object);
+            NetworkObject gameObject;
+            gameObject = new NetworkObject(TypeObject.Message, "tryStartGame", player.getId(), null);
+            player.getOut().writeUnshared(gameObject);
             player.getOut().flush();
-        } catch (IOException e) {
+            System.out.println("ca c'est bon");
+        } catch (Exception e) {
             e.getStackTrace();
         }
     }
 
-    public void addPanels() {
+    public void startGame(HashSet<String> hashSet) {
+        try {
+            game = new Game(hashSet);
+            System.out.println(game.getBoard() == null);
+            NetworkObject gameObject = new NetworkObject(TypeObject.Game, "startGame", player.getId(), game);
+            player.getOut().writeUnshared(gameObject);
+            player.getOut().flush();
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+    }
+
+    public void addPanels(Game game) {
+        this.game = game;
+        gamePanel = new GamePanel(this);
+        actionPlayer = new ActionPlayerPanel(this);
         actionPlayer.add(gamePanel);
         gameWindow.add(actionPlayer);
     }
@@ -113,8 +129,10 @@ public class App implements Runnable {
 
             if (deltaF >= 1) {
                 mainMenu.repaint();
-                actionPlayer.repaint();
-                gamePanel.repaint();
+                if (actionPlayer != null) {
+                    actionPlayer.repaint();
+                    gamePanel.repaint();
+                }
                 gameWindow.repaint();
                 gameWindow.revalidate();
                 deltaF--;

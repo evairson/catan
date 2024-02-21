@@ -1,8 +1,9 @@
 package model.geometry;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Layout {
+public class Layout implements Serializable {
     private Orientation orientation;
     private Point origin;
     private Point size;

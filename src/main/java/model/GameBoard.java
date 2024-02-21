@@ -3,9 +3,9 @@ package model;
 import model.geometry.*;
 import model.tiles.*;
 import others.Constants;
-import model.geometry.CubeCoordinates;
 
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
@@ -17,7 +17,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Polygon;
 
-public class GameBoard {
+public class GameBoard implements Serializable {
     private HashMap<CubeCoordinates, Tile> board;
     private Layout layout;
     private int gridSize = 2;

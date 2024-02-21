@@ -1,6 +1,8 @@
 package model.resources;
 
-public abstract class Resources {
+import java.io.Serializable;
+
+public abstract class Resources implements Serializable {
 
     private int amount;
 
