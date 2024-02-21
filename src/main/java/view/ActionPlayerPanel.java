@@ -9,9 +9,12 @@ import javax.imageio.ImageIO;
 import java.lang.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import model.App;
 import model.Game;
+import model.Player;
+import model.resources.Resources;
 import view.gamepanels.DeckPanel;
 import view.gamepanels.ResourcesPanel;
 import view.gamepanels.ShopPanel;
@@ -363,8 +366,10 @@ public class ActionPlayerPanel extends JPanel {
         add(playersPanel);
     }
 
-    private void update() {
-        dice.newPlayer(game.getCurrentPlayer());
+    public void update() {
+        Player currentPlayer = game.getCurrentPlayer();
+        dice.newPlayer(currentPlayer);
+        resourcesPanel.updateResourceLabels(currentPlayer);
 
         namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
         for (int i = 0; i < game.getPlayers().size(); i++) {
