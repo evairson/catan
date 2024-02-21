@@ -4,7 +4,7 @@ import others.Constants;
 import view.utilities.ButtonImage;
 import javax.swing.*;
 
-import model.Game;
+import model.App;
 
 import java.awt.*;
 
@@ -14,9 +14,9 @@ public class MainMenu extends JPanel {
     private JButton optionsBtn;
     private JButton quitBtn;
     private Image backgroundImage;
-    private Game game;
+    private App game;
 
-    public MainMenu(Game game) {
+    public MainMenu(App game) {
         this.game = game;
         setLayout(null); // Disposer les boutons verticalement
         loadBackgroundImage("src/main/resources/mainMenu.png");
