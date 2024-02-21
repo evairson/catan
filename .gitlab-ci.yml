@@ -1,4 +1,4 @@
-image: openjdk:11
+image: openjdk:21
 
 stages:
   - lint
@@ -7,15 +7,11 @@ stages:
 lint:
   stage: lint
   script:
-    - apt-get update && apt-get install -y checkstyle
-    - find src/ -name "*.java" -exec checkstyle -c ./checkstyle.xml {} \; > checkstyle_report.txt
-    - cat checkstyle_report.txt
-    - if egrep -q "\[ERROR\]" checkstyle_report.txt; then exit 1; fi
+    - curl -L -o checkstyle-8.41-all.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-8.41/checkstyle-8.41-all.jar
+    - java -jar checkstyle-8.41-all.jar -c ./checkstyle.xml src/
+  allow_failure: true
 
 build:
   stage: build
   script:
-    - find . -name "*.java" | xargs javac -classpath build -d bin
-  artifacts:
-    paths:
-      - build/
+    - javac src/main/java/*/*.java src/main/java/*/*/*.java

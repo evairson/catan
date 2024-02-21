@@ -6,6 +6,10 @@ import model.buildings.*;
 import model.resources.*;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
+import model.buildings.Building;
+import model.cards.CardStack;
+import model.cards.DevelopmentCard;
+import model.resources.Resources;
 
 public class Player {
     static final int NUMBER_DICE = 7;
@@ -22,10 +26,10 @@ public class Player {
     private int dice1;
     private int dice2;
     private String name;
-    // private Coordonnee cord;
+    private Boolean hasThrowDices;
     private ArrayList<Resources> resources;
 
-    // private ArrayList<Card> cardsDev;
+    private ArrayList<DevelopmentCard> cardsDev;
     private ArrayList<Building> buildings;
 
     public Player(Color c, String name) {
@@ -38,6 +42,7 @@ public class Player {
         resources.add(new Wood(3));
         resources.add(new Wool(3));
         buildings = new ArrayList<>();
+        cardsDev = new ArrayList<>();
     }
 
     public void printBuildings() {
@@ -95,6 +100,14 @@ public class Player {
         color = c;
     }
 
+    public boolean hasThrowDices() {
+        return hasThrowDices;
+    }
+
+    public void setHasTrowDices(Boolean b) {
+        hasThrowDices = b;
+    }
+
     public Boolean isTurn() {
         return turn;
     }
@@ -107,6 +120,14 @@ public class Player {
         return dice1 + dice2;
     }
 
+    public int getDice1() {
+        return dice1;
+    }
+
+    public int getDice2() {
+        return dice2;
+    }
+
     public ArrayList<Building> getBuildings() {
         return buildings;
     }
@@ -115,14 +136,23 @@ public class Player {
         return resources;
     }
 
-    // ------------------------------------
+    public ArrayList<DevelopmentCard> getCardsDev() {
+        return cardsDev;
+    }
+
+    public void setCardsDev(ArrayList<DevelopmentCard> cardsDev) {
+        this.cardsDev = cardsDev;
+    }
+
+// ------------------------------------
+
 
     public void throwDice1() {
-        dice1 = (int) (Math.random() * NUMBER_DICE); // (max-min+1)*min
+        dice1 = (int) ((Math.random() * NUMBER_DICE) + 1); // (max-min+1)*min
     }
 
     public void throwDice2() {
-        dice2 = (int) (Math.random() * NUMBER_DICE);
+        dice2 = (int) ((Math.random() * NUMBER_DICE) + 1);
     }
 
     public void throwDices() {
@@ -174,6 +204,10 @@ public class Player {
 
     public void changeWith(Player p) {
         // TODO :
+    }
+
+    public void drawCard(CardStack stack) {
+        cardsDev.add(stack.getCardStack().pop());
     }
 
 }
