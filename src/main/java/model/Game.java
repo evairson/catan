@@ -25,7 +25,7 @@ public class Game implements StateMethods {
         players = new ListPlayers(0, player1, player2, player3, player4);
 
         Point point1 = new Point(400, 400);
-        Point point2 = new Point(50, 50);
+        Point point2 = new Point(70, 70);
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
         board = new GameBoard(layout);
 
