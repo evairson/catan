@@ -1,32 +1,40 @@
 package model.buildings;
 
 import model.Player;
-import model.resources.Resources;
-
+import model.resources.*;
+import others.Constants;
 import java.awt.*;
 import java.util.ArrayList;
+import model.tiles.TileVertex;
 
 public class Colony extends Building {
     private boolean isCity = false;
     private boolean isPort = false;
-
-
-    private ArrayList<Resources> costColony; //dans l'ordre
-    private ArrayList<Resources> costCity;
+    private TileVertex vertex;
 
     public Colony(Player owner) {
         super(owner);
-
     }
 
-    public Colony(Player player, Boolean isCity, boolean isPort) {
+    public Colony(Player player, boolean isCity, boolean isPort, TileVertex vertex) {
         super(player);
         this.isCity = isCity;
         this.isPort = isPort;
+        this.vertex = vertex;
     }
 
     public void setVille() {
         isCity = true;
+    }
+
+    public boolean cityBuyable(Player player) {
+        int[] cost = getCost(true);
+        return super.buyable(player, cost);
+    }
+
+    public boolean colonyBuyable(Player player) {
+        int[] cost = getCost(false);
+        return super.buyable(player, cost);
     }
 
     public void setPort() {
@@ -37,21 +45,22 @@ public class Colony extends Building {
         return (isCity ? 2 : 1);
     }
 
-    public ArrayList<Resources> getCost(boolean isCity) {
+    public int[] getCost(boolean isCity) {
         if (isCity) {
-            return costCity;
+            return Constants.BuildingCosts.CITY;
         }
-        return costColony;
+        return Constants.BuildingCosts.COLONY;
     }
 
-    public boolean buy(Player player, boolean isCity) {
+    public boolean buyAndPlace(Player player, boolean isCity, TileVertex vertex) {
         if (super.buy(player, getCost(isCity))) {
-            Colony colony = new Colony(player, isCity, false);
-            //faudrait check si c'est un port aussi là
+            Colony colony = new Colony(player, isCity, false, vertex);
+            player.getBuildings().remove(vertex.getBuilding());
+            vertex.setBuilding(colony);
+            // faudrait check si c'est un port aussi là
             player.getBuildings().add(colony);
             return true;
         }
         return false;
     }
 }
-

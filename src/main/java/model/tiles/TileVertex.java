@@ -20,7 +20,9 @@ public class TileVertex {
     public void setBuilding(Building building) {
         this.building = building;
     }
-
+    public Building getBuilding() {
+        return building;
+    }
     public Set<Tile> getTiles() {
         return tiles;
     }

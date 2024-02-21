@@ -1,7 +1,7 @@
 package model.buildings;
 
 import model.Player;
-import model.resources.Resources;
+import model.resources.*;
 
 import java.util.ArrayList;
 import java.awt.*;
@@ -13,15 +13,25 @@ public abstract class Building {
         this.owner = owner;
     }
 
-    public boolean buyable(Player player, ArrayList<Resources> cost) {
-        for (Resources value : cost) {
-            for (Resources resource : player.getResources()) {
-                if (value.getClass() != resource.getClass()) {
-                    continue;
-                }
-                if (value.getAmount() <= resource.getAmount()) {
-                    continue;
-                }
+    public Player getOwner() {
+        return owner;
+    }
+
+    public boolean buyable(Player player, int[] cost) {
+        for (int i = 0; i < cost.length; i++) {
+            if (player.getResources().get(i) instanceof Clay && player.getResources().get(i).getAmount() < cost[0]) {
+                return false;
+            }
+            if (player.getResources().get(i) instanceof Ore && player.getResources().get(i).getAmount() < cost[1]) {
+                return false;
+            }
+            if (player.getResources().get(i) instanceof Wheat && player.getResources().get(i).getAmount() < cost[2]) {
+                return false;
+            }
+            if (player.getResources().get(i) instanceof Wood && player.getResources().get(i).getAmount() < cost[3]) {
+                return false;
+            }
+            if (player.getResources().get(i) instanceof Wool && player.getResources().get(i).getAmount() < cost[4]) {
                 return false;
             }
         }
@@ -51,12 +61,41 @@ public abstract class Building {
         }
     }
 
-    public boolean buy(Player player, ArrayList<Resources> cost) {
+    public boolean buy(Player player, int[] cost) {
         if (buyable(player, cost)) {
-            for (int i = 0; i < cost.size(); i++) {
-                player.getResources().get(i).payAmount(cost.get(i).getAmount());
-                return true;
+            for (int i = 0; i < cost.length; i++) {
+                if (player.getResources().get(i) instanceof Clay) {
+                    if (!player.getResources().get(i).payAmount(cost[0])) {
+                        return false;
+                    }
+                    System.out.println("payed " + cost[0] + " clay");
+                }
+                if (player.getResources().get(i) instanceof Ore) {
+                    if (!player.getResources().get(i).payAmount(cost[1])) {
+                        return false;
+                    }
+                    System.out.println("payed " + cost[1] + " ore");
+                }
+                if (player.getResources().get(i) instanceof Wheat) {
+                    if (!player.getResources().get(i).payAmount(cost[2])) {
+                        return false;
+                    }
+                    System.out.println("payed " + cost[2] + " wheat");
+                }
+                if (player.getResources().get(i) instanceof Wood) {
+                    if (!player.getResources().get(i).payAmount(cost[3])) {
+                        return false;
+                    }
+                    System.out.println("payed " + cost[3] + " wood");
+                }
+                if (player.getResources().get(i) instanceof Wool) {
+                    if (!player.getResources().get(i).payAmount(cost[4])) {
+                        return false;
+                    }
+                    System.out.println("payed " + cost[4] + " wool");
+                }
             }
+            return true;
         }
         return false;
     }

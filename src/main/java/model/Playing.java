@@ -47,11 +47,18 @@ public class Playing implements StateMethods {
     @Override
     public void mouseClicked(MouseEvent e) {
         System.out.println("Mouse clicked");
-        if (board.isLookingForEdge()) {
-            System.out.println("Looking for edge and clicked");
-            game.getCurrentPlayer().buildRoad(board.getClosestTileEdge());
-            game.getCurrentPlayer().printBuildings();
+        if (board.isPlacingCity()) {
+            game.buildCity();
+            System.out.println("Building city");
+        } else if (board.isPlacingColony()) {
+            game.buildColony();
+            System.out.println("Building colony");
+        } else if (board.isPlacingRoad()) {
+            game.buildRoad();
+            System.out.println("Building road");
         }
+
+        game.getCurrentPlayer().printResources();
     }
 
     @Override

@@ -8,7 +8,6 @@ import view.TileImageLoader;
 import view.TileType;
 import model.geometry.CubeCoordinates;
 
-
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -17,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import view.TileType.*;
 
-public class  GameBoard {
+public class GameBoard {
     private HashMap<CubeCoordinates, Tile> board;
     private Layout layout;
     private int gridSize = 2;
@@ -34,6 +33,10 @@ public class  GameBoard {
 
     private boolean lookingForVertex = false;
     private boolean lookingForEdge = false;
+    private boolean placingRoad = false;
+    private boolean placingColony = false;
+    private boolean placingCity = false;
+
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
 
@@ -43,6 +46,25 @@ public class  GameBoard {
         this.initialiseBoard();
         // rendre la centre et la taille de la grille dynamique
 
+    }
+
+    public void setPlacingRoad(boolean placingRoad) {
+        this.placingRoad = placingRoad;
+    }
+    public void setPlacingColony(boolean placingColony) {
+        this.placingColony = placingColony;
+    }
+    public void setPlacingCity(boolean placingCity) {
+        this.placingCity = placingCity;
+    }
+    public boolean isPlacingRoad() {
+        return placingRoad;
+    }
+    public boolean isPlacingColony() {
+        return placingColony;
+    }
+    public boolean isPlacingCity() {
+        return placingCity;
     }
 
     public TileVertex getClosestTileVertex() {
@@ -240,7 +262,21 @@ public class  GameBoard {
 
     private void drawVertices(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(Color.BLACK); // Color for the vertices
+        // Draw the vertices
+        for (Point vertex : verticesMap.keySet()) {
+            if (verticesMap.get(vertex).getBuilding() != null) {
+                g2d.setColor(verticesMap.get(vertex).getBuilding().getColorInAwt());
+                g2d.fillOval((int) vertex.getX() - 4, (int) vertex.getY() - 4, 8, 8);
+            } else {
+                g2d.setColor(Color.BLACK);
+                g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
+            }
+        }
+    }
 
+    public void drawImagesInHexes(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             Tile tile = entry.getValue();
             Polygon hexagon = new Polygon();
@@ -255,11 +291,6 @@ public class  GameBoard {
             int imgY = bounds.y + (bounds.height - img.getHeight()) / 2;
 
             g2d.drawImage(img, imgX, imgY, null);
-        }
-        // Draw the vertices
-        g2d.setColor(Color.BLACK); // Color for the vertices
-        for (Point vertex : verticesMap.keySet()) {
-            g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
         }
     }
 
@@ -283,6 +314,7 @@ public class  GameBoard {
     public void drawBoard(Graphics g) {
         drawVertices(g);
         drawEdges(g);
+        drawImagesInHexes(g);
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
             drawText(g, entry.getValue().getDiceValue() + "", layout.cubeToPixel(layout, cubeCoord));

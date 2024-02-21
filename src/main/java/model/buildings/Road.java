@@ -2,7 +2,7 @@ package model.buildings;
 
 import model.Player;
 import model.resources.Resources;
-
+import others.Constants;
 import java.awt.*;
 import java.util.ArrayList;
 import model.tiles.TileEdge;
@@ -11,29 +11,32 @@ public class Road extends Building {
 
     private TileEdge edge;
     private Player.Color playerColor;
-    private ArrayList<Resources> cost; // dans l'ordre encore ^^^^^^
+    
+    public Road(Player owner) {
+        super(owner);
+    }
 
     public Road(Player owner, TileEdge edge, Player.Color playerColor) {
         super(owner);
         this.edge = edge;
+        this.playerColor = playerColor;
+    }
+    public boolean buyable(Player player) {
+        return super.buyable(player, getCost());
     }
 
     public TileEdge getEdge() {
         return this.edge;
     }
 
-    public ArrayList<Resources> getCost() {
-        return cost;
+    public int[] getCost() {
+        return Constants.BuildingCosts.ROAD;
     }
-
-    public void setCost(ArrayList<Resources> cost) {
-        this.cost = cost;
-    }
-
-    public boolean buyAndPlace(Player player, TileEdge edge, ArrayList<Resources> cost) {
-        if (super.buy(player, cost)) {
+    public boolean buyAndPlace(Player player, TileEdge edge) {
+        if (super.buy(player, getCost())) {
             Road road = new Road(player, edge, player.getColor());
             player.getBuildings().add(road);
+            edge.setBuilding(road);
             return true;
         }
         return false;

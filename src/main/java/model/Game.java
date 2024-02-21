@@ -8,6 +8,7 @@ import view.GameState;
 import view.GameWindow;
 import view.menu.MainMenu;
 import model.tiles.TileVertex;
+import model.tiles.TileEdge;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -57,7 +58,7 @@ public class Game implements Runnable {
         board = playing.getBoard();
         playing.setGame(this);
         mainMenu.requestFocus();
-        //add a mouse click listener to the gamePanel
+        // add a mouse click listener to the gamePanel
         gamePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -68,34 +69,100 @@ public class Game implements Runnable {
         startGameLoop();
     }
 
-    public void buildCity() {
-        if (board.isLookingForEdge()) {
-            board.setLookingForEdge(!board.isLookingForEdge());
+    public void buildCityButtonAction() {
+        if (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) {
+            if (getCurrentPlayer().hasColony()) {
+                System.out.println("You can build a city");
+                if (board.isLookingForVertex()) {
+                    board.setLookingForVertex(!board.isLookingForVertex());
+                    board.setPlacingCity(false);
+                    board.setPlacingRoad(false);
+                    board.setPlacingColony(false);
+                } else {
+                    board.setPlacingCity(true);
+                    board.setPlacingRoad(false);
+                    board.setPlacingColony(false);
+                    board.setLookingForVertex(true);
+                }
+                if (board.isLookingForEdge()) {
+                    board.setLookingForEdge(!board.isLookingForEdge());
+                    board.setPlacingRoad(false);
+                    board.setPlacingColony(false);
+                }
+            }
         }
-        board.setLookingForVertex(!board.isLookingForVertex());
-        if (board.isLookingForVertex()) {
-            TileVertex cVertex = board.getClosestTileVertex();
-            getCurrentPlayer().buildCity(cVertex);
+    }
+
+    public void buildColonyButtonAction() {
+        if (Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) {
+            if (board.isLookingForVertex()) {
+                board.setLookingForVertex(!board.isLookingForVertex());
+                board.setPlacingCity(false);
+                board.setPlacingRoad(false);
+                board.setPlacingColony(false);
+            } else {
+                board.setPlacingCity(false);
+                board.setPlacingRoad(false);
+                board.setPlacingColony(true);
+                board.setLookingForVertex(true);
+            }
+            if (board.isLookingForEdge()) {
+                board.setLookingForEdge(!board.isLookingForEdge());
+                board.setPlacingRoad(false);
+                board.setPlacingCity(false);
+            }
+        }
+    }
+
+    public void buildRoadButtonAction() {
+        if (Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) {
+            if (board.isLookingForEdge()) {
+                board.setLookingForEdge(!board.isLookingForEdge());
+                board.setPlacingCity(false);
+                board.setPlacingColony(false);
+                board.setPlacingRoad(false);
+            } else {
+                board.setPlacingCity(false);
+                board.setPlacingColony(false);
+                board.setPlacingRoad(true);
+                board.setLookingForEdge(true);
+            }
+            if (board.isLookingForVertex()) {
+                board.setLookingForVertex(!board.isLookingForVertex());
+                board.setPlacingCity(false);
+                board.setPlacingColony(false);
+            }
         }
     }
 
     public void buildColony() {
-        if (board.isLookingForEdge()) {
-            board.setLookingForEdge(!board.isLookingForEdge());
-        }
-        board.setLookingForVertex(!board.isLookingForVertex());
         if (board.isLookingForVertex()) {
-
             TileVertex cVertex = board.getClosestTileVertex();
             getCurrentPlayer().buildColony(cVertex);
         }
+        // rajouter un if ça a marché (transformer Player.buildColony en boolean)
+        board.setLookingForVertex(false);
+        board.setPlacingColony(false);
     }
 
     public void buildRoad() {
-        if (board.isLookingForVertex()) {
-            board.setLookingForVertex(!board.isLookingForVertex());
+        if (board.isLookingForEdge()) {
+            TileEdge cEdge = board.getClosestTileEdge();
+            getCurrentPlayer().buildRoad(cEdge);
         }
-        board.setLookingForEdge(!board.isLookingForEdge());
+        // rajouter un if ça a marché (transformer Player.buildRoad en boolean)
+        board.setLookingForEdge(false);
+        board.setPlacingRoad(false);
+    }
+
+    public void buildCity() {
+        if (board.isLookingForVertex()) {
+            TileVertex cVertex = board.getClosestTileVertex();
+            getCurrentPlayer().buildCity(cVertex);
+        }
+        // rajouter un if ça a marché (transformer Player.buildCity en boolean)
+        board.setLookingForVertex(false);
+        board.setPlacingCity(false);
     }
 
     public Playing getPlaying() {

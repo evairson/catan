@@ -3,7 +3,7 @@ package model;
 import java.util.ArrayList;
 
 import model.buildings.*;
-import model.resources.Resources;
+import model.resources.*;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
 
@@ -32,6 +32,11 @@ public class Player {
         color = c;
         this.name = name;
         resources = new ArrayList<>();
+        resources.add(new Clay(1));
+        resources.add(new Ore(8));
+        resources.add(new Wheat(8));
+        resources.add(new Wood(3));
+        resources.add(new Wool(3));
         buildings = new ArrayList<>();
     }
 
@@ -39,6 +44,22 @@ public class Player {
         for (Building b : buildings) {
             System.out.println(b);
         }
+    }
+
+    public boolean hasColony() {
+        for (Building b : buildings) {
+            if (b instanceof Colony) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void printResources() {
+        for (Resources r : resources) {
+            System.out.print(r + " ");
+        }
+        System.out.println();
     }
 
     // Getter / Setter : ---------------
@@ -115,19 +136,36 @@ public class Player {
 
     public void buildRoad(TileEdge edge) {
         if (edge.getBuilding() == null) {
-            Road r = new Road(this, edge, color);
-            edge.setBuilding(r);
-            this.buildings.add(r);
+            Road r = new Road(this);
+            r.buyAndPlace(this, edge);
             System.out.println("Road built");
+        } else {
+            System.out.println("Road not built");
         }
     }
 
     public void buildColony(TileVertex vertex) {
-        // TODO :
+        if (vertex.getBuilding() == null) {
+            Colony c = new Colony(this);
+            if (c.buyAndPlace(this, false, vertex)) {
+                System.out.println("Colony built");
+            }
+        } else {
+            System.out.println("Colony not built");
+        }
     }
 
     public void buildCity(TileVertex vertex) {
-        // TODO :
+        if (vertex.getBuilding() != null && vertex.getBuilding() instanceof Colony) {
+            if (vertex.getBuilding().getOwner().equals(this)) {
+                Colony c = (Colony) vertex.getBuilding();
+                if (c.buyAndPlace(this, true, vertex)) {
+                    System.out.println("City built");
+                }
+            }
+        } else {
+            System.out.println("City not built");
+        }
     }
 
     public void createOrBuy() {
