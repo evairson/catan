@@ -203,25 +203,25 @@ public class ActionPlayerPanel extends JPanel {
         card = new ButtonImage(basePath + "card.png", basePath + "card.png",
         770, 560, 3, null, null);
 
-        Runnable cityRunnable = () -> game.buildCityButtonAction();
-        city = new ButtonImage(basePath + "building/city.png", basePath + "building/city.png",
-        1150, 20, 2, cityRunnable, null);
-
-        Runnable colonyRunnable = () -> game.buildColonyButtonAction();
-        colony = new ButtonImage(basePath + "building/colony.png", basePath + "building/colony.png",
-        1150, 130, 2, colonyRunnable, null);
-
-        Runnable roadRunnable = () -> game.buildRoadButtonAction();
-        road = new ButtonImage(basePath + "building/road.png", basePath + "building/road.png",
-        1150, 220, 2, roadRunnable, null);
+//        Runnable cityRunnable = () -> game.buildCityButtonAction();
+//        city = new ButtonImage(basePath + "building/city.png", basePath + "building/city.png",
+//        1150, 20, 2, cityRunnable, null);
+//
+//        Runnable colonyRunnable = () -> game.buildColonyButtonAction();
+//        colony = new ButtonImage(basePath + "building/colony.png", basePath + "building/colony.png",
+//        1150, 130, 2, colonyRunnable, null);
+//
+//        Runnable roadRunnable = () -> game.buildRoadButtonAction();
+//        road = new ButtonImage(basePath + "building/road.png", basePath + "building/road.png",
+//        1150, 220, 2, roadRunnable, null);
 
         /*plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
         1160, 310, 8, null, null);
         */
 
-        add(city);
-        add(colony);
-        add(road);
+//        add(city);
+//        add(colony);
+//        add(road);
 
         //add(plus);
 
