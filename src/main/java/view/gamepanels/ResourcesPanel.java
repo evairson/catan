@@ -87,9 +87,12 @@ public class ResourcesPanel extends JPanel {
         woodLabel.setText(String.valueOf(woodAmount));
         woolLabel.setText(String.valueOf(woolAmount));
     }
-    public void updateResourceLabels(Player p){
+    public void updateResourceLabels(Player p) {
         ArrayList<Resources> playerResources = p.getResources();
-        updateResourceLabels(playerResources.get(0).getAmount(), playerResources.get(1).getAmount(),
-                playerResources.get(2).getAmount(), playerResources.get(3).getAmount(), playerResources.get(4).getAmount());
+        updateResourceLabels(playerResources.get(0).getAmount(),
+                playerResources.get(1).getAmount(),
+                playerResources.get(2).getAmount(),
+                playerResources.get(3).getAmount(),
+                playerResources.get(4).getAmount());
     }
 }

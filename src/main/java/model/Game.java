@@ -40,8 +40,8 @@ public class Game implements StateMethods {
         players.next();
     }
 
-    public ListPlayers getPlayers(){
-        return players;                                                                                                                                                                                                         
+    public ListPlayers getPlayers() {
+        return players;
     }
 
     public Player getCurrentPlayer() {
@@ -118,7 +118,7 @@ public class Game implements StateMethods {
     }
 
     // Build methods ---------------
-     public void buildCityButtonAction() {
+    public void buildCityButtonAction() {
         if (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) {
             if (getCurrentPlayer().hasColony()) {
                 System.out.println("You can build a city");

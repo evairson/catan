@@ -9,12 +9,10 @@ import javax.imageio.ImageIO;
 import java.lang.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import model.App;
 import model.Game;
 import model.Player;
-import model.resources.Resources;
 import view.gamepanels.DeckPanel;
 import view.gamepanels.ResourcesPanel;
 import view.gamepanels.ShopPanel;
