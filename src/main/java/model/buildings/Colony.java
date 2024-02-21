@@ -1,10 +1,7 @@
 package model.buildings;
 
 import model.Player;
-import model.resources.*;
 import others.Constants;
-import java.awt.*;
-import java.util.ArrayList;
 import model.tiles.TileVertex;
 
 public class Colony extends Building {

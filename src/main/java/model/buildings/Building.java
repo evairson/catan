@@ -2,8 +2,6 @@ package model.buildings;
 
 import model.Player;
 import model.resources.*;
-
-import java.util.ArrayList;
 import java.awt.*;
 
 public abstract class Building {
@@ -19,19 +17,24 @@ public abstract class Building {
 
     public boolean buyable(Player player, int[] cost) {
         for (int i = 0; i < cost.length; i++) {
-            if (player.getResources().get(i) instanceof Clay && player.getResources().get(i).getAmount() < cost[0]) {
+            if (player.getResources().get(i) instanceof Clay
+                && player.getResources().get(i).getAmount() < cost[0]) {
                 return false;
             }
-            if (player.getResources().get(i) instanceof Ore && player.getResources().get(i).getAmount() < cost[1]) {
+            if (player.getResources().get(i) instanceof Ore
+                && player.getResources().get(i).getAmount() < cost[1]) {
                 return false;
             }
-            if (player.getResources().get(i) instanceof Wheat && player.getResources().get(i).getAmount() < cost[2]) {
+            if (player.getResources().get(i) instanceof Wheat
+                && player.getResources().get(i).getAmount() < cost[2]) {
                 return false;
             }
-            if (player.getResources().get(i) instanceof Wood && player.getResources().get(i).getAmount() < cost[3]) {
+            if (player.getResources().get(i) instanceof Wood
+                && player.getResources().get(i).getAmount() < cost[3]) {
                 return false;
             }
-            if (player.getResources().get(i) instanceof Wool && player.getResources().get(i).getAmount() < cost[4]) {
+            if (player.getResources().get(i) instanceof Wool
+                && player.getResources().get(i).getAmount() < cost[4]) {
                 return false;
             }
         }

@@ -14,7 +14,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import view.TileType.*;
 
 public class GameBoard {
     private HashMap<CubeCoordinates, Tile> board;
@@ -362,7 +361,6 @@ public class GameBoard {
             if (distance < minDistanceToEdge) {
                 minDistanceToEdge = distance;
                 closestEdge = edge;
-                this.closestEdge = closestEdge;
                 closestTileEdge = this.edgesMap.get(edge);
             }
         }
@@ -376,7 +374,6 @@ public class GameBoard {
             if (distance < minDistanceToVertex) {
                 minDistanceToVertex = distance;
                 closestVertex = vertex;
-                this.closestVertex = closestVertex;
                 closestTileVertex = this.verticesMap.get(vertex);
             }
         }

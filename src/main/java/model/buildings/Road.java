@@ -1,17 +1,15 @@
 package model.buildings;
 
 import model.Player;
-import model.resources.Resources;
 import others.Constants;
 import java.awt.*;
-import java.util.ArrayList;
 import model.tiles.TileEdge;
 
 public class Road extends Building {
 
     private TileEdge edge;
     private Player.Color playerColor;
-    
+
     public Road(Player owner) {
         super(owner);
     }
