@@ -7,6 +7,10 @@ import view.GameWindow;
 import view.menu.MainMenu;
 
 import java.awt.*;
+import java.io.IOException;
+
+import network.NetworkObjet;
+import network.PlayerClient;
 
 public class App implements Runnable {
     private GamePanel gamePanel;
@@ -16,17 +20,23 @@ public class App implements Runnable {
     private static GameBoard board;
     private Game game;
     private MainMenu mainMenu;
+    private PlayerClient player;
 
     public static GameBoard getBoard() {
         return board;
     }
 
+    public MainMenu getMainMenu() {
+        return mainMenu;
+    }
 
     public static void setBoard(GameBoard board) {
         App.board = board;
     }
 
-    public App() {
+    public App(PlayerClient playerClient) {
+        player = playerClient;
+        player.setApp(this);
         mainMenu = new MainMenu(this);
         gamePanel = new GamePanel(this);
         game = new Game();
@@ -50,6 +60,16 @@ public class App implements Runnable {
     private void startGameLoop() {
         gameThread = new Thread(this);
         gameThread.start();
+    }
+
+    public void startGame() {
+        NetworkObjet object = new NetworkObjet("start", 1, null);
+        try {
+            player.getOut().writeObject(object);
+            player.getOut().flush();
+        } catch (IOException e) {
+            e.getStackTrace();
+        }
     }
 
     public void addPanels() {

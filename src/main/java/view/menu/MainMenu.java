@@ -40,7 +40,7 @@ public class MainMenu extends JPanel {
     private void initializeButtons() {
         String basePath = "src/main/resources/";
         playBtn = new ButtonImage(basePath + "playButton.png", basePath + "playButtonHover.png",
-                500, 100, 1, this::startapp, null);
+                500, 100, 1, this::startAll, null);
         optionsBtn = new ButtonImage(basePath + "optionsButton.png", basePath + "optionsButtonHover.png",
                 550, 330, 1, this::startOptions, null);
         quitBtn = new ButtonImage(basePath + "quitButton.png", basePath + "quitButtonHover.png",
@@ -48,6 +48,10 @@ public class MainMenu extends JPanel {
         add(playBtn);
         add(optionsBtn);
         add(quitBtn);
+    }
+
+    public void startAll() {
+        app.startGame();
     }
 
     public void startapp() {

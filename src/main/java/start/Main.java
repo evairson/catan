@@ -1,6 +1,7 @@
 package start;
 
 import model.App;
+import network.PlayerClient;
 import network.Server;
 
 import java.net.InetAddress;
@@ -15,29 +16,38 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("1 : créer serveur 2 : se connecter à un existant");
         if (Integer.parseInt(sc.nextLine()) == 1) {
-            SwingUtilities.invokeLater(() -> {
-                Server server = new Server();
-            });
+            new Thread(() -> {
+                try {
+                    Server server = new Server();
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+            }).start();
             try {
                 InetAddress address = InetAddress.getByName("localhost");
                 System.out.println(address);
-                Socket socket = new Socket(address, 12345);
+                PlayerClient player = new PlayerClient(address, 8000);
                 System.out.println("yeaaah");
+                SwingUtilities.invokeLater(() -> {
+                    System.out.println("launching game");
+                    App game = new App(player);
+                });
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             System.out.println("Entrez l'adresse IP du serveur :");
             try {
-                Socket socket = new Socket(sc.nextLine(), 12345);
+                InetAddress address = InetAddress.getByName(sc.nextLine());
+                PlayerClient player = new PlayerClient(address, 8000);
                 System.out.println("yeaaah2");
+                SwingUtilities.invokeLater(() -> {
+                    System.out.println("launching game");
+                    App game = new App(player);
+                });
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        /*SwingUtilities.invokeLater(() -> {
-            System.out.println("launching game");
-            App game = new App();
-        });*/
     }
 }
