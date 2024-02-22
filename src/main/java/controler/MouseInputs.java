@@ -6,12 +6,11 @@ import java.awt.event.MouseMotionListener;
 
 import model.App;
 import view.GameState;
-import model.Game;
 
 public class MouseInputs implements MouseListener, MouseMotionListener {
 
     private App app;
-   
+
     public MouseInputs(App app) {
         this.app = app;
     }
