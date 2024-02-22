@@ -36,6 +36,8 @@ public class App implements Runnable {
 
         mainMenu.requestFocus();
 
+        actionPlayer.update();
+
         startGameLoop();
     }
 
