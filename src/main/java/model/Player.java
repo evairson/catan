@@ -12,7 +12,7 @@ import model.cards.DevelopmentCard;
 import model.resources.Resources;
 
 public class Player {
-    static final int NUMBER_DICE = 7;
+    static final int NUMBER_DICE = 6;
 
     public enum Color {
         RED,
