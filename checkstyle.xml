@@ -183,6 +183,8 @@
     <module name="FinalClass"/>
     <module name="InterfaceIsType"/>
     <module name="VisibilityModifier"/>
+      <property name="protectedAllowed" value="true">
+
 
     <!-- Miscellaneous other checks.                   -->
     <!-- See https://checkstyle.org/checks/misc/index.html -->
