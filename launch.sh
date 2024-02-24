@@ -1,6 +1,3 @@
-#!/bin/bash
-## This is a simple bash script to compile all files and run the Main file.
-
 ## How to run the program
 # Path: launch.sh
 
@@ -23,10 +20,10 @@ javac  -d src/classFiles @files.txt
 
 if [ $platform -eq 0 ] 
 then
-    CLASSPATH=".;src/classFiles/;src/classFiles/*;src/classFiles/*/*;src/classFiles/*/*/*;src/classFiles/*/*/*/*;src/classFiles/*/*/*/*/*"
+    CLASSPATH=".;src/classFiles/;src/classFiles/*;src/classFiles/*/*;src/classFiles/*/*/*;src/classFiles/*/*/*/*;src/classFiles/*/*/*/*/*;src/main/resources"
 elif [ $platform -eq 1 ] 
 then 
-    CLASSPATH=".:src/classFiles/:src/classFiles/*:src/classFiles/*/*:src/classFiles/*/*/*:src/classFiles/*/*/*/*:src/classFiles/*/*/*/*/*"
+    CLASSPATH=".:src/classFiles/:src/classFiles/*:src/classFiles/*/*:src/classFiles/*/*/*:src/classFiles/*/*/*/*:src/classFiles/*/*/*/*/*:src/main/resources"
 else 
     echo "Please enter 0 (Windows start) or 1 (Linux start)"
     exit 1
@@ -41,6 +38,3 @@ rm -r $DELCLASSPATH
 rm files.txt
 #For Windows
 #read -p "Press any key to continue" x
-
-
-

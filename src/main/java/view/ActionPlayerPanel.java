@@ -12,6 +12,11 @@ import java.io.IOException;
 
 import model.App;
 import model.Game;
+import model.Player;
+import view.gamepanels.DeckPanel;
+import view.gamepanels.ResourcesPanel;
+import view.gamepanels.ShopPanel;
+import view.gamepanels.TradePanel;
 import model.cards.DevelopmentCard;
 import model.cards.KnightCard;
 import model.cards.ProgessCard;
@@ -23,12 +28,6 @@ import view.utilities.Resolution;
 public class ActionPlayerPanel extends JPanel {
     private ButtonImage endTurn;
     private ButtonImage tradeButton;
-
-    private ButtonImage wood;
-    private ButtonImage ore;
-    private ButtonImage clay;
-    private ButtonImage wheat;
-    private ButtonImage wool;
 
     private ButtonImage city;
     private ButtonImage colony;
@@ -42,19 +41,20 @@ public class ActionPlayerPanel extends JPanel {
     private App app;
     private Game game;
     private ResourcesPanel resourcesPanel;
+    private ShopPanel shopPanel;
+    private TradePanel tradePanel;
+    private DeckPanel deckPanel;
+    private Animation animate = new Animation();
 
     private JPanel cardsPanel;
     private JPanel cardPanel;
     private JPanel playersPanel;
-
     private RollingDice dice;
-
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         this.app = app;
         game = app.getGame();
-
 
         setLayout(null);
         setOpaque(true);
@@ -63,33 +63,144 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        initializeRollingDicePanel();
+        initializeTradePanel();
+        initializeResourcesPanel();
+        initializeShopPanel(game);
+        initializeDeckPanel();
+        createButton();
+
+    }
+
+    private void initializeRollingDicePanel() {
+        int xCoord = Resolution.calculateResolution(1108, 440)[0];
+        int yCoord = Resolution.calculateResolution(1108, 440)[1];
 
         dice = new RollingDice(game.getCurrentPlayer());
+        dice.setBounds(xCoord, yCoord, (int) (205 / Resolution.divider()),
+                (int) (150 / Resolution.divider()));
         add(dice);
+        dice.setOpaque(false);
+    }
 
-        createPlayerPanel();
+    private void initializeDeckPanel() {
+        int xCoord = Resolution.calculateResolution(750, 620)[0];
+        int yCoord = Resolution.calculateResolution(750, 620)[1];
 
-        Animation animate = new Animation();
-        int xCoord = Resolution.calculateResolution(200, 650)[0];
-        int yCoord = Resolution.calculateResolution(200, 650)[1];
+        deckPanel = new DeckPanel(this::addCardsPanel);
         MouseAdapter animMouse = new MouseAdapter() {
+            private final int length = (int) (200 / Resolution.divider());
+
             @Override
             public void mouseEntered(MouseEvent e) {
-                animate.jPanelYUp(yCoord, yCoord - 150, 2, 1, resourcesPanel);
+                if (!deckPanel.isMouseInside()) {
+                    animate.jPanelYUp(yCoord, yCoord - length, 2, 1, deckPanel);
+                    deckPanel.setMouseInside(true);
+                }
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
-                animate.jPanelYDown(yCoord - 150, yCoord, 2, 1, resourcesPanel);
+                SwingUtilities.invokeLater(() -> {
+                    Point mousePos = SwingUtilities.convertPoint(e.getComponent(),
+                            e.getPoint(), deckPanel);
+                    if (!deckPanel.contains(mousePos)) {
+                        animate.jPanelYDown(yCoord - length, yCoord, 2, 1, deckPanel);
+                        deckPanel.setMouseInside(false);
+                    }
+                });
             }
         };
-        resourcesPanel = new ResourcesPanel(animMouse);
-        resourcesPanel.setVisible(true);
-        resourcesPanel.setBounds(xCoord, yCoord, (int) (975 / Resolution.divider()),
-                (int) (210 / Resolution.divider()));
-        resourcesPanel.addMouseListener(animMouse);
+        deckPanel.setOpaque(false);
+        deckPanel.setAnimMouse(animMouse);
+        deckPanel.setVisible(true);
+        deckPanel.setBounds(xCoord, yCoord, (int) (195 / Resolution.divider()),
+                (int) (500 / Resolution.divider()));
+        deckPanel.addMouseListener(animMouse);
+        add(deckPanel);
+    }
 
+    private void initializeShopPanel(Game game) {
+        int xCoord = Resolution.calculateResolution(1220, 20)[0];
+        int yCoord = Resolution.calculateResolution(1220, 20)[1];
+        shopPanel = new ShopPanel(this::drawCard, game);
+        MouseAdapter animMouse = new MouseAdapter() {
+            private final int length = (int) (200 / Resolution.divider());
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (!shopPanel.isMouseInside()) {
+                    animate.jPanelXLeft(xCoord, xCoord - length, 2, 1, shopPanel);
+                    shopPanel.setMouseInside(true);
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                SwingUtilities.invokeLater(() -> {
+                    Point mousePos = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), shopPanel);
+                    if (!shopPanel.contains(mousePos)) {
+                        animate.jPanelXRight(xCoord - length, xCoord, 2, 1, shopPanel);
+                        shopPanel.setMouseInside(false);
+                    }
+                });
+            }
+        };
+        shopPanel.setOpaque(false);
+        shopPanel.setAnimMouse(animMouse);
+        shopPanel.setVisible(true);
+        shopPanel.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
+                (int) (840 / Resolution.divider()));
+        shopPanel.addMouseListener(animMouse);
+        add(shopPanel);
+    }
+
+    private void initializeResourcesPanel() {
+        int xCoord = Resolution.calculateResolution(180, 620)[0];
+        int yCoord = Resolution.calculateResolution(180, 620)[1];
+        resourcesPanel = new ResourcesPanel();
+        createPlayerPanel();
+        MouseAdapter animMouse = new MouseAdapter() {
+            private final int length = (int) (200 / Resolution.divider());
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (!resourcesPanel.isMouseInside()) {
+                    animate.jPanelYUp(yCoord, yCoord - length, 2, 1, resourcesPanel);
+                    resourcesPanel.setMouseInside(true);
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                SwingUtilities.invokeLater(() -> {
+                    Point mousePos = SwingUtilities.convertPoint(e.getComponent(),
+                            e.getPoint(), resourcesPanel);
+                    if (!resourcesPanel.contains(mousePos)) {
+                        animate.jPanelYDown(yCoord - length, yCoord, 2, 1, resourcesPanel);
+                        resourcesPanel.setMouseInside(false);
+                    }
+                });
+            }
+        };
+        resourcesPanel.setOpaque(false);
+        resourcesPanel.setAnimMouse(animMouse);
+        resourcesPanel.setVisible(true);
+        resourcesPanel.setBounds(xCoord, yCoord, (int) (1040 / Resolution.divider()),
+                (int) (500 / Resolution.divider()));
+        resourcesPanel.addMouseListener(animMouse);
         add(resourcesPanel);
-        createButton();
+    }
+
+    private void initializeTradePanel() {
+        int xCoord = Resolution.calculateResolution(50, 560)[0];
+        int yCoord = Resolution.calculateResolution(50, 560)[1];
+        tradePanel = new TradePanel(this::trade);
+        tradePanel.setVisible(true);
+        tradePanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
+                (int) (185 / Resolution.divider()));
+        add(tradePanel);
+        tradePanel.setOpaque(false);
     }
 
     private void createButton() {
@@ -99,46 +210,38 @@ public class ActionPlayerPanel extends JPanel {
         tradeButton = new ButtonImage(basePath + "tradeButton.png", basePath + "tradeButton.png",
                 50, 560, 5, this::trade, null);
 
-//        wood = new ButtonImage(basePath + "resources/wood.png", basePath + "resources/wood.png",
-//                200, 550, 2, null);
-//        ore = new ButtonImage(basePath + "resources/ore.png", basePath + "resources/ore.png",
-//                300, 550, 2, null);
-//        clay = new ButtonImage(basePath + "resources/clay.png", basePath + "resources/clay.png",
-//                400, 550, 2, null);
-//        wheat = new ButtonImage(basePath + "resources/wheat.png", basePath + "resources/wheat.png",
-//                500, 550, 2, null);
-//        wool = new ButtonImage(basePath + "resources/wool.png", basePath + "resources/wool.png",
-//             600, 550, 2, null);
-
         card = new ButtonImage(basePath + "card.png", basePath + "card.png",
-        770, 560, 3, this::addcardsPanel, null);
+                770, 560, 3, null, null);
 
+        //
+        // city = new ButtonImage(basePath + "building/city.png", basePath +
+        // "building/city.png",
+        // 1150, 20, 2, cityRunnable, null);
+        //
+        //
+        // colony = new ButtonImage(basePath + "building/colony.png", basePath +
+        // "building/colony.png",
+        // 1150, 130, 2, colonyRunnable, null);
+        //
+        //
+        // road = new ButtonImage(basePath + "building/road.png", basePath +
+        // "building/road.png",
+        // 1150, 220, 2, roadRunnable, null);
 
-        city = new ButtonImage(basePath + "building/city.png", basePath + "building/city.png",
-        1150, 20, 2, null, null);
-        colony = new ButtonImage(basePath + "building/colony.png", basePath + "building/colony.png",
-        1150, 130, 2, null, null);
-        road = new ButtonImage(basePath + "building/road.png", basePath + "building/road.png",
-        1150, 220, 2, null, null);
+        /*
+         * plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
+         * 1160, 310, 8, null, null);
+         */
 
-        plus = new ButtonImage(basePath + "card.png", basePath + "card.png",
-        1170, 310, 5, this::drawCard, null);
+        // add(city);
+        // add(colony);
+        // add(road);
 
-//        add(wood);
-//        add(wool);
-//        add(ore);
-//        add(clay);
-//        add(wheat);
-
-        add(city);
-        add(colony);
-        add(road);
-
-        add(plus);
+        // add(plus);
 
         add(tradeButton);
         add(endTurn);
-        add(card);
+        // add(card);
     }
 
     private void changeTurn() {
@@ -150,7 +253,7 @@ public class ActionPlayerPanel extends JPanel {
         // TODO : A remplir
     }
 
-    private void addcardsPanel() {
+    private void addCardsPanel() {
         if (cardsPanel != null) {
             remove(cardsPanel);
         }
@@ -161,7 +264,7 @@ public class ActionPlayerPanel extends JPanel {
         for (int i = 0; i < game.getCurrentPlayer().getCardsDev().size(); i++) {
             String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(i));
             ButtonImage b = new ButtonImage(basePath + card, basePath + card,
-                300 + i * 100, 250, 1.5, this::useCard, null);
+                    300 + i * 100, 250, 1.5, this::useCard, null);
             cardsPanel.add(b);
         }
         JPanel self = this;
@@ -175,10 +278,9 @@ public class ActionPlayerPanel extends JPanel {
             }
         });
         cardsPanel.setOpaque(false);
-        add(cardsPanel, 10);
+        add(cardsPanel, 0);
         repaint();
         revalidate();
-
     }
 
     private void useCard() {
@@ -207,7 +309,7 @@ public class ActionPlayerPanel extends JPanel {
         int last = game.getCurrentPlayer().getCardsDev().size();
         String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(last - 1));
         ButtonImage b = new ButtonImage(basePath + card, basePath + card,
-            600, 250, 1.5, this::useCard, null);
+                600, 250, 1.5, this::useCard, null);
         cardPanel.add(b);
         JPanel self = this;
         cardPanel.addMouseListener(new MouseAdapter() {
@@ -221,7 +323,7 @@ public class ActionPlayerPanel extends JPanel {
             }
         });
         cardPanel.setOpaque(false);
-        add(cardPanel, 10);
+        add(cardPanel, 0);
         repaint();
         revalidate();
     }
@@ -260,7 +362,7 @@ public class ActionPlayerPanel extends JPanel {
                 Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
                 String text = game.getPlayers().get(i).getName().toUpperCase();
                 Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
-                String textUnderligne = player ? "<html><u> " + text + "</u></html>"  : " " + text;
+                String textUnderligne = player ? "<html><u> " + text + "</u></html>" : " " + text;
                 panel = new JLabel(textUnderligne, new ImageIcon(buttonImage), JLabel.CENTER);
                 panel.setVerticalTextPosition(JLabel.CENTER);
                 panel.setHorizontalTextPosition(JLabel.RIGHT);
@@ -276,14 +378,16 @@ public class ActionPlayerPanel extends JPanel {
         add(playersPanel);
     }
 
-    private void update() {
-        dice.newPlayer(game.getCurrentPlayer());
+    public void update() {
+        Player currentPlayer = game.getCurrentPlayer();
+        dice.newPlayer(currentPlayer);
+        resourcesPanel.updateResourceLabels(currentPlayer);
 
         namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
         for (int i = 0; i < game.getPlayers().size(); i++) {
             String text = game.getPlayers().get(i).getName().toUpperCase();
             Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
-            String textUnderligne = player ? "<html><u>" + text + "</u></html>"  : " " + text;
+            String textUnderligne = player ? "<html><u>" + text + "</u></html>" : " " + text;
             ((JLabel) playersPanel.getComponents()[i]).setText(textUnderligne);
         }
         try {

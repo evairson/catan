@@ -1,40 +1,45 @@
 package model.buildings;
 
 import model.Player;
-import model.resources.Resources;
-import model.tiles.Tile;
-
-import java.awt.*;
-import java.util.ArrayList;
+import others.Constants;
+import model.tiles.TileVertex;
 
 public class Colony extends Building {
     private boolean isCity = false;
     private boolean isPort = false;
+    private TileVertex vertex;
 
-    private Point p;
-
-    private ArrayList<Resources> costColony; //dans l'ordre
-    private ArrayList<Resources> costCity;
-
-    private ArrayList<Tile> tiles;
-
-    public Colony(Point p) {
-        this.p = p;
+    public Colony(Player owner) {
+        super(owner);
     }
 
-    public Colony(Point p, Boolean isCity, boolean isPort, ArrayList<Tile> tiles) {
-        this(p);
+    public Colony(Player player, boolean isCity, boolean isPort, TileVertex vertex) {
+        super(player);
         this.isCity = isCity;
         this.isPort = isPort;
-        this.tiles = tiles;
+        this.vertex = vertex;
     }
 
-    public ArrayList<Tile> getTiles() {
-        return tiles;
+    public boolean getIsCity() {
+        return isCity;
     }
 
     public void setVille() {
         isCity = true;
+    }
+
+    public TileVertex getVertex() {
+        return vertex;
+    }
+
+    public boolean cityBuyable(Player player) {
+        int[] cost = getCost(true);
+        return super.buyable(player, cost);
+    }
+
+    public boolean colonyBuyable(Player player) {
+        int[] cost = getCost(false);
+        return super.buyable(player, cost);
     }
 
     public void setPort() {
@@ -45,22 +50,22 @@ public class Colony extends Building {
         return (isCity ? 2 : 1);
     }
 
-    public ArrayList<Resources> getCost(boolean isCity) {
+    public int[] getCost(boolean isCity) {
         if (isCity) {
-            return costCity;
+            return Constants.BuildingCosts.CITY;
         }
-        return costColony;
+        return Constants.BuildingCosts.COLONY;
     }
 
-    public boolean buy(Player player, Point p, boolean isCity) {
+    public boolean buyAndPlace(Player player, boolean isCity, TileVertex vertex) {
         if (super.buy(player, getCost(isCity))) {
-            Colony colony = new Colony(p, isCity, false, null);
-            //ajouter les tiles à proximité
-            //faudrait check si c'est un port aussi là
+            Colony colony = new Colony(player, isCity, false, vertex);
+            player.getBuildings().remove(vertex.getBuilding());
+            vertex.setBuilding(colony);
+            // faudrait check si c'est un port aussi là
             player.getBuildings().add(colony);
             return true;
         }
         return false;
     }
 }
-
