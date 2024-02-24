@@ -88,6 +88,17 @@ public class Constants {
         public static final int WOOL = 4;
         public static final int ORE = 5;
 
+        public static final String getResources(int i) {
+            switch (i) {
+                case 1: return "wood";
+                case 2: return "wheat";
+                case 3: return "brick";
+                case 4: return "sheep";
+                case 5: return "ore";
+                default: return "";
+            }
+        }
+
         public static final int[] TILE_TYPES_DEFAULT = new int[] {WOOD, WOOD, WOOD, WOOD, WHEAT, WHEAT,
             WHEAT, WHEAT, CLAY, CLAY, CLAY, WOOL, WOOL, WOOL, WOOL, ORE, ORE, ORE};
 

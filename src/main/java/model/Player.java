@@ -9,7 +9,10 @@ import model.tiles.TileVertex;
 import model.buildings.Building;
 import model.cards.CardStack;
 import model.cards.DevelopmentCard;
+import model.resources.Clay;
 import model.resources.Resources;
+import model.resources.Wheat;
+import model.resources.Wood;
 
 public class Player {
     static final int NUMBER_DICE = 6;
@@ -43,6 +46,7 @@ public class Player {
         resources.add(new Wool(3));
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
+        hasThrowDices = false;
     }
 
     public void printBuildings() {
@@ -116,7 +120,7 @@ public class Player {
         turn = b;
     }
 
-    public int getDies() {
+    public int getDice() {
         return dice1 + dice2;
     }
 
@@ -207,7 +211,11 @@ public class Player {
     }
 
     public void drawCard(CardStack stack) {
-        cardsDev.add(stack.getCardStack().pop());
+        if (!stack.getCardStack().isEmpty()) {
+            cardsDev.add(stack.getCardStack().pop());
+        } else {
+            System.out.println("0 cartes dans le deck");
+        }
     }
 
 }

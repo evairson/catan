@@ -4,9 +4,12 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import model.buildings.Building;
+import model.buildings.Colony;
 import model.cards.CardStack;
 import model.geometry.Layout;
 import model.geometry.Point;
+import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
 import others.Constants;
@@ -16,8 +19,10 @@ public class Game implements StateMethods {
     private static GameBoard board;
     private ListPlayers players; // ListPlayers extends ArrayList
     private CardStack stack;
+    private boolean resourcesGiven;
 
     Game() {
+        resourcesGiven = false;
         Player player1 = new Player(Player.Color.RED, "Player1");
         Player player2 = new Player(Player.Color.YELLOW, "Player2");
         Player player3 = new Player(Player.Color.BLUE, "Player3");
@@ -38,6 +43,7 @@ public class Game implements StateMethods {
 
     public void endTurn() {
         players.next();
+        resourcesGiven = false;
     }
 
     public ListPlayers getPlayers() {
@@ -66,6 +72,27 @@ public class Game implements StateMethods {
 
     @Override
     public void update() {
+        if (getCurrentPlayer().hasThrowDices() && !resourcesGiven) {
+            for (Player p : players) {
+                for (Building b : p.getBuildings()) {
+                    if (b instanceof Colony) {
+                        Colony c = (Colony) b;
+                        for (Tile t : c.getVertex().getTiles()) {
+                            if (t.getDiceValue() == getCurrentPlayer().getDice()) {
+                                if (c.getIsCity()) {
+                                    p.getResources().get(t.getResourceType().getId()).addAmount(2);
+                                    System.out.println("2 " + t.getResourceType() + p.getColorString());
+                                } else {
+                                    p.getResources().get(t.getResourceType().getId() - 1).addAmount(1);
+                                    System.out.println("1 " + t.getResourceType() + p.getColorString());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            resourcesGiven = true;
+        }
     }
 
     @Override
