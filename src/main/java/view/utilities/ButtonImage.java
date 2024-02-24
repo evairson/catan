@@ -23,7 +23,6 @@ public class ButtonImage extends JButton {
                                   int yCoordBaseHeight, double scale, Runnable action,
                                   MouseAdapter hoverEvent) {
         try {
-
             // Coordonnées pour la résolution cible
             int xCoord = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight)[0];
             int yCoord = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight)[1];
