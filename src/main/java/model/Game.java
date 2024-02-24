@@ -4,9 +4,12 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import model.buildings.Building;
+import model.buildings.Colony;
 import model.cards.CardStack;
 import model.geometry.Layout;
 import model.geometry.Point;
+import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
 import others.Constants;
@@ -17,8 +20,10 @@ public class Game implements StateMethods {
     private ListPlayers players; // ListPlayers extends ArrayList
     private CardStack stack;
     private Thief thief;
+    private boolean resourcesGiven;
 
     Game() {
+        resourcesGiven = false;
         Player player1 = new Player(Player.Color.RED, "Player1");
         Player player2 = new Player(Player.Color.YELLOW, "Player2");
         Player player3 = new Player(Player.Color.BLUE, "Player3");
@@ -44,6 +49,7 @@ public class Game implements StateMethods {
 
     public void endTurn() {
         players.next();
+        resourcesGiven = false;
     }
 
     public ListPlayers getPlayers() {
@@ -80,6 +86,29 @@ public class Game implements StateMethods {
 
     @Override
     public void update() {
+        if (getCurrentPlayer().hasThrowDices() && !resourcesGiven) {
+            for (Player player : players) {
+                for (Building b : player.getBuildings()) {
+                    if (b instanceof Colony) {
+                        Colony colony = (Colony) b;
+                        for (Tile tile : colony.getVertex().getTiles()) {
+                            if (tile.getDiceValue() == getCurrentPlayer().getDice()) {
+                                if (colony.getIsCity()) {
+                                    Integer number = player.getResources().get(tile.getResourceType());
+                                    player.getResources().replace(tile.getResourceType(), number + 2);
+                                    System.out.println("2 " + tile.getResourceType() + player.getName());
+                                } else {
+                                    Integer number = player.getResources().get(tile.getResourceType());
+                                    player.getResources().replace(tile.getResourceType(), number + 1);
+                                    System.out.println("1 " + tile.getResourceType() + player.getName());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            resourcesGiven = true;
+        }
     }
 
     @Override
