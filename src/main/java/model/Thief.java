@@ -1,13 +1,14 @@
 package model;
 
 import model.tiles.Tile;
+import view.TileType;
 
 public class Thief {
     private Tile tile;
     private boolean onDesert;
 
     public boolean isOnDesert() {
-        return tile.getResourceType() == 0;
+        return tile.getResourceType() == TileType.DESERT;
     }
 
     public Tile getTile() {

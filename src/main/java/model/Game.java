@@ -58,7 +58,7 @@ public class Game implements StateMethods {
     public GameBoard getBoard() {
         return board;
     }
-    
+
     public static void setBoard(GameBoard board) {
         Game.board = board;
     }
@@ -87,7 +87,7 @@ public class Game implements StateMethods {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) { // TODO :
+    public void mouseClicked(MouseEvent e) {
         System.out.println("Mouse clicked");
         if (board.isPlacingCity()) {
             buildCity();

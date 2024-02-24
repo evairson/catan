@@ -31,8 +31,8 @@ public class GameBoard {
     private double minDistanceToCenterTile;
     private Thief thief;
     private boolean thiefMode;
-    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages();
-
+    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages(false);
+    private Map<TileType, BufferedImage> tileImagesS = TileImageLoader.loadAndResizeTileImages(true);
     private boolean lookingForVertex = false;
     private boolean lookingForEdge = false;
     private boolean placingRoad = false;
@@ -298,22 +298,22 @@ public class GameBoard {
 
     public void drawImagesInHexes(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        for (Map.Entry<Tile, Color> entry : tileColors.entrySet()) {
-            Tile tile = entry.getKey();
-            Color color = entry.getValue();
-            CubeCoordinates cubeCoord = tile.getCoordinates();
-            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
-
-            g2d.setColor(color);
-            if (thiefMode && highlightedTile == entry.getKey()) {
-                g2d.setColor(Color.blue);
-            }
+        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
+            Tile tile = entry.getValue();
             Polygon hexagon = new Polygon();
+            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
+            boolean highlight = false;
+
             for (Point vertex : hexagonVertices) {
                 hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
             }
             Rectangle bounds = hexagon.getBounds();
-            BufferedImage img = tileImages.get(tile.getResourceType());
+            BufferedImage img;
+            if (thiefMode && highlightedTile == tile) {
+                img = tileImagesS.get(tile.getResourceType());
+            } else {
+                img = tileImages.get(tile.getResourceType());
+            }
 
             int imgX = bounds.x + (bounds.width - img.getWidth()) / 2;
             int imgY = bounds.y + (bounds.height - img.getHeight()) / 2;
