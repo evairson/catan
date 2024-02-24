@@ -140,7 +140,7 @@ public class GameBoard {
     public void addTile(int q, int r, int diceValue, TileType resourceType) {
         int s = -q - r;
         Tile tile = new Tile(q, r, diceValue, resourceType);
-        if (resourceType == 0) { //TODO :
+        if (resourceType == TileType.DESERT) {
             thief.setTile(tile);
         }
         board.put(new CubeCoordinates(q, r, s), tile);
