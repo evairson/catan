@@ -2,9 +2,9 @@ package others;
 
 import model.geometry.Orientation;
 import model.geometry.CubeCoordinates;
-
+import model.resources.*;
 import java.awt.*;
-
+import java.util.ArrayList;
 
 public class Constants {
     public static class CubeCoordinatesConst {
@@ -13,6 +13,55 @@ public class Constants {
             new CubeCoordinates(0, -1, 1), new CubeCoordinates(-1, 0, 1),
             new CubeCoordinates(-1, 1, 0), new CubeCoordinates(0, 1, -1)
         };
+    }
+
+    public static class BuildingCosts {
+        public static final int[] ROAD = new int[] {1, 0, 0, 1, 0};
+        public static final int[] COLONY = new int[] {1, 0, 1, 1, 1};
+        public static final int[] CITY = new int[] {0, 3, 2, 0, 0};
+
+        public static boolean canBuildRoad(ArrayList<Resources> resources) {
+            for (int i = 0; i < resources.size(); i++) {
+                if (resources.get(i) instanceof Wood && resources.get(i).getAmount() < ROAD[3]) {
+                    return false;
+                }
+                if (resources.get(i) instanceof Clay && resources.get(i).getAmount() < ROAD[0]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static boolean canBuildColony(ArrayList<Resources> resources) {
+            for (int i = 0; i < resources.size(); i++) {
+                if (resources.get(i) instanceof Wood && resources.get(i).getAmount() < COLONY[3]) {
+                    return false;
+                }
+                if (resources.get(i) instanceof Clay && resources.get(i).getAmount() < COLONY[0]) {
+                    return false;
+                }
+                if (resources.get(i) instanceof Wheat && resources.get(i).getAmount() < COLONY[2]) {
+                    return false;
+                }
+                if (resources.get(i) instanceof Wool && resources.get(i).getAmount() < COLONY[4]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static boolean canBuildCity(ArrayList<Resources> resources) {
+            for (int i = 0; i < resources.size(); i++) {
+                if (resources.get(i) instanceof Wheat && resources.get(i).getAmount() < CITY[2]) {
+                    return false;
+                }
+                if (resources.get(i) instanceof Ore && resources.get(i).getAmount() < CITY[1]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
 
     public static class Game {
@@ -30,17 +79,17 @@ public class Constants {
 
     public static class BoardConstants {
         public static final int[] TILE_DICE_VALUES_DEFAULT = new int[] {9, 8, 5, 12, 11, 3, 6, 10, 6, 4, 11,
-            2, 4, 3, 5, 9, 10, 8, 0 };
+                                                                        2, 4, 3, 5, 9, 10, 8, 0};
 
         public static final int DESERT = 0;
         public static final int WOOD = 1;
         public static final int WHEAT = 2;
-        public static final int BRICK = 3;
-        public static final int SHEEP = 4;
+        public static final int CLAY = 3;
+        public static final int WOOL = 4;
         public static final int ORE = 5;
 
-        public static final int[] TILE_TYPES_DEFAULT = new int[] {WOOD, WOOD, WOOD, WOOD, WHEAT, WHEAT, WHEAT,
-            WHEAT, BRICK, BRICK, BRICK, SHEEP, SHEEP, SHEEP, SHEEP, ORE, ORE, ORE };
+        public static final int[] TILE_TYPES_DEFAULT = new int[] {WOOD, WOOD, WOOD, WOOD, WHEAT, WHEAT,
+            WHEAT, WHEAT, CLAY, CLAY, CLAY, WOOL, WOOL, WOOL, WOOL, ORE, ORE, ORE};
 
         private static int[] randomizeArray(int[] arr) {
             for (int i = arr.length - 1; i > 0; i--) {
