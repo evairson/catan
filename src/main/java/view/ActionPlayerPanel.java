@@ -250,7 +250,10 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void trade() {
-        // TODO : A remplir
+        Container contentPane = this.app.getGameWindow().getContentPane();
+        CardLayout layout = this.app.getGameWindow().getLayout();
+        app.createTradePanel();
+        layout.show(contentPane, "tradePanel");
     }
 
     private void addCardsPanel() {
