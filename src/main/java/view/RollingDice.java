@@ -104,7 +104,7 @@ public class RollingDice extends JPanel {
 
                 }
                 player.setHasTrowDices(true);
-                if (player.getDice() != 7) {
+                if (player.getDice() == 7) {
                     game.setThiefMode(true);
                 }
             } catch (InterruptedException e) {
