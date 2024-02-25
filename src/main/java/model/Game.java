@@ -257,5 +257,4 @@ public class Game implements StateMethods {
         board.setLookingForVertex(false);
         board.setPlacingCity(false);
     }
-
 }

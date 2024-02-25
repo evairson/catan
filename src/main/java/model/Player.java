@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import model.buildings.*;
+import model.cards.VictoryPointCard;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
 import view.TileType;
@@ -30,7 +31,9 @@ public class Player {
     private HashMap<TileType, Integer> resources;
     private ArrayList<DevelopmentCard> cardsDev;
     private ArrayList<Building> buildings;
-
+    private int points;
+    private boolean hasBiggestArmy;
+    private boolean hasLongestRoute;
     public Player(Color c, String name) {
         color = c;
         this.name = name;
@@ -43,6 +46,9 @@ public class Player {
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;
+        points = 0;
+        hasBiggestArmy = false;
+        hasLongestRoute = false;
     }
 
     public void printBuildings() {
@@ -138,6 +144,15 @@ public class Player {
     public ArrayList<DevelopmentCard> getCardsDev() {
         return cardsDev;
     }
+    public boolean hasWon(){
+        return points >= 10;
+    }
+    public boolean hasBiggestArmy() {
+        return hasBiggestArmy;
+    }
+    public boolean hasLongestRoute() {
+        return hasLongestRoute;
+    }
 
     public void setCardsDev(ArrayList<DevelopmentCard> cardsDev) {
         this.cardsDev = cardsDev;
@@ -189,6 +204,7 @@ public class Player {
             if (c.buyAndPlace(this, false, vertex)) {
                 System.out.println("Colony built");
             }
+            points++;
         } else {
             System.out.println("Colony not built");
         }
@@ -201,6 +217,7 @@ public class Player {
                 if (c.buyAndPlace(this, true, vertex)) {
                     System.out.println("City built");
                 }
+                points++;
             }
         } else {
             System.out.println("City not built");
@@ -217,7 +234,11 @@ public class Player {
 
     public void drawCard(CardStack stack) {
         if (!stack.getCardStack().isEmpty()) {
-            cardsDev.add(stack.getCardStack().pop());
+            DevelopmentCard card = stack.getCardStack().pop();
+            if (card instanceof VictoryPointCard){
+                points++;
+            }
+            cardsDev.add(card);
         } else {
             System.out.println("0 cartes dans le deck");
         }

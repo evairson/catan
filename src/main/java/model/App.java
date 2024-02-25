@@ -1,17 +1,15 @@
 package model;
 
 import others.Constants;
-import view.ActionPlayerPanel;
-import view.GamePanel;
-import view.GameWindow;
+import view.*;
 import view.menu.MainMenu;
-import view.TradePanel;
 
 import java.awt.*;
 
 public class App implements Runnable {
     private GamePanel gamePanel;
     private ActionPlayerPanel actionPlayer;
+    private WinPanel winPanel;
     private GameWindow gameWindow;
     private Thread gameThread;
     private static GameBoard board;
@@ -29,8 +27,9 @@ public class App implements Runnable {
     public App() {
         mainMenu = new MainMenu(this);
         gamePanel = new GamePanel(this);
-        game = new Game();
+        createNewGame();
         actionPlayer = new ActionPlayerPanel(this);
+        winPanel = new WinPanel(this);
         gameWindow = new GameWindow(gamePanel, actionPlayer, mainMenu);
 
         mainMenu.requestFocus();
@@ -39,7 +38,9 @@ public class App implements Runnable {
 
         startGameLoop();
     }
-
+    public void createNewGame(){
+        this.game = new Game();
+    }
     public Game getGame() {
         return game;
     }
@@ -54,10 +55,15 @@ public class App implements Runnable {
         gameThread = new Thread(this);
         gameThread.start();
     }
+    private void stopGameLoop() {
+        gameThread.interrupt();
+    }
 
     public void addPanels() {
         actionPlayer.add(gamePanel);
+        gameWindow.getContentPane().add(mainMenu, "mainMenu");
         gameWindow.getContentPane().add(actionPlayer, "actionPlayerPanel");
+        gameWindow.getContentPane().add(winPanel, "winPanel");
     }
     public void createTradePanel() {
         TradePanel tradePanel = new TradePanel(this.game, this.gameWindow);
@@ -68,6 +74,15 @@ public class App implements Runnable {
 
     public void update() {
         game.update();
+        checkWin();
+    }
+    public void checkWin(){
+        if(game.getCurrentPlayer().hasWon()){
+            stopGameLoop();
+            Container contentPane = getGameWindow().getContentPane();
+            CardLayout layout = getGameWindow().getLayout();
+            layout.show(contentPane, "winPanel");
+        }
     }
 
     public void render(Graphics g) {
