@@ -86,6 +86,10 @@ public class Game implements StateMethods {
 
     @Override
     public void update() {
+        lootResources();
+    }
+
+    public void lootResources() {
         if (getCurrentPlayer().hasThrowDices() && !resourcesGiven) {
             for (Player player : players) {
                 for (Building b : player.getBuildings()) {
