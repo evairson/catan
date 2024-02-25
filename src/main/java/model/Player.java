@@ -144,7 +144,7 @@ public class Player {
     public ArrayList<DevelopmentCard> getCardsDev() {
         return cardsDev;
     }
-    public boolean hasWon(){
+    public boolean hasWon() {
         return points >= 10;
     }
     public boolean hasBiggestArmy() {
@@ -235,7 +235,7 @@ public class Player {
     public void drawCard(CardStack stack) {
         if (!stack.getCardStack().isEmpty()) {
             DevelopmentCard card = stack.getCardStack().pop();
-            if (card instanceof VictoryPointCard){
+            if (card instanceof VictoryPointCard) {
                 points++;
             }
             cardsDev.add(card);

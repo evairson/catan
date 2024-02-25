@@ -38,7 +38,7 @@ public class App implements Runnable {
 
         startGameLoop();
     }
-    public void createNewGame(){
+    public void createNewGame() {
         this.game = new Game();
     }
     public Game getGame() {
@@ -76,8 +76,8 @@ public class App implements Runnable {
         game.update();
         checkWin();
     }
-    public void checkWin(){
-        if(game.getCurrentPlayer().hasWon()){
+    public void checkWin() {
+        if (game.getCurrentPlayer().hasWon()) {
             stopGameLoop();
             Container contentPane = getGameWindow().getContentPane();
             CardLayout layout = getGameWindow().getLayout();

@@ -32,7 +32,7 @@ public class WinPanel extends JPanel {
             Container contentPane = this.app.getGameWindow().getContentPane();
             CardLayout layout = this.app.getGameWindow().getLayout();
             app.createNewGame();
-            layout.show(contentPane,"mainMenu");
+            layout.show(contentPane, "mainMenu");
         });
         JButton exitButton = new JButton("Exit");
         exitButton.addActionListener(e -> {
