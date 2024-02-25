@@ -28,8 +28,11 @@ public class GameBoard {
     private double minDistanceToEdge;
     private Point mousePosition;
     private double minDistanceToVertex;
-    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages();
-
+    private double minDistanceToCenterTile;
+    private Thief thief;
+    private boolean thiefMode;
+    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages(false);
+    private Map<TileType, BufferedImage> tileImagesS = TileImageLoader.loadAndResizeTileImages(true);
     private boolean lookingForVertex = false;
     private boolean lookingForEdge = false;
     private boolean placingRoad = false;
@@ -39,12 +42,27 @@ public class GameBoard {
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
 
-    public GameBoard(Layout layout) {
+    private Tile highlightedTile;
+
+    public GameBoard(Layout layout, Thief thief) {
+        this.thief = thief;
         board = new HashMap<CubeCoordinates, Tile>();
         this.layout = layout;
         this.initialiseBoard();
         // rendre la centre et la taille de la grille dynamique
 
+    }
+
+    public void setThiefMode(boolean b) {
+        thiefMode = b;
+    }
+
+    public boolean getThiefMode() {
+        return thiefMode;
+    }
+
+    public Layout getLayout() {
+        return layout;
     }
 
     public void setPlacingRoad(boolean placingRoad) {
@@ -121,7 +139,11 @@ public class GameBoard {
 
     public void addTile(int q, int r, int diceValue, TileType resourceType) {
         int s = -q - r;
-        board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue, resourceType));
+        Tile tile = new Tile(q, r, diceValue, resourceType);
+        if (resourceType == TileType.DESERT) {
+            thief.setTile(tile);
+        }
+        board.put(new CubeCoordinates(q, r, s), tile);
     }
 
     public Tile getTile(int q, int r) {
@@ -280,11 +302,18 @@ public class GameBoard {
             Tile tile = entry.getValue();
             Polygon hexagon = new Polygon();
             ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
+            boolean highlight = false;
+
             for (Point vertex : hexagonVertices) {
                 hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
             }
             Rectangle bounds = hexagon.getBounds();
-            BufferedImage img = tileImages.get(tile.getResourceType());
+            BufferedImage img;
+            if (thiefMode && highlightedTile == tile) {
+                img = tileImagesS.get(tile.getResourceType());
+            } else {
+                img = tileImages.get(tile.getResourceType());
+            }
 
             int imgX = bounds.x + (bounds.width - img.getWidth()) / 2;
             int imgY = bounds.y + (bounds.height - img.getHeight()) / 2;
@@ -337,12 +366,21 @@ public class GameBoard {
                     (int) edge.getEnd().getY());
         } catch (Exception e) { // null seulement la première fois qu'on survole un hexagone
         }
+        drawThief(g);
+    }
+
+    public void drawThief(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        Point p = layout.cubeToPixel(layout, thief.getTile().getCoordinates());
+        g2d.setColor(Color.white);
+        g2d.fillOval((int) p.getX() - 10, (int) p.getY() - 10, 20, 20);
     }
 
     public void mouseMoved(MouseEvent e) {
         mousePosition = new Point(e.getX(), e.getY());
         minDistanceToVertex = Double.MAX_VALUE;
         minDistanceToEdge = Double.MAX_VALUE;
+        minDistanceToCenterTile = Double.MAX_VALUE;
         closestVertex = null;
         closestEdge = null;
 
@@ -350,8 +388,21 @@ public class GameBoard {
             closestTileVertex = findClosestVertex();
         } else if (lookingForEdge) {
             closestTileEdge = findClosestEdge();
+        } else if (thiefMode) {
+            for (CubeCoordinates coordinatesTile : this.board.keySet()) {
+                double distance = layout.cubeToPixel(layout, coordinatesTile).distance(mousePosition);
+                if (distance < minDistanceToCenterTile) {
+                    minDistanceToCenterTile = distance;
+                    highlightedTile = board.get(coordinatesTile);
+                }
+            }
         }
 
+    }
+
+    public void changeThief(MouseEvent e) {
+        thief.setTile(highlightedTile);
+        thiefMode = false;
     }
 
     public TileEdge findClosestEdge() {

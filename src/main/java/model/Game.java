@@ -19,6 +19,7 @@ public class Game implements StateMethods {
     private static GameBoard board;
     private ListPlayers players; // ListPlayers extends ArrayList
     private CardStack stack;
+    private Thief thief;
     private boolean resourcesGiven;
 
     Game() {
@@ -32,13 +33,18 @@ public class Game implements StateMethods {
         Point point1 = new Point(400, 400);
         Point point2 = new Point(70, 70);
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
-        board = new GameBoard(layout);
+        thief = new Thief();
+        board = new GameBoard(layout, thief);
 
         stack = new CardStack();
     }
 
     public CardStack getStack() {
         return stack;
+    }
+
+    public Thief getThief() {
+        return thief;
     }
 
     public void endTurn() {
@@ -59,6 +65,14 @@ public class Game implements StateMethods {
         return board;
     }
 
+    public static void setBoard(GameBoard board) {
+        Game.board = board;
+    }
+
+    public void setThiefMode(boolean b) {
+        board.setThiefMode(b);
+    }
+
     public void draw(Graphics g) {
         board.draw(g);
     }
@@ -73,18 +87,20 @@ public class Game implements StateMethods {
     @Override
     public void update() {
         if (getCurrentPlayer().hasThrowDices() && !resourcesGiven) {
-            for (Player p : players) {
-                for (Building b : p.getBuildings()) {
+            for (Player player : players) {
+                for (Building b : player.getBuildings()) {
                     if (b instanceof Colony) {
-                        Colony c = (Colony) b;
-                        for (Tile t : c.getVertex().getTiles()) {
-                            if (t.getDiceValue() == getCurrentPlayer().getDice()) {
-                                if (c.getIsCity()) {
-                                    p.getResources().get(t.getResourceType().getId()).addAmount(2);
-                                    System.out.println("2 " + t.getResourceType() + p.getColorString());
+                        Colony colony = (Colony) b;
+                        for (Tile tile : colony.getVertex().getTiles()) {
+                            if (tile.getDiceValue() == getCurrentPlayer().getDice()) {
+                                if (colony.getIsCity()) {
+                                    Integer number = player.getResources().get(tile.getResourceType());
+                                    player.getResources().replace(tile.getResourceType(), number + 2);
+                                    System.out.println("2 " + tile.getResourceType() + player.getName());
                                 } else {
-                                    p.getResources().get(t.getResourceType().getId() - 1).addAmount(1);
-                                    System.out.println("1 " + t.getResourceType() + p.getColorString());
+                                    Integer number = player.getResources().get(tile.getResourceType());
+                                    player.getResources().replace(tile.getResourceType(), number + 1);
+                                    System.out.println("1 " + tile.getResourceType() + player.getName());
                                 }
                             }
                         }
@@ -111,6 +127,8 @@ public class Game implements StateMethods {
         } else if (board.isPlacingRoad()) {
             buildRoad();
             System.out.println("Building road");
+        } else if (board.getThiefMode()) {
+            board.changeThief(e);
         }
 
         getCurrentPlayer().printResources();

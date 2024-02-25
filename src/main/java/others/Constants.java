@@ -2,9 +2,10 @@ package others;
 
 import model.geometry.Orientation;
 import model.geometry.CubeCoordinates;
-import model.resources.*;
+import view.TileType;
+
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Constants {
     public static class CubeCoordinatesConst {
@@ -20,42 +21,40 @@ public class Constants {
         public static final int[] COLONY = new int[] {1, 0, 1, 1, 1};
         public static final int[] CITY = new int[] {0, 3, 2, 0, 0};
 
-        public static boolean canBuildRoad(ArrayList<Resources> resources) {
+        public static boolean canBuildRoad(HashMap<TileType, Integer> resources) {
             for (int i = 0; i < resources.size(); i++) {
-                if (resources.get(i) instanceof Wood && resources.get(i).getAmount() < ROAD[3]) {
+                if (resources.get(TileType.WOOD) < ROAD[3]) {
                     return false;
                 }
-                if (resources.get(i) instanceof Clay && resources.get(i).getAmount() < ROAD[0]) {
+                if (resources.get(TileType.CLAY) < ROAD[0]) {
                     return false;
                 }
             }
             return true;
         }
 
-        public static boolean canBuildColony(ArrayList<Resources> resources) {
-            for (int i = 0; i < resources.size(); i++) {
-                if (resources.get(i) instanceof Wood && resources.get(i).getAmount() < COLONY[3]) {
-                    return false;
-                }
-                if (resources.get(i) instanceof Clay && resources.get(i).getAmount() < COLONY[0]) {
-                    return false;
-                }
-                if (resources.get(i) instanceof Wheat && resources.get(i).getAmount() < COLONY[2]) {
-                    return false;
-                }
-                if (resources.get(i) instanceof Wool && resources.get(i).getAmount() < COLONY[4]) {
-                    return false;
-                }
+        public static boolean canBuildColony(HashMap<TileType, Integer> resources) {
+            if (resources.get(TileType.WOOD) < COLONY[3]) {
+                return false;
+            }
+            if (resources.get(TileType.CLAY) < COLONY[0]) {
+                return false;
+            }
+            if (resources.get(TileType.WHEAT) < COLONY[2]) {
+                return false;
+            }
+            if (resources.get(TileType.WOOL) < COLONY[4]) {
+                return false;
             }
             return true;
         }
 
-        public static boolean canBuildCity(ArrayList<Resources> resources) {
+        public static boolean canBuildCity(HashMap<TileType, Integer> resources) {
             for (int i = 0; i < resources.size(); i++) {
-                if (resources.get(i) instanceof Wheat && resources.get(i).getAmount() < CITY[2]) {
+                if (resources.get(TileType.WHEAT) < CITY[2]) {
                     return false;
                 }
-                if (resources.get(i) instanceof Ore && resources.get(i).getAmount() < CITY[1]) {
+                if (resources.get(TileType.ORE) < CITY[1]) {
                     return false;
                 }
             }

@@ -1,18 +1,15 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import model.buildings.*;
-import model.resources.*;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
+import view.TileType;
 import model.buildings.Building;
 import model.cards.CardStack;
 import model.cards.DevelopmentCard;
-import model.resources.Clay;
-import model.resources.Resources;
-import model.resources.Wheat;
-import model.resources.Wood;
 
 public class Player {
     static final int NUMBER_DICE = 6;
@@ -30,7 +27,7 @@ public class Player {
     private int dice2;
     private String name;
     private Boolean hasThrowDices;
-    private ArrayList<Resources> resources;
+    private HashMap<TileType, Integer> resources;
 
     private ArrayList<DevelopmentCard> cardsDev;
     private ArrayList<Building> buildings;
@@ -38,12 +35,12 @@ public class Player {
     public Player(Color c, String name) {
         color = c;
         this.name = name;
-        resources = new ArrayList<>();
-        resources.add(new Clay(1));
-        resources.add(new Ore(8));
-        resources.add(new Wheat(8));
-        resources.add(new Wood(3));
-        resources.add(new Wool(3));
+        resources = new HashMap<>();
+        resources.put(TileType.CLAY, 1);
+        resources.put(TileType.ORE, 8);
+        resources.put(TileType.WHEAT, 8);
+        resources.put(TileType.WOOD, 3);
+        resources.put(TileType.WOOL, 3);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;
@@ -65,7 +62,7 @@ public class Player {
     }
 
     public void printResources() {
-        for (Resources r : resources) {
+        for (TileType r : resources.keySet()) {
             System.out.print(r + " ");
         }
         System.out.println();
@@ -136,7 +133,7 @@ public class Player {
         return buildings;
     }
 
-    public ArrayList<Resources> getResources() {
+    public HashMap<TileType, Integer> getResources() {
         return resources;
     }
 

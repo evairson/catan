@@ -4,12 +4,14 @@ import view.utilities.ImgService;
 
 import javax.swing.*;
 
+import model.Game;
 import model.Player;
 import view.utilities.Resolution;
 
 import java.awt.*;
 
 public class RollingDice extends JPanel {
+    private Game game;
     private Player player;
     private JButton rollButton;
     private JLabel diceOneImg;
@@ -23,9 +25,10 @@ public class RollingDice extends JPanel {
         return player.getDice2();
     }
 
-    public RollingDice(Player player) {
+    public RollingDice(Game game) {
+        this.game = game;
+        this.player = game.getCurrentPlayer();
         int[] coords = Resolution.calculateResolution(0, 0);
-        this.player = player;
         setLayout(null);
         setOpaque(true);
         ImageIcon icon = new ImageIcon(getClass().getResource("/view/dice/d1b.png"));
@@ -101,6 +104,9 @@ public class RollingDice extends JPanel {
 
                 }
                 player.setHasTrowDices(true);
+                if (player.getDice() == 7) {
+                    game.setThiefMode(true);
+                }
             } catch (InterruptedException e) {
                 System.out.println("Threading Error in class RollingDice " + e);
             }
