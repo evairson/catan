@@ -21,8 +21,7 @@ public class Game implements StateMethods {
     private CardStack stack;
     private Thief thief;
     private boolean resourcesGiven;
-
-    Game() {
+    public Game() {
         resourcesGiven = false;
         Player player1 = new Player(Player.Color.RED, "Player1");
         Player player2 = new Player(Player.Color.YELLOW, "Player2");

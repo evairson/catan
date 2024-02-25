@@ -28,7 +28,6 @@ public class Player {
     private String name;
     private Boolean hasThrowDices;
     private HashMap<TileType, Integer> resources;
-
     private ArrayList<DevelopmentCard> cardsDev;
     private ArrayList<Building> buildings;
 
@@ -136,13 +135,22 @@ public class Player {
     public HashMap<TileType, Integer> getResources() {
         return resources;
     }
-
     public ArrayList<DevelopmentCard> getCardsDev() {
         return cardsDev;
     }
 
     public void setCardsDev(ArrayList<DevelopmentCard> cardsDev) {
         this.cardsDev = cardsDev;
+    }
+
+    /**
+     * This function adds an amount of resource to the specified resource type.
+     * @param resourceType The resource type we want to increase
+     * @param valueToAdd The increase amount
+     */
+
+    public void addResource(TileType resourceType, int valueToAdd) {
+        resources.merge(resourceType, valueToAdd, Integer::sum);
     }
 
 // ------------------------------------
@@ -215,4 +223,46 @@ public class Player {
         }
     }
 
+    /**
+     * This method checks if we have enough amounts of resources to match those of the resourcesToGive array.
+     * @param resourcesToGive The amounts of the resources we want to give
+     * @return true if we have enough, false if we don't
+     */
+    public boolean hasEnough(int[] resourcesToGive) {
+        int[] ourResources = {resources.get(TileType.CLAY),
+                resources.get(TileType.ORE),
+                resources.get(TileType.WHEAT),
+                resources.get(TileType.WOOD),
+                resources.get(TileType.WOOL)};
+        for (int i = 0; i < 5; i++) {
+            if (resourcesToGive[i] > ourResources[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * This method adds the amounts of resources contained in the resourcesAmountsToAdd array.
+     * @param resourceAmountsToAdd The amounts of resources we add
+     */
+    public void addResourceAmount(int[] resourceAmountsToAdd) {
+        addResource(TileType.CLAY, resourceAmountsToAdd[0]);
+        addResource(TileType.ORE, resourceAmountsToAdd[1]);
+        addResource(TileType.WHEAT, resourceAmountsToAdd[2]);
+        addResource(TileType.WOOD, resourceAmountsToAdd[3]);
+        addResource(TileType.WOOL, resourceAmountsToAdd[4]);
+    }
+
+    /**
+     * This method removes the amount of resources contained in the resourcesAmountsToRemove array.
+     * @param resourceAmountsToRemove The amounts of resources we remove
+     */
+    public void removeResourceAmount(int[] resourceAmountsToRemove) {
+        addResource(TileType.CLAY, -resourceAmountsToRemove[0]);
+        addResource(TileType.ORE, -resourceAmountsToRemove[1]);
+        addResource(TileType.WHEAT, -resourceAmountsToRemove[2]);
+        addResource(TileType.WOOD, -resourceAmountsToRemove[3]);
+        addResource(TileType.WOOL, -resourceAmountsToRemove[4]);
+    }
 }
