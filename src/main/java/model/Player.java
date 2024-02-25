@@ -1,15 +1,15 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import model.buildings.*;
-import model.resources.*;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
+import view.TileType;
 import model.buildings.Building;
 import model.cards.CardStack;
 import model.cards.DevelopmentCard;
-import model.resources.*;
 
 public class Player {
     static final int NUMBER_DICE = 6;
@@ -27,22 +27,22 @@ public class Player {
     private int dice2;
     private String name;
     private Boolean hasThrowDices;
-    private ArrayList<Resources> resources;
-
+    private HashMap<TileType, Integer> resources;
     private ArrayList<DevelopmentCard> cardsDev;
     private ArrayList<Building> buildings;
 
     public Player(Color c, String name) {
         color = c;
         this.name = name;
-        resources = new ArrayList<>();
-        resources.add(new Clay(1));
-        resources.add(new Ore(8));
-        resources.add(new Wheat(8));
-        resources.add(new Wood(3));
-        resources.add(new Wool(3));
+        resources = new HashMap<>();
+        resources.put(TileType.CLAY, 1);
+        resources.put(TileType.ORE, 8);
+        resources.put(TileType.WHEAT, 8);
+        resources.put(TileType.WOOD, 3);
+        resources.put(TileType.WOOL, 3);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
+        hasThrowDices = false;
     }
 
     public void printBuildings() {
@@ -61,7 +61,7 @@ public class Player {
     }
 
     public void printResources() {
-        for (Resources r : resources) {
+        for (TileType r : resources.keySet()) {
             System.out.print(r + " ");
         }
         System.out.println();
@@ -116,7 +116,7 @@ public class Player {
         turn = b;
     }
 
-    public int getDies() {
+    public int getDice() {
         return dice1 + dice2;
     }
 
@@ -132,25 +132,25 @@ public class Player {
         return buildings;
     }
 
-    public ArrayList<Resources> getResources() {
+    public HashMap<TileType, Integer> getResources() {
         return resources;
     }
-    public int[] getResourcesAmounts() {
-        int[] retour = new int[5];
-        retour[0] = this.resources.get(0).getAmount();
-        retour[1] = this.resources.get(1).getAmount();
-        retour[2] = this.resources.get(2).getAmount();
-        retour[3] = this.resources.get(3).getAmount();
-        retour[4] = this.resources.get(4).getAmount();
-        return retour;
-    }
-
     public ArrayList<DevelopmentCard> getCardsDev() {
         return cardsDev;
     }
 
     public void setCardsDev(ArrayList<DevelopmentCard> cardsDev) {
         this.cardsDev = cardsDev;
+    }
+
+    /**
+     * This function adds an amount of resource to the specified resource type.
+     * @param resourceType The resource type we want to increase
+     * @param valueToAdd The increase amount
+     */
+
+    public void addResource(TileType resourceType, int valueToAdd) {
+        resources.merge(resourceType, valueToAdd, Integer::sum);
     }
 
 // ------------------------------------
@@ -216,7 +216,11 @@ public class Player {
     }
 
     public void drawCard(CardStack stack) {
-        cardsDev.add(stack.getCardStack().pop());
+        if (!stack.getCardStack().isEmpty()) {
+            cardsDev.add(stack.getCardStack().pop());
+        } else {
+            System.out.println("0 cartes dans le deck");
+        }
     }
 
     /**
@@ -225,7 +229,11 @@ public class Player {
      * @return true if we have enough, false if we don't
      */
     public boolean hasEnough(int[] resourcesToGive) {
-        int[] ourResources = this.getResourcesAmounts();
+        int[] ourResources = {resources.get(TileType.CLAY),
+                resources.get(TileType.ORE),
+                resources.get(TileType.WHEAT),
+                resources.get(TileType.WOOD),
+                resources.get(TileType.WOOL)};
         for (int i = 0; i < 5; i++) {
             if (resourcesToGive[i] > ourResources[i]) {
                 return false;
@@ -239,9 +247,11 @@ public class Player {
      * @param resourceAmountsToAdd The amounts of resources we add
      */
     public void addResourceAmount(int[] resourceAmountsToAdd) {
-        for (int i = 0; i < 5; i++) {
-            this.resources.get(i).addAmount(resourceAmountsToAdd[i]);
-        }
+        addResource(TileType.CLAY, resourceAmountsToAdd[0]);
+        addResource(TileType.ORE, resourceAmountsToAdd[1]);
+        addResource(TileType.WHEAT, resourceAmountsToAdd[2]);
+        addResource(TileType.WOOD, resourceAmountsToAdd[3]);
+        addResource(TileType.WOOL, resourceAmountsToAdd[4]);
     }
 
     /**
@@ -249,8 +259,10 @@ public class Player {
      * @param resourceAmountsToRemove The amounts of resources we remove
      */
     public void removeResourceAmount(int[] resourceAmountsToRemove) {
-        for (int i = 0; i < 5; i++) {
-            this.resources.get(i).payAmount(resourceAmountsToRemove[i]);
-        }
+        addResource(TileType.CLAY, -resourceAmountsToRemove[0]);
+        addResource(TileType.ORE, -resourceAmountsToRemove[1]);
+        addResource(TileType.WHEAT, -resourceAmountsToRemove[2]);
+        addResource(TileType.WOOD, -resourceAmountsToRemove[3]);
+        addResource(TileType.WOOL, -resourceAmountsToRemove[4]);
     }
 }

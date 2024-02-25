@@ -20,8 +20,16 @@ public class Colony extends Building {
         this.vertex = vertex;
     }
 
+    public boolean getIsCity() {
+        return isCity;
+    }
+
     public void setVille() {
         isCity = true;
+    }
+
+    public TileVertex getVertex() {
+        return vertex;
     }
 
     public boolean cityBuyable(Player player) {

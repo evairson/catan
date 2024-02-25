@@ -67,6 +67,7 @@ public class App implements Runnable {
     }
 
     public void update() {
+        game.update();
     }
 
     public void render(Graphics g) {

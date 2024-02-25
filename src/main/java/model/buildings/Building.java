@@ -1,8 +1,10 @@
 package model.buildings;
 
 import model.Player;
-import model.resources.*;
+import view.TileType;
+
 import java.awt.*;
+import java.util.HashMap;
 
 public abstract class Building {
     private Player owner;
@@ -17,24 +19,19 @@ public abstract class Building {
 
     public boolean buyable(Player player, int[] cost) {
         for (int i = 0; i < cost.length; i++) {
-            if (player.getResources().get(i) instanceof Clay
-                && player.getResources().get(i).getAmount() < cost[0]) {
+            if (player.getResources().get(TileType.CLAY) < cost[0]) {
                 return false;
             }
-            if (player.getResources().get(i) instanceof Ore
-                && player.getResources().get(i).getAmount() < cost[1]) {
+            if (player.getResources().get(TileType.ORE) < cost[1]) {
                 return false;
             }
-            if (player.getResources().get(i) instanceof Wheat
-                && player.getResources().get(i).getAmount() < cost[2]) {
+            if (player.getResources().get(TileType.WHEAT) < cost[2]) {
                 return false;
             }
-            if (player.getResources().get(i) instanceof Wood
-                && player.getResources().get(i).getAmount() < cost[3]) {
+            if (player.getResources().get(TileType.WOOD) < cost[3]) {
                 return false;
             }
-            if (player.getResources().get(i) instanceof Wool
-                && player.getResources().get(i).getAmount() < cost[4]) {
+            if (player.getResources().get(TileType.WOOL) < cost[4]) {
                 return false;
             }
         }
@@ -66,38 +63,22 @@ public abstract class Building {
 
     public boolean buy(Player player, int[] cost) {
         if (buyable(player, cost)) {
-            for (int i = 0; i < cost.length; i++) {
-                if (player.getResources().get(i) instanceof Clay) {
-                    if (!player.getResources().get(i).payAmount(cost[0])) {
-                        return false;
-                    }
-                    System.out.println("payed " + cost[0] + " clay");
-                }
-                if (player.getResources().get(i) instanceof Ore) {
-                    if (!player.getResources().get(i).payAmount(cost[1])) {
-                        return false;
-                    }
-                    System.out.println("payed " + cost[1] + " ore");
-                }
-                if (player.getResources().get(i) instanceof Wheat) {
-                    if (!player.getResources().get(i).payAmount(cost[2])) {
-                        return false;
-                    }
-                    System.out.println("payed " + cost[2] + " wheat");
-                }
-                if (player.getResources().get(i) instanceof Wood) {
-                    if (!player.getResources().get(i).payAmount(cost[3])) {
-                        return false;
-                    }
-                    System.out.println("payed " + cost[3] + " wood");
-                }
-                if (player.getResources().get(i) instanceof Wool) {
-                    if (!player.getResources().get(i).payAmount(cost[4])) {
-                        return false;
-                    }
-                    System.out.println("payed " + cost[4] + " wool");
-                }
-            }
+            HashMap<TileType, Integer> resources = player.getResources();
+
+            resources.replace(TileType.CLAY, resources.get(TileType.CLAY) - cost[0]);
+            System.out.println("payed " + cost[0] + " clay");
+
+            resources.replace(TileType.ORE, resources.get(TileType.ORE) - cost[1]);
+            System.out.println("payed " + cost[1] + " ore");
+
+            resources.replace(TileType.WHEAT, resources.get(TileType.WHEAT) - cost[2]);
+            System.out.println("payed " + cost[2] + " wheat");
+
+            resources.replace(TileType.WOOD, resources.get(TileType.WOOD) - cost[3]);
+            System.out.println("payed " + cost[3] + " wood");
+
+            resources.replace(TileType.WOOL, resources.get(TileType.WOOL) - cost[4]);
+            System.out.println("payed " + cost[4] + " wool");
             return true;
         }
         return false;

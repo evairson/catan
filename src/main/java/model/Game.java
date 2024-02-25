@@ -4,9 +4,12 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import model.buildings.Building;
+import model.buildings.Colony;
 import model.cards.CardStack;
 import model.geometry.Layout;
 import model.geometry.Point;
+import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
 import others.Constants;
@@ -16,8 +19,10 @@ public class Game implements StateMethods {
     private static GameBoard board;
     private ListPlayers players; // ListPlayers extends ArrayList
     private CardStack stack;
-
+    private Thief thief;
+    private boolean resourcesGiven;
     public Game() {
+        resourcesGiven = false;
         Player player1 = new Player(Player.Color.RED, "Player1");
         Player player2 = new Player(Player.Color.YELLOW, "Player2");
         Player player3 = new Player(Player.Color.BLUE, "Player3");
@@ -27,7 +32,8 @@ public class Game implements StateMethods {
         Point point1 = new Point(400, 400);
         Point point2 = new Point(70, 70);
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
-        board = new GameBoard(layout);
+        thief = new Thief();
+        board = new GameBoard(layout, thief);
 
         stack = new CardStack();
     }
@@ -36,8 +42,13 @@ public class Game implements StateMethods {
         return stack;
     }
 
+    public Thief getThief() {
+        return thief;
+    }
+
     public void endTurn() {
         players.next();
+        resourcesGiven = false;
     }
 
     public ListPlayers getPlayers() {
@@ -53,6 +64,14 @@ public class Game implements StateMethods {
         return board;
     }
 
+    public static void setBoard(GameBoard board) {
+        Game.board = board;
+    }
+
+    public void setThiefMode(boolean b) {
+        board.setThiefMode(b);
+    }
+
     public void draw(Graphics g) {
         board.draw(g);
     }
@@ -66,6 +85,29 @@ public class Game implements StateMethods {
 
     @Override
     public void update() {
+        if (getCurrentPlayer().hasThrowDices() && !resourcesGiven) {
+            for (Player player : players) {
+                for (Building b : player.getBuildings()) {
+                    if (b instanceof Colony) {
+                        Colony colony = (Colony) b;
+                        for (Tile tile : colony.getVertex().getTiles()) {
+                            if (tile.getDiceValue() == getCurrentPlayer().getDice()) {
+                                if (colony.getIsCity()) {
+                                    Integer number = player.getResources().get(tile.getResourceType());
+                                    player.getResources().replace(tile.getResourceType(), number + 2);
+                                    System.out.println("2 " + tile.getResourceType() + player.getName());
+                                } else {
+                                    Integer number = player.getResources().get(tile.getResourceType());
+                                    player.getResources().replace(tile.getResourceType(), number + 1);
+                                    System.out.println("1 " + tile.getResourceType() + player.getName());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            resourcesGiven = true;
+        }
     }
 
     @Override
@@ -84,6 +126,8 @@ public class Game implements StateMethods {
         } else if (board.isPlacingRoad()) {
             buildRoad();
             System.out.println("Building road");
+        } else if (board.getThiefMode()) {
+            board.changeThief(e);
         }
 
         getCurrentPlayer().printResources();

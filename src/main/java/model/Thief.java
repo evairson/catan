@@ -1,19 +1,22 @@
 package model;
 
+import model.tiles.Tile;
+import view.TileType;
+
 public class Thief {
-    // private Coordonnee cord;
+    private Tile tile;
     private boolean onDesert;
 
-    Thief() {
-        onDesert = true;
-    }
-
-    public void setOnDesert(boolean b) {
-        onDesert = b;
-    }
-
     public boolean isOnDesert() {
-        return onDesert;
+        return tile.getResourceType() == TileType.DESERT;
+    }
+
+    public Tile getTile() {
+        return tile;
+    }
+
+    public void setTile(Tile tile) {
+        this.tile = tile;
     }
 
 

@@ -2,8 +2,6 @@ package view;
 
 import model.Game;
 import model.Player;
-import model.resources.Resources;
-
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -12,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TradePanel extends JPanel {
 
@@ -48,28 +47,28 @@ public class TradePanel extends JPanel {
         // Créer un JPanel pour les éléments donnés
         JPanel givePanel = new JPanel(new GridLayout(6, 2));
         JLabel giveLabel = new JLabel("You give", SwingConstants.CENTER);
-        ArrayList<Resources> tradingPResources = tradingPlayer.getResources();
-        JLabel resourceLabel1 = new JLabel("Clay (you have " + tradingPResources.get(0).getAmount() + ") :");
-        JLabel resourceLabel2 = new JLabel("Ore (you have " + tradingPResources.get(1).getAmount() + ") :");
-        JLabel resourceLabel3 = new JLabel("Wheat (you have " + tradingPResources.get(2).getAmount() + ") :");
-        JLabel resourceLabel4 = new JLabel("Wood (you have " + tradingPResources.get(3).getAmount() + ") :");
-        JLabel resourceLabel5 = new JLabel("Wool (you have " + tradingPResources.get(4).getAmount() + ") :");
-        JTextField resource1 = new ResourceField(tradingPlayer.getResources().get(0).getAmount());
-        JTextField resource2 = new ResourceField(tradingPlayer.getResources().get(1).getAmount());
-        JTextField resource3 = new ResourceField(tradingPlayer.getResources().get(2).getAmount());
-        JTextField resource4 = new ResourceField(tradingPlayer.getResources().get(3).getAmount());
-        JTextField resource5 = new ResourceField(tradingPlayer.getResources().get(4).getAmount());
+        HashMap<TileType, Integer> tradingPResources = tradingPlayer.getResources();
+        JLabel resLabel1 = new JLabel("Clay (you have " + tradingPResources.get(TileType.CLAY) + ") :");
+        JLabel resLabel2 = new JLabel("Ore (you have " + tradingPResources.get(TileType.ORE) + ") :");
+        JLabel resLabel3 = new JLabel("Wheat (you have " + tradingPResources.get(TileType.WHEAT) + ") :");
+        JLabel resLabel4 = new JLabel("Wood (you have " + tradingPResources.get(TileType.WOOD) + ") :");
+        JLabel resLabel5 = new JLabel("Wool (you have " + tradingPResources.get(TileType.WOOL) + ") :");
+        JTextField resource1 = new ResourceField(tradingPlayer.getResources().get(TileType.CLAY));
+        JTextField resource2 = new ResourceField(tradingPlayer.getResources().get(TileType.ORE));
+        JTextField resource3 = new ResourceField(tradingPlayer.getResources().get(TileType.WHEAT));
+        JTextField resource4 = new ResourceField(tradingPlayer.getResources().get(TileType.WOOD));
+        JTextField resource5 = new ResourceField(tradingPlayer.getResources().get(TileType.WOOL));
         givePanel.add(giveLabel);
         givePanel.add(new JLabel()); // Emplacement vide pour centrer "You give"
-        givePanel.add(resourceLabel1);
+        givePanel.add(resLabel1);
         givePanel.add(resource1);
-        givePanel.add(resourceLabel2);
+        givePanel.add(resLabel2);
         givePanel.add(resource2);
-        givePanel.add(resourceLabel3);
+        givePanel.add(resLabel3);
         givePanel.add(resource3);
-        givePanel.add(resourceLabel4);
+        givePanel.add(resLabel4);
         givePanel.add(resource4);
-        givePanel.add(resourceLabel5);
+        givePanel.add(resLabel5);
         givePanel.add(resource5);
 
         // Créer un JPanel pour les éléments reçus
@@ -247,15 +246,15 @@ public class TradePanel extends JPanel {
             JPanel youGivePanel = new JPanel(new GridLayout(7, 1));
             JLabel youGiveLabel = new JLabel("You give", SwingConstants.CENTER);
             JLabel resourceLabel6 = new JLabel("Clay (you have "
-                    + receivingPlayer.getResources().get(0).getAmount() + ") : " + receive[0]);
+                    + receivingPlayer.getResources().get(TileType.CLAY) + ") : " + receive[0]);
             JLabel resourceLabel7 = new JLabel("Ore (you have "
-                    + receivingPlayer.getResources().get(1).getAmount() + ") : " + receive[1]);
+                    + receivingPlayer.getResources().get(TileType.ORE) + ") : " + receive[1]);
             JLabel resourceLabel8 = new JLabel("Wheat (you have "
-                    + receivingPlayer.getResources().get(2).getAmount() + ") : " + receive[2]);
+                    + receivingPlayer.getResources().get(TileType.WHEAT) + ") : " + receive[2]);
             JLabel resourceLabel9 = new JLabel("Wood (you have "
-                    + receivingPlayer.getResources().get(3).getAmount() + ") : " + receive[3]);
+                    + receivingPlayer.getResources().get(TileType.WOOD) + ") : " + receive[3]);
             JLabel resourceLabel10 = new JLabel("Wool (you have "
-                    + receivingPlayer.getResources().get(4).getAmount() + ") : " + receive[4]);
+                    + receivingPlayer.getResources().get(TileType.WOOL) + ") : " + receive[4]);
             youGivePanel.add(youGiveLabel);
             youGivePanel.add(resourceLabel6);
             youGivePanel.add(resourceLabel7);

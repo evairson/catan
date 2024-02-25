@@ -3,12 +3,11 @@ package view.gamepanels;
 import javax.swing.*;
 
 import model.Player;
-import model.resources.Resources;
+import view.TileType;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
 
 import java.awt.event.MouseAdapter;
-import java.util.ArrayList;
 
 public class ResourcesPanel extends JPanel {
 
@@ -88,11 +87,10 @@ public class ResourcesPanel extends JPanel {
         woolLabel.setText(String.valueOf(woolAmount));
     }
     public void updateResourceLabels(Player p) {
-        ArrayList<Resources> playerResources = p.getResources();
-        updateResourceLabels(playerResources.get(0).getAmount(),
-                playerResources.get(1).getAmount(),
-                playerResources.get(2).getAmount(),
-                playerResources.get(3).getAmount(),
-                playerResources.get(4).getAmount());
+        updateResourceLabels(p.getResources().get(TileType.CLAY),
+                p.getResources().get(TileType.ORE),
+                p.getResources().get(TileType.WHEAT),
+                p.getResources().get(TileType.WOOD),
+                p.getResources().get(TileType.WOOL));
     }
 }

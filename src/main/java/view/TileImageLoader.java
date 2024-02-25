@@ -10,11 +10,11 @@ import java.io.File;
 
 public class TileImageLoader {
 
-    public static Map<TileType, BufferedImage> loadAndResizeTileImages() {
+    public static Map<TileType, BufferedImage> loadAndResizeTileImages(boolean highlight) {
         Map<TileType, BufferedImage> tileImages = new EnumMap<>(TileType.class);
         // Charger et redimensionner chaque image pour chaque type de tuile
         for (TileType type : TileType.values()) {
-            BufferedImage originalImage = loadImage(type.getImagePath());
+            BufferedImage originalImage = loadImage(highlight ? type.getImagePathS() : type.getImagePath());
             if (originalImage != null) {
                 BufferedImage resizedImage = resizeImage(originalImage, originalImage.getWidth() / 2,
                         originalImage.getHeight() / 2);
