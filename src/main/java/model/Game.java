@@ -131,7 +131,7 @@ public class Game implements StateMethods {
             buildRoad();
             System.out.println("Building road");
         } else if (board.getThiefMode()) {
-            board.changeThief(e);
+            board.changeThief();
         }
 
         getCurrentPlayer().printResources();

@@ -7,7 +7,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.imageio.ImageIO;
 import java.lang.*;
-
+import java.util.ArrayList;
 import java.io.IOException;
 
 import model.App;
@@ -19,7 +19,8 @@ import view.gamepanels.ShopPanel;
 import view.gamepanels.TradePanel;
 import model.cards.DevelopmentCard;
 import model.cards.KnightCard;
-import model.cards.ProgessCard;
+import model.cards.Monopoly;
+import model.cards.ProgressCard;
 import others.Constants;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
@@ -50,6 +51,8 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel cardPanel;
     private JPanel playersPanel;
     private RollingDice dice;
+
+    private boolean cardPlayed = false;
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -246,6 +249,7 @@ public class ActionPlayerPanel extends JPanel {
 
     private void changeTurn() {
         game.endTurn();
+        cardPlayed = false;
         update();
     }
 
@@ -265,19 +269,22 @@ public class ActionPlayerPanel extends JPanel {
         cardsPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         String basePath = "src/main/resources/";
         for (int i = 0; i < game.getCurrentPlayer().getCardsDev().size(); i++) {
-            String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(i));
-            ButtonImage b = new ButtonImage(basePath + card, basePath + card,
-                    300 + i * 100, 250, 1.5, this::useCard, null);
+            DevelopmentCard card = game.getCurrentPlayer().getCardsDev().get(i);
+            String stringCard = cardImageUrl(card);
+            System.out.println(card.getClass().getSimpleName());
+            ButtonImage b = new ButtonImage(basePath + stringCard, basePath + stringCard,
+                    300 + i * 100, 250, 1.5,
+                switch (card.getClass().getSimpleName()) {
+                    case "KnightCard": yield (this::useKnight);
+                    case "ProgressCard": yield (this::useMonopoly);
+                    default: yield null;
+                }, null);
             cardsPanel.add(b);
         }
-        JPanel self = this;
         cardsPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                self.remove(cardsPanel);
-                cardsPanel = null;
-                repaint();
-                revalidate();
+                removeCardsPanel();
             }
         });
         cardsPanel.setOpaque(false);
@@ -286,14 +293,49 @@ public class ActionPlayerPanel extends JPanel {
         revalidate();
     }
 
+    public void removeCardsPanel() {
+        this.remove(cardsPanel);
+        cardsPanel = null;
+        repaint();
+        revalidate();
+    }
+
+    private void useKnight() {
+        removeCardsPanel();
+        cardPlayed = true;
+        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i) instanceof KnightCard) {
+                cards.remove(i);
+                break;
+            }
+        }
+        game.getBoard().setThiefMode(true);
+        System.out.println("knigh");
+    }
+
+    private void useMonopoly() {
+        removeCardsPanel();
+        cardPlayed = true;
+        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i) instanceof Monopoly) {
+                cards.remove(i);
+                break;
+            }
+        }
+        game.getBoard().setWaitingChoice(true);
+        System.out.println("progress");
+    }
+
     private void useCard() {
-        // TODO :
+        //
     }
 
     private String cardImageUrl(DevelopmentCard card) {
         if (card instanceof KnightCard) {
             return "cards/knight.png";
-        } else if (card instanceof ProgessCard) {
+        } else if (card instanceof ProgressCard) {
             return "cards/progress.png";
         } else {
             return "cards/point.png";
@@ -309,8 +351,9 @@ public class ActionPlayerPanel extends JPanel {
         cardPanel.setLayout(null);
         cardPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         String basePath = "src/main/resources/";
-        int last = game.getCurrentPlayer().getCardsDev().size();
-        String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(last - 1));
+        ArrayList<DevelopmentCard> devCards = game.getCurrentPlayer().getCardsDev();
+        int last = devCards.size();
+        String card = cardImageUrl(devCards.get(last - 1));
         ButtonImage b = new ButtonImage(basePath + card, basePath + card,
                 600, 250, 1.5, this::useCard, null);
         cardPanel.add(b);

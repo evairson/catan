@@ -38,6 +38,7 @@ public class GameBoard {
     private boolean placingRoad = false;
     private boolean placingColony = false;
     private boolean placingCity = false;
+    private boolean waitingChoice = false;
 
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
@@ -59,6 +60,14 @@ public class GameBoard {
 
     public boolean getThiefMode() {
         return thiefMode;
+    }
+
+    public void setWaitingChoice(boolean b) {
+        waitingChoice = b;
+    }
+
+    public boolean getWaitngChoice() {
+        return waitingChoice;
     }
 
     public Layout getLayout() {
@@ -400,7 +409,7 @@ public class GameBoard {
 
     }
 
-    public void changeThief(MouseEvent e) {
+    public void changeThief() {
         thief.setTile(highlightedTile);
         thiefMode = false;
     }

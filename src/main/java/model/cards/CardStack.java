@@ -18,7 +18,7 @@ public class CardStack {
             cardToMix.add(new KnightCard());
         }
         for (int i = 0; i < NB_POINT; i++) {
-            cardToMix.add(new ProgessCard());
+            cardToMix.add(new ProgressCard());
         }
         for (int i = 0; i < NB_PROGRESS; i++) {
             cardToMix.add(new VictoryPointCard());
