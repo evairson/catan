@@ -1,6 +1,7 @@
 package view;
 
 import others.Constants;
+import view.gamepanels.TradePanel;
 import view.menu.MainMenu;
 
 import javax.swing.*;
