@@ -24,8 +24,9 @@ public class ButtonImage extends JButton {
                                   MouseAdapter hoverEvent) {
         try {
             // Coordonnées pour la résolution cible
-            int xCoord = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight)[0];
-            int yCoord = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight)[1];
+            int[] coords = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight);
+            int xCoord = coords[0];
+            int yCoord = coords[1];
 
             // Nouveau diviseur pour la résolution cible
             double divider = scale * Resolution.divider();
