@@ -21,7 +21,12 @@ public class Game implements StateMethods {
     private CardStack stack;
     private Thief thief;
     private boolean resourcesGiven;
-    public Game() {
+    private boolean start = true;
+    private boolean backwards = false;
+    private App app;
+
+    public Game(App app) {
+        this.app = app;
         resourcesGiven = false;
         Player player1 = new Player(Player.Color.RED, "Player1");
         Player player2 = new Player(Player.Color.YELLOW, "Player2");
@@ -47,8 +52,22 @@ public class Game implements StateMethods {
     }
 
     public void endTurn() {
-        players.next();
+        if (start && getCurrentPlayer().getName().equals("Player4")) {
+            start = false;
+            backwards = true;
+        } else if (backwards && getCurrentPlayer().getName().equals("Player1")) {
+            backwards = false;
+        } else if (backwards) {
+            players.prev();
+        } else {
+            players.next();
+        }
+
+        if (!start && !backwards) {
+            app.getActionPlayerPanel().getRollingDice().setButtonIsOn(true);
+        }
         resourcesGiven = false;
+        app.getActionPlayerPanel().getRollingDice().newPlayer(getCurrentPlayer());
     }
 
     public ListPlayers getPlayers() {

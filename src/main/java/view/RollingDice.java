@@ -25,6 +25,10 @@ public class RollingDice extends JPanel {
         return player.getDice2();
     }
 
+    public void setButtonIsOn(Boolean b) {
+        rollButton.setEnabled(b);
+    }
+
     public RollingDice(Game game) {
         this.game = game;
         this.player = game.getCurrentPlayer();
@@ -74,6 +78,7 @@ public class RollingDice extends JPanel {
                 (int) (33 / Resolution.divider()));
         rollButton.addActionListener(actionEvent -> roll());
         this.add(rollButton);
+        rollButton.setEnabled(false);
     }
 
     public void roll() {
@@ -112,11 +117,11 @@ public class RollingDice extends JPanel {
             }
         });
         rollThread.start();
+        System.out.println(player.getColorString());
     }
 
     public void newPlayer(Player player) {
         player.setHasTrowDices(false);
         this.player = player;
-        rollButton.setEnabled(true);
     }
 }

@@ -75,6 +75,10 @@ public class ActionPlayerPanel extends JPanel {
 
     }
 
+    public RollingDice getRollingDice() {
+        return dice;
+    }
+
     private void initializeRollingDicePanel() {
         int xCoord = Resolution.calculateResolution(1108, 440)[0];
         int yCoord = Resolution.calculateResolution(1108, 440)[1];
@@ -426,7 +430,7 @@ public class ActionPlayerPanel extends JPanel {
 
     public void update() {
         Player currentPlayer = game.getCurrentPlayer();
-        dice.newPlayer(currentPlayer);
+        //dice.newPlayer(currentPlayer);
         resourcesPanel.updateResourceLabels(currentPlayer);
 
         namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());

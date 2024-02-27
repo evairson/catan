@@ -29,7 +29,7 @@ public class App implements Runnable {
     public App() {
         mainMenu = new MainMenu(this);
         gamePanel = new GamePanel(this);
-        game = new Game();
+        game = new Game(this);
         actionPlayer = new ActionPlayerPanel(this);
         gameWindow = new GameWindow(gamePanel, actionPlayer, mainMenu);
 
@@ -43,6 +43,11 @@ public class App implements Runnable {
     public Game getGame() {
         return game;
     }
+
+    public ActionPlayerPanel getActionPlayerPanel() {
+        return actionPlayer;
+    }
+
     public GameWindow getGameWindow() {
         return gameWindow;
     }
