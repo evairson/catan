@@ -52,7 +52,6 @@ public class ActionPlayerPanel extends JPanel {
         }
         initializeRollingDicePanel();
         initializeTradeButtonPanel();
-        initializeTradePanel();
         initializeResourcesPanel();
         initializeShopPanel(game);
         initializeDeckPanel();
@@ -144,15 +143,33 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeTradePanel() {
-        int xCoord = Resolution.calculateResolution(480, 120)[0];
-        int yCoord = Resolution.calculateResolution(480, 120)[1];
-        tradePanel = new TradePanel(xCoord, yCoord, (int) (800 / Resolution.divider()),
-                (int) (600 / Resolution.divider()));
-        tradePanel.setOpaque(true);
-        tradePanel.setBounds(xCoord, yCoord, (int) (800 / Resolution.divider()),
-                (int) (600 / Resolution.divider()));
-        tradePanel.setVisible(false);
-        add(tradePanel);
+        showTradePanel();
+    }
+
+    private JFrame getMainFrame() {
+        Container current = this;
+        while (current.getParent() != null) {
+            current = current.getParent();
+            if (current instanceof JFrame) {
+                return (JFrame) current;
+            }
+        }
+        return null; // Si le JFrame n'est pas trouvé (ce qui ne devrait pas arriver)
+    }
+
+    private void showTradePanel() {
+        JFrame mainFrame = getMainFrame();
+        JLayeredPane layeredPane = mainFrame.getLayeredPane();
+        TradePanel tradePanel = new TradePanel();
+        layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
+        tradePanel.setVisible(true);
+        setComponentsEnabled(false);
+    }
+
+    public void setComponentsEnabled(boolean enabled) {
+        for (Component comp : this.getComponents()) {
+            comp.setEnabled(enabled);
+        }
     }
 
     private void initializeResourcesPanel() {
@@ -195,7 +212,7 @@ public class ActionPlayerPanel extends JPanel {
     private void initializeTradeButtonPanel() {
         int xCoord = Resolution.calculateResolution(50, 560)[0];
         int yCoord = Resolution.calculateResolution(50, 560)[1];
-        tradeButtonPanel = new TradeButtonPanel(this::trade);
+        tradeButtonPanel = new TradeButtonPanel(this::initializeTradePanel);
         tradeButtonPanel.setVisible(true);
         tradeButtonPanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
                 (int) (185 / Resolution.divider()));
@@ -216,14 +233,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void trade() {
-        tradePanel.setVisible(true);
-        int length = (int) (200 / Resolution.divider());
-        int yCoord = resourcesPanel.getY();
-        animate.jPanelYUp(yCoord, yCoord - length, 2, 1, resourcesPanel);
-        resourcesPanel.setLabelTradeVisible(true);
-        length = (int) (400 / Resolution.divider());
-        int xCoord = tradeButtonPanel.getX();
-        animate.jPanelXLeft(xCoord, xCoord - length, 2, 1, tradeButtonPanel);
+
     }
 
     private void addCardsPanel() {

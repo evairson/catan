@@ -1,5 +1,6 @@
 package view.gamepanels;
 
+import others.Constants;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
 
@@ -10,81 +11,52 @@ import java.awt.event.MouseEvent;
 
 public class TradePanel extends JPanel {
     private Image backgroundImage;
-    private ButtonImage clay;
-    private ButtonImage ore;
-    private ButtonImage wheat;
-    private ButtonImage wood;
-    private ButtonImage wool;
-    private ButtonImage accept;
-    private ButtonImage decline;
+    private ButtonImage[] playerOneButtons = new ButtonImage[5];
+    private ButtonImage[] playerTwoButtons = new ButtonImage[5];
+    private JLabel[] playerOneLabels = new JLabel[5];
+    private JLabel[] playerTwoLabels = new JLabel[5];
 
-    private JLabel clayLabelTrade;
-    private JLabel oreLabelTrade;
-    private JLabel wheatLabelTrade;
-    private JLabel woodLabelTrade;
-    private JLabel woolLabelTrade;
-
-
-    public TradePanel(int xCoord, int yCoord, int width, int height) {
+    private final String[] resourceNames = {"clay", "ore", "wheat", "wood", "wool"};
+    private final int[] buttonYPositions = {378, 310, 446, 245, 515};
+    public TradePanel() {
         setLayout(null);
-        setBounds(xCoord, yCoord, width, height);
         loadBackgroundImage("src/main/resources/tradePanel.png");
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         createResourceButtons();
         createTradeButtons();
-        createLabelsButtons();
-    }
-
-    private void createLabelsButtons() {
-        clayLabelTrade = createCounterLabel(180, 200, clay.getWidth());
-        oreLabelTrade = createCounterLabel(140, 200, ore.getWidth());
-        wheatLabelTrade = createCounterLabel(220, 200, wheat.getWidth());
-        woodLabelTrade = createCounterLabel(100, 200, wood.getWidth());
-        woolLabelTrade = createCounterLabel(260, 200, wool.getWidth());
-
-        add(clayLabelTrade);
-        add(oreLabelTrade);
-        add(wheatLabelTrade);
-        add(woodLabelTrade);
-        add(woolLabelTrade);
-
-        woodLabelTrade.setBackground(Color.CYAN);
-        configureButton(wood, woodLabelTrade);
-        configureButton(ore, oreLabelTrade);
-        configureButton(wheat, wheatLabelTrade);
-        configureButton(clay, clayLabelTrade);
-        configureButton(wool, woolLabelTrade);
-    }
-
-    private void createTradeButtons() {
-        accept = new ButtonImage("src/main/resources/acceptButton.png", "src/main/resources/acceptButton.png",
-                50, 260, 2.5, null, null);
-        decline = new ButtonImage("src/main/resources/refuseButton.png",
-                "src/main/resources/refuseButton.png",
-                290, 260, 2.5, null, null);
-
-        add(accept);
-        add(decline);
     }
     private void createResourceButtons() {
         String basePath = "src/main/resources/resources/";
-        clay = new ButtonImage(basePath + "clay.png", basePath + "clay.png",
-                180, 210, 5, () -> { }, null); // 400
-        ore = new ButtonImage(basePath + "ore.png", basePath + "ore.png",
-                140, 210, 5, () -> { }, null); // 300 - 550
-        wheat = new ButtonImage(basePath + "wheat.png", basePath + "wheat.png",
-                220, 210, 5, () -> { }, null); // 500
-        wood = new ButtonImage(basePath + "wood.png", basePath + "wood.png",
-                100, 210, 5, () -> { }, null); // 200 - 550
-        wool = new ButtonImage(basePath + "wool.png", basePath + "wool.png",
-                260, 210, 5, () -> { }, null); // 600
+        for (int i = 0; i < resourceNames.length; i++) {
+            playerOneButtons[i] = createButtonImage(basePath + resourceNames[i] + ".png",
+                    357, buttonYPositions[i]);
+            playerOneLabels[i] = createCounterLabel(400, buttonYPositions[i],
+                    playerOneButtons[i].getHeight());
 
-        add(clay);
-        add(ore);
-        add(wheat);
-        add(wood);
-        add(wool);
+            playerTwoButtons[i] = createButtonImage(basePath + resourceNames[i] + ".png",
+                    888, buttonYPositions[i]);
+            playerTwoLabels[i] = createCounterLabel(865, buttonYPositions[i],
+                    playerTwoButtons[i].getHeight());
+
+            configureButton(playerOneButtons[i], playerOneLabels[i]);
+            configureButton(playerTwoButtons[i], playerTwoLabels[i]);
+        }
     }
-
+    private ButtonImage createButtonImage(String imagePath, int x, int y) {
+        ButtonImage button = new ButtonImage(imagePath, imagePath, x, y, 5, () -> { }, null);
+        add(button);
+        return button;
+    }
+    private void createTradeButtons() {
+        createTradeButton("src/main/resources/proposeButton.png", 605, 629);
+        createTradeButton("src/main/resources/acceptButton.png", 320, 629);
+        createTradeButton("src/main/resources/refuseButton.png", 830, 629);
+    }
+    private ButtonImage createTradeButton(String imagePath, int x, int y) {
+        ButtonImage button = new ButtonImage(imagePath, imagePath, x, y, 0.69, null, null);
+        add(button);
+        return button;
+    }
     private void configureButton(ButtonImage button, JLabel counterLabel) {
         button.addActionListener(e -> {
             int value = Integer.parseInt(counterLabel.getText()) + 1;
@@ -100,21 +72,21 @@ public class TradePanel extends JPanel {
             }
         });
     }
-
-    private JLabel createCounterLabel(int x, int y, int width) {
+    private JLabel createCounterLabel(int x, int y, int height) {
         int[] coords = Resolution.calculateResolution(x, y);
         JLabel label = new JLabel("0", SwingConstants.CENTER);
         label.setForeground(Color.RED);
-        label.setBounds(coords[0], coords[1], width, 20);
+        label.setBounds(coords[0], coords[1], 20, height);
+        Font labelFont = label.getFont();
+        label.setFont(labelFont.deriveFont(18.0f));
+        add(label);
         return label;
     }
-
     private void loadBackgroundImage(String path) {
         ImageIcon icon = new ImageIcon(path);
-        backgroundImage = icon.getImage().getScaledInstance(this.getWidth(),
-                this.getHeight(), Image.SCALE_SMOOTH);
+        backgroundImage = icon.getImage().getScaledInstance(Constants.Game.WIDTH,
+                Constants.Game.HEIGHT, Image.SCALE_SMOOTH);
     }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

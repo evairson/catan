@@ -65,12 +65,6 @@ public class App implements Runnable {
         gameWindow.getContentPane().add(actionPlayer, "actionPlayerPanel");
         gameWindow.getContentPane().add(winPanel, "winPanel");
     }
-    public void createTradePanel() {
-//        TradePanel tradePanel = new TradePanel(this.game, this.gameWindow);
-
-        //Ajoute la fenetre de trade
-//        gameWindow.getContentPane().add(tradePanel, "tradePanel");
-    }
 
     public void update() {
         game.update();
