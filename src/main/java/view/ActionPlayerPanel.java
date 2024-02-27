@@ -13,6 +13,7 @@ import java.io.IOException;
 import model.App;
 import model.Game;
 import model.Player;
+import others.ListPlayers;
 import view.gamepanels.*;
 import model.cards.DevelopmentCard;
 import model.cards.KnightCard;
@@ -160,7 +161,8 @@ public class ActionPlayerPanel extends JPanel {
     private void showTradePanel() {
         JFrame mainFrame = getMainFrame();
         JLayeredPane layeredPane = mainFrame.getLayeredPane();
-        TradePanel tradePanel = new TradePanel();
+        ListPlayers listPlayers = game.getPlayers();
+        TradePanel tradePanel = new TradePanel(listPlayers);
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);
         setComponentsEnabled(false);

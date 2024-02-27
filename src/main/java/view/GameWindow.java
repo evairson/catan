@@ -14,6 +14,11 @@ public class GameWindow extends JFrame {
     private GamePanel gamePanel;
 
     private ActionPlayerPanel actionPlayer;
+
+    public ActionPlayerPanel getActionPlayer() {
+        return actionPlayer;
+    }
+
     private MainMenu mainMenu;
     private TradePanel tradePanel;
     private CardLayout layout;

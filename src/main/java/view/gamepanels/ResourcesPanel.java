@@ -9,15 +9,8 @@ import view.utilities.Resolution;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class ResourcesPanel extends JPanel {
-
-    private JLabel clayLabelTrade;
-    private JLabel oreLabelTrade;
-    private JLabel wheatLabelTrade;
-    private JLabel woodLabelTrade;
-    private JLabel woolLabelTrade;
 
     private JLabel clayLabel;
     private JLabel oreLabel;
@@ -66,68 +59,17 @@ public class ResourcesPanel extends JPanel {
         woodLabel = createResourceLabel(20, 133, wood.getWidth());
         woolLabel = createResourceLabel(420, 133, wool.getWidth());
 
-        clayLabelTrade = createCounterLabel(220, 20, clay.getWidth());
-        oreLabelTrade = createCounterLabel(120, 20, ore.getWidth());
-        wheatLabelTrade = createCounterLabel(323, 20, wheat.getWidth());
-        woodLabelTrade = createCounterLabel(20, 20, wood.getWidth());
-        woolLabelTrade = createCounterLabel(420, 20, wool.getWidth());
-
-        configureButton(wood, woodLabelTrade);
-        configureButton(ore, oreLabelTrade);
-        configureButton(wheat, wheatLabelTrade);
-        configureButton(clay, clayLabelTrade);
-        configureButton(wool, woolLabelTrade);
-
         add(clayLabel);
         add(oreLabel);
         add(wheatLabel);
         add(woodLabel);
         add(woolLabel);
 
-        setLabelTradeVisible(false);
-        add(clayLabelTrade);
-        add(oreLabelTrade);
-        add(wheatLabelTrade);
-        add(woodLabelTrade);
-        add(woolLabelTrade);
-
         add(clay);
         add(ore);
         add(wheat);
         add(wood);
         add(wool);
-    }
-
-    public void setLabelTradeVisible(boolean b) {
-        woodLabelTrade.setVisible(b);
-        clayLabelTrade.setVisible(b);
-        oreLabelTrade.setVisible(b);
-        wheatLabelTrade.setVisible(b);
-        woolLabelTrade.setVisible(b);
-    }
-
-    private void configureButton(ButtonImage button, JLabel counterLabel) {
-        button.addActionListener(e -> {
-            int value = Integer.parseInt(counterLabel.getText()) + 1;
-            counterLabel.setText(String.valueOf(value));
-        });
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    int value = Integer.parseInt(counterLabel.getText()) - 1;
-                    counterLabel.setText(String.valueOf(Math.max(0, value))); // Évite les valeurs négatives
-                }
-            }
-        });
-    }
-
-    private JLabel createCounterLabel(int x, int y, int width) {
-        int[] coords = Resolution.calculateResolution(x, y);
-        JLabel label = new JLabel("0", SwingConstants.CENTER);
-        label.setForeground(Color.RED);
-        label.setBounds(coords[0], coords[1], width, 20);
-        return label;
     }
 
     private JLabel createResourceLabel(int x, int y, int width) {

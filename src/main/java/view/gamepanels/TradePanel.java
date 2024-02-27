@@ -1,6 +1,9 @@
 package view.gamepanels;
 
+import model.Player;
 import others.Constants;
+import others.ListPlayers;
+import view.GameWindow;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
 
@@ -18,13 +21,62 @@ public class TradePanel extends JPanel {
 
     private final String[] resourceNames = {"clay", "ore", "wheat", "wood", "wool"};
     private final int[] buttonYPositions = {378, 310, 446, 245, 515};
-    public TradePanel() {
+    private ListPlayers listPlayers;
+    private Player selectedPlayer;
+    private JLabel selectedPlayerLabel;
+    public TradePanel(ListPlayers listPlayers) {
+        this.listPlayers = listPlayers;
+        initializeUI();
+
         setLayout(null);
         loadBackgroundImage("src/main/resources/tradePanel.png");
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         createResourceButtons();
         createTradeButtons();
     }
+
+    public GameWindow getParentFrame() {
+        return (GameWindow) SwingUtilities.getWindowAncestor(this);
+    }
+
+    public void closeTradePanel() {
+        GameWindow parentFrame = getParentFrame();
+        if (parentFrame != null) {
+            this.setVisible(false);
+            parentFrame.getActionPlayer().setComponentsEnabled(true);
+            parentFrame.getActionPlayer().setVisible(true);
+        }
+    }
+
+    private void initializeUI() {
+
+        // Définir la position du label du joueur sélectionné
+        selectedPlayerLabel = new JLabel("Aucun joueur sélectionné");
+        selectedPlayerLabel.setBounds(10, 10, 300, 30); // Exemple de positionnement
+        add(selectedPlayerLabel);
+
+        int baseX = 10; // Position de départ pour le premier bouton
+        int baseY = 50; // Position Y pour tous les boutons
+        int buttonWidth = 100; // Largeur des boutons
+        int buttonHeight = 30; // Hauteur des boutons
+        int gap = 110; // Espace entre les boutons
+
+        // Créer et ajouter les boutons pour chaque joueur (sauf le joueur courant)
+        for (Player player : listPlayers) {
+            if (player != listPlayers.getCurrentPlayer()) {
+                JButton playerButton = new JButton(player.getName());
+                playerButton.setBounds(baseX, baseY, buttonWidth, buttonHeight);
+                playerButton.addActionListener(e -> {
+                    selectedPlayer = player;
+                    selectedPlayerLabel.setText("Échange avec : " + selectedPlayer.getName());
+                });
+                add(playerButton);
+                baseX += gap; // Déplacer la position X pour le prochain bouton
+            }
+        }
+    }
+
+
     private void createResourceButtons() {
         String basePath = "src/main/resources/resources/";
         for (int i = 0; i < resourceNames.length; i++) {
@@ -53,7 +105,7 @@ public class TradePanel extends JPanel {
         createTradeButton("src/main/resources/refuseButton.png", 830, 629);
     }
     private ButtonImage createTradeButton(String imagePath, int x, int y) {
-        ButtonImage button = new ButtonImage(imagePath, imagePath, x, y, 0.69, null, null);
+        ButtonImage button = new ButtonImage(imagePath, imagePath, x, y, 0.69, this::closeTradePanel, null);
         add(button);
         return button;
     }
