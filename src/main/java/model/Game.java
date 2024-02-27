@@ -52,6 +52,10 @@ public class Game implements StateMethods {
     }
 
     public void endTurn() {
+        if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
+            return;
+        }
+
         if (start && getCurrentPlayer().getName().equals("Player4")) {
             start = false;
             backwards = true;
