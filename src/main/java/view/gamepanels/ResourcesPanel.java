@@ -55,7 +55,7 @@ public class ResourcesPanel extends JPanel {
 
         clayLabel = createResourceLabel(220, 133, clay.getWidth());
         oreLabel = createResourceLabel(120, 133, ore.getWidth());
-        wheatLabel = createResourceLabel(323, 133, wheat.getWidth());
+        wheatLabel = createResourceLabel(320, 133, wheat.getWidth());
         woodLabel = createResourceLabel(20, 133, wood.getWidth());
         woolLabel = createResourceLabel(420, 133, wool.getWidth());
 
@@ -69,6 +69,18 @@ public class ResourcesPanel extends JPanel {
         wheatLabel.setOpaque(true);
         woodLabel.setOpaque(true);
         woolLabel.setOpaque(true);
+
+        clay.setBackground(Color.RED);
+        ore.setBackground(Color.RED);
+        wheat.setBackground(Color.RED);
+        wood.setBackground(Color.RED);
+        wool.setBackground(Color.RED);
+        clay.setOpaque(true);
+        ore.setOpaque(true);
+        wheat.setOpaque(true);
+        wood.setOpaque(true);
+        wool.setOpaque(true);
+
         add(clayLabel);
         add(oreLabel);
         add(wheatLabel);
