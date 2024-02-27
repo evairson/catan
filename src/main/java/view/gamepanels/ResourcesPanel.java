@@ -97,7 +97,7 @@ public class ResourcesPanel extends JPanel {
     private JLabel createResourceLabel(int x, int y, int width) {
         int[] coords = Resolution.calculateResolution(x, y);
         JLabel label = new JLabel("0", SwingConstants.CENTER);
-        label.setBounds(coords[0], coords[1], width, 20);
+        label.setBounds(coords[0], coords[1] + 10, width, (int) (27 / Resolution.divider()));
         return label;
     }
 
