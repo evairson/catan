@@ -208,8 +208,8 @@ public class ActionPlayerPanel extends JPanel {
         resourcesPanel.setBounds(xCoord, yCoord, (int) (1040 / Resolution.divider()),
                 (int) (500 / Resolution.divider()));
         resourcesPanel.addMouseListener(animMouse);
-        resourcesPanel.setBackground(Color.YELLOW);
-        resourcesPanel.setOpaque(true);
+//        resourcesPanel.setBackground(Color.YELLOW);
+//        resourcesPanel.setOpaque(true);
         add(resourcesPanel);
     }
 

@@ -20,7 +20,7 @@ public class TradePanel extends JPanel {
     private JLabel[] playerTwoLabels = new JLabel[5];
 
     private final String[] resourceNames = {"clay", "ore", "wheat", "wood", "wool"};
-    private final int[] buttonYPositions = {378, 310, 446, 245, 515};
+    private final int[] buttonYPositions = {378, 312, 446, 245, 515};
     private ListPlayers listPlayers;
     private Player selectedPlayer;
     private JLabel selectedPlayerLabel;
@@ -33,6 +33,7 @@ public class TradePanel extends JPanel {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         createResourceButtons();
         createTradeButtons();
+        createPlayersButtons();
     }
 
     public GameWindow getParentFrame() {
@@ -50,9 +51,12 @@ public class TradePanel extends JPanel {
 
     private void initializeUI() {
 
-        // Définir la position du label du joueur sélectionné
-        selectedPlayerLabel = new JLabel("Aucun joueur sélectionné");
-        selectedPlayerLabel.setBounds(10, 10, 300, 30); // Exemple de positionnement
+        selectedPlayerLabel = new JLabel("AUCUN JOUEUR SÉLECTIONNÉ");
+        int[] coords = Resolution.calculateResolution(500, 20);
+        selectedPlayerLabel.setBounds(coords[0], coords[1], 310, 30);
+        selectedPlayerLabel.setFont(new Font("SansSerif", Font.BOLD, calculateScale()));
+        selectedPlayerLabel.setBackground(Color.RED);
+        selectedPlayerLabel.setOpaque(true);
         add(selectedPlayerLabel);
 
         int baseX = 10; // Position de départ pour le premier bouton
@@ -94,6 +98,46 @@ public class TradePanel extends JPanel {
             configureButton(playerTwoButtons[i], playerTwoLabels[i]);
         }
     }
+
+    private void createPlayersButtons() {
+        int spacing = 100; // Espacement entre chaque bouton de joueur
+        int initialX = 520;
+        int y = 550;
+        for (Player player : listPlayers) {
+            if (player != listPlayers.getCurrentPlayer()) {
+                addPlayerButton(player, initialX, y);
+                initialX += spacing; // Décale le prochain bouton vers la droite
+            }
+        }
+    }
+
+    private void addPlayerButton(Player player, int x, int y) {
+        String pionPathImg = "src/main/resources/pion/pion" + player.getColorString() + ".png";
+        createButtonImage(pionPathImg, x, y - 20);
+        JLabel playerName = createPlayerNameLabel(player.getName().toUpperCase(), x, y + 30);
+        add(playerName);
+    }
+
+    private JLabel createPlayerNameLabel(String name, int x, int y) {
+        JLabel playerName = new JLabel(name, SwingConstants.CENTER);
+        playerName.setFont(new Font("SansSerif", Font.BOLD, calculateScale()));
+        playerName.setBackground(Color.decode("#F3DCB7"));
+        playerName.setOpaque(true);
+        playerName.setBounds(calculateBounds(x - 30, y));
+        return playerName;
+    }
+
+    private int calculateScale() {
+        return (int) (40 / Resolution.divider());
+    }
+
+    private Rectangle calculateBounds(int x, int y) {
+        int scale = calculateScale();
+        int[] coords = Resolution.calculateResolution(x, y);
+        return new Rectangle(coords[0], coords[1], (int) (scale * 10 / Resolution.divider()),
+                (int) (scale * 1.35 / Resolution.divider()));
+    }
+
     private ButtonImage createButtonImage(String imagePath, int x, int y) {
         ButtonImage button = new ButtonImage(imagePath, imagePath, x, y, 5, () -> { }, null);
         add(button);
@@ -129,10 +173,14 @@ public class TradePanel extends JPanel {
         JLabel label = new JLabel("0", SwingConstants.CENTER);
         label.setForeground(Color.RED);
         label.setBounds(coords[0], coords[1], 20, height);
-        Font labelFont = label.getFont();
-        label.setFont(labelFont.deriveFont(18.0f));
+        int scale = (int) (32 / Resolution.divider());
+        label.setFont(new Font("SansSerif", Font.BOLD, scale));
         add(label);
         return label;
+    }
+
+    private void setSelectedPlayer() {
+
     }
     private void loadBackgroundImage(String path) {
         ImageIcon icon = new ImageIcon(path);

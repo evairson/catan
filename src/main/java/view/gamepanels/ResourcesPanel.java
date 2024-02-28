@@ -59,28 +59,27 @@ public class ResourcesPanel extends JPanel {
         woodLabel = createResourceLabel(20, 133, wood.getWidth());
         woolLabel = createResourceLabel(420, 133, wool.getWidth());
 
-        clayLabel.setBackground(Color.CYAN);
-        oreLabel.setBackground(Color.CYAN);
-        wheatLabel.setBackground(Color.CYAN);
-        woodLabel.setBackground(Color.CYAN);
-        woolLabel.setBackground(Color.CYAN);
-        clayLabel.setOpaque(true);
-        oreLabel.setOpaque(true);
-        wheatLabel.setOpaque(true);
-        woodLabel.setOpaque(true);
-        woolLabel.setOpaque(true);
-
-        clay.setBackground(Color.RED);
-        ore.setBackground(Color.RED);
-        wheat.setBackground(Color.RED);
-        wood.setBackground(Color.RED);
-        wool.setBackground(Color.RED);
-        clay.setOpaque(true);
-        ore.setOpaque(true);
-        wheat.setOpaque(true);
-        wood.setOpaque(true);
-        wool.setOpaque(true);
-
+//        clayLabel.setBackground(Color.CYAN);
+//        oreLabel.setBackground(Color.CYAN);
+//        wheatLabel.setBackground(Color.CYAN);
+//        woodLabel.setBackground(Color.CYAN);
+//        woolLabel.setBackground(Color.CYAN);
+//        clayLabel.setOpaque(true);
+//        oreLabel.setOpaque(true);
+//        wheatLabel.setOpaque(true);
+//        woodLabel.setOpaque(true);
+//        woolLabel.setOpaque(true);
+//
+//        clay.setBackground(Color.RED);
+//        ore.setBackground(Color.RED);
+//        wheat.setBackground(Color.RED);
+//        wood.setBackground(Color.RED);
+//        wool.setBackground(Color.RED);
+//        clay.setOpaque(true);
+//        ore.setOpaque(true);
+//        wheat.setOpaque(true);
+//        wood.setOpaque(true);
+//        wool.setOpaque(true);
         add(clayLabel);
         add(oreLabel);
         add(wheatLabel);
@@ -97,7 +96,9 @@ public class ResourcesPanel extends JPanel {
     private JLabel createResourceLabel(int x, int y, int width) {
         int[] coords = Resolution.calculateResolution(x, y);
         JLabel label = new JLabel("0", SwingConstants.CENTER);
-        label.setBounds(coords[0], coords[1] + 10, width, (int) (27 / Resolution.divider()));
+        label.setBounds(coords[0], coords[1], width, (int) (27 / Resolution.divider()));
+        int scale = (int) (24 / Resolution.divider());
+        label.setFont(new Font("SansSerif", Font.BOLD, scale));
         return label;
     }
 
