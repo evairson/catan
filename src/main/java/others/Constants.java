@@ -2,9 +2,10 @@ package others;
 
 import model.geometry.Orientation;
 import model.geometry.CubeCoordinates;
+import view.TileType;
 
 import java.awt.*;
-
+import java.util.HashMap;
 
 public class Constants {
     public static class CubeCoordinatesConst {
@@ -13,6 +14,53 @@ public class Constants {
             new CubeCoordinates(0, -1, 1), new CubeCoordinates(-1, 0, 1),
             new CubeCoordinates(-1, 1, 0), new CubeCoordinates(0, 1, -1)
         };
+    }
+
+    public static class BuildingCosts {
+        public static final int[] ROAD = new int[] {1, 0, 0, 1, 0};
+        public static final int[] COLONY = new int[] {1, 0, 1, 1, 1};
+        public static final int[] CITY = new int[] {0, 3, 2, 0, 0};
+
+        public static boolean canBuildRoad(HashMap<TileType, Integer> resources) {
+            for (int i = 0; i < resources.size(); i++) {
+                if (resources.get(TileType.WOOD) < ROAD[3]) {
+                    return false;
+                }
+                if (resources.get(TileType.CLAY) < ROAD[0]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static boolean canBuildColony(HashMap<TileType, Integer> resources) {
+            if (resources.get(TileType.WOOD) < COLONY[3]) {
+                return false;
+            }
+            if (resources.get(TileType.CLAY) < COLONY[0]) {
+                return false;
+            }
+            if (resources.get(TileType.WHEAT) < COLONY[2]) {
+                return false;
+            }
+            if (resources.get(TileType.WOOL) < COLONY[4]) {
+                return false;
+            }
+            return true;
+        }
+
+        public static boolean canBuildCity(HashMap<TileType, Integer> resources) {
+            for (int i = 0; i < resources.size(); i++) {
+                if (resources.get(TileType.WHEAT) < CITY[2]) {
+                    return false;
+                }
+                if (resources.get(TileType.ORE) < CITY[1]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
 
     public static class Game {
@@ -30,17 +78,17 @@ public class Constants {
 
     public static class BoardConstants {
         public static final int[] TILE_DICE_VALUES_DEFAULT = new int[] {9, 8, 5, 12, 11, 3, 6, 10, 6, 4, 11,
-            2, 4, 3, 5, 9, 10, 8, 0 };
+                                                                        2, 4, 3, 5, 9, 10, 8, 0};
 
         public static final int DESERT = 0;
         public static final int WOOD = 1;
         public static final int WHEAT = 2;
-        public static final int BRICK = 3;
-        public static final int SHEEP = 4;
+        public static final int CLAY = 3;
+        public static final int WOOL = 4;
         public static final int ORE = 5;
 
-        public static final int[] TILE_TYPES_DEFAULT = new int[] {WOOD, WOOD, WOOD, WOOD, WHEAT, WHEAT, WHEAT,
-            WHEAT, BRICK, BRICK, BRICK, SHEEP, SHEEP, SHEEP, SHEEP, ORE, ORE, ORE };
+        public static final int[] TILE_TYPES_DEFAULT = new int[] {WOOD, WOOD, WOOD, WOOD, WHEAT, WHEAT,
+            WHEAT, WHEAT, CLAY, CLAY, CLAY, WOOL, WOOL, WOOL, WOOL, ORE, ORE, ORE};
 
         private static int[] randomizeArray(int[] arr) {
             for (int i = arr.length - 1; i > 0; i--) {

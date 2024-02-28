@@ -5,6 +5,7 @@ import view.ActionPlayerPanel;
 import view.GamePanel;
 import view.GameWindow;
 import view.menu.MainMenu;
+import view.TradePanel;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -41,8 +42,9 @@ public class App implements Runnable {
         mainMenu = new MainMenu(this);
         gameWindow = new GameWindow(null, null, mainMenu);
 
-
         mainMenu.requestFocus();
+
+        actionPlayer.update();
 
         startGameLoop();
     }
@@ -50,7 +52,9 @@ public class App implements Runnable {
     public Game getGame() {
         return game;
     }
-
+    public GameWindow getGameWindow() {
+        return gameWindow;
+    }
     public final GamePanel getGamePanel() {
         return gamePanel;
     }
@@ -89,10 +93,17 @@ public class App implements Runnable {
         gamePanel = new GamePanel(this);
         actionPlayer = new ActionPlayerPanel(this);
         actionPlayer.add(gamePanel);
-        gameWindow.add(actionPlayer);
+        gameWindow.getContentPane().add(actionPlayer, "actionPlayerPanel");
+    }
+    public void createTradePanel() {
+        TradePanel tradePanel = new TradePanel(this.game, this.gameWindow);
+
+        //Ajoute la fenetre de trade
+        gameWindow.getContentPane().add(tradePanel, "tradePanel");
     }
 
     public void update() {
+        game.update();
     }
 
     public void render(Graphics g) {

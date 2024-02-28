@@ -14,6 +14,8 @@ public class GameWindow extends JFrame {
 
     private ActionPlayerPanel actionPlayer;
     private MainMenu mainMenu;
+    private TradePanel tradePanel;
+    private CardLayout layout;
 
     public GameWindow(GamePanel gamePanel, ActionPlayerPanel actionPlayer, MainMenu mainMenu) {
         this.actionPlayer = actionPlayer;
@@ -34,11 +36,18 @@ public class GameWindow extends JFrame {
         } //full useless si un écran :)
 
         this.mainMenu = mainMenu;
-        setLayout(null);
-        add(mainMenu);
+
+        //Le layout de la JFrame est un CardLayout, qui permet de changer facilement de JPanel
+        CardLayout layout = new CardLayout();
+        this.layout = layout;
+        this.getContentPane().setLayout(layout);
+
+        this.getContentPane().add(mainMenu, "mainMenu");
         //add(actionPlayer, BorderLayout.CENTER);
         //GameBoard board = new GameBoard(null);
         //add(board);
+
+
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -49,5 +58,10 @@ public class GameWindow extends JFrame {
     }
     public void close(int i) {
         System.exit(i);
+    }
+
+    @Override
+    public CardLayout getLayout() {
+        return layout;
     }
 }

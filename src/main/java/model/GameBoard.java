@@ -1,21 +1,24 @@
 package model;
 
 import model.geometry.*;
+import model.geometry.Point;
 import model.tiles.*;
 import others.Constants;
+import view.TileImageLoader;
+import view.TileType;
+import model.geometry.CubeCoordinates;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.BasicStroke;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Polygon;
 
 public class GameBoard implements Serializable {
     private HashMap<CubeCoordinates, Tile> board;
@@ -23,7 +26,6 @@ public class GameBoard implements Serializable {
     private int gridSize = 2;
     private HashMap<Point, TileVertex> verticesMap;
     private HashMap<Point, TileEdge> edgesMap;
-    private HashMap<Tile, Color> tileColors;
     // sert à stocker les coordonnées du sommet le plus proche de la souris
     // peut aller dans une autre classe...
     private Point closestVertex = new Point(0, 0);
@@ -31,13 +33,96 @@ public class GameBoard implements Serializable {
     private double minDistanceToEdge;
     private Point mousePosition;
     private double minDistanceToVertex;
+    private double minDistanceToCenterTile;
+    private Thief thief;
+    private boolean thiefMode;
+    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages(false);
+    private Map<TileType, BufferedImage> tileImagesS = TileImageLoader.loadAndResizeTileImages(true);
+    private boolean lookingForVertex = false;
+    private boolean lookingForEdge = false;
+    private boolean placingRoad = false;
+    private boolean placingColony = false;
+    private boolean placingCity = false;
 
-    public GameBoard(Layout layout) {
+    private TileVertex closestTileVertex = new TileVertex();
+    private TileEdge closestTileEdge = new TileEdge();
+
+    private Tile highlightedTile;
+
+    public GameBoard(Layout layout, Thief thief) {
+        this.thief = thief;
         board = new HashMap<CubeCoordinates, Tile>();
         this.layout = layout;
         this.initialiseBoard();
         // rendre la centre et la taille de la grille dynamique
 
+    }
+
+    public void setThiefMode(boolean b) {
+        thiefMode = b;
+    }
+
+    public boolean getThiefMode() {
+        return thiefMode;
+    }
+
+    public Layout getLayout() {
+        return layout;
+    }
+
+    public void setPlacingRoad(boolean placingRoad) {
+        this.placingRoad = placingRoad;
+    }
+    public void setPlacingColony(boolean placingColony) {
+        this.placingColony = placingColony;
+    }
+    public void setPlacingCity(boolean placingCity) {
+        this.placingCity = placingCity;
+    }
+    public boolean isPlacingRoad() {
+        return placingRoad;
+    }
+    public boolean isPlacingColony() {
+        return placingColony;
+    }
+    public boolean isPlacingCity() {
+        return placingCity;
+    }
+
+    public TileVertex getClosestTileVertex() {
+        return closestTileVertex;
+    }
+
+    public TileEdge getClosestTileEdge() {
+        return closestTileEdge;
+    }
+
+    public void setClosestTileVertex(TileVertex closestTileVertex) {
+        this.closestTileVertex = closestTileVertex;
+    }
+
+    public void setClosestTileEdge(TileEdge closestTileEdge) {
+        this.closestTileEdge = closestTileEdge;
+    }
+
+    public void setLookingForVertex(boolean lookingForVertex) {
+        this.lookingForVertex = lookingForVertex;
+    }
+
+    public void setLookingForEdge(boolean lookingForEdge) {
+        this.lookingForEdge = lookingForEdge;
+    }
+
+    public void setGridSize(int gridSize) {
+        this.gridSize = gridSize;
+    }
+
+    public boolean isLookingForVertex() {
+        return lookingForVertex;
+    }
+
+    public boolean isLookingForEdge() {
+        return lookingForEdge;
     }
 
     public void addTile(Tile t) {
@@ -57,9 +142,13 @@ public class GameBoard implements Serializable {
         board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue));
     }
 
-    public void addTile(int q, int r, int diceValue, int resourceType) {
+    public void addTile(int q, int r, int diceValue, TileType resourceType) {
         int s = -q - r;
-        board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue, resourceType));
+        Tile tile = new Tile(q, r, diceValue, resourceType);
+        if (resourceType == TileType.DESERT) {
+            thief.setTile(tile);
+        }
+        board.put(new CubeCoordinates(q, r, s), tile);
     }
 
     public Tile getTile(int q, int r) {
@@ -89,44 +178,32 @@ public class GameBoard implements Serializable {
                     } else {
                         tileResourceType = 0;
                     }
-                    addTile(q, r, tileDiceValue, tileResourceType);
+                    addTile(q, r, tileDiceValue, getTileType(tileResourceType));
                     presetTileDiceValue++;
 
                     System.out.println("Tile (" + q + ", " + r + ", " + s + "), Ressource Type: "
-                        + tileResourceType + " added to the board");
+                            + tileResourceType + " added to the board");
                 }
             }
         }
-        assignTileColors();
         initialiseVertices();
         initialiseEdges();
     }
 
-    private void assignTileColors() {
-        tileColors = new HashMap<>();
-        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
-            Tile tile = entry.getValue();
-            int resourceType = tile.getResourceType();
-            switch (resourceType) {
-                case 1:
-                    tileColors.put(tile, Color.GREEN);
-                    break;
-                case 2:
-                    tileColors.put(tile, Color.YELLOW);
-                    break;
-                case 3:
-                    tileColors.put(tile, Color.RED);
-                    break;
-                case 4:
-                    tileColors.put(tile, Color.WHITE);
-                    break;
-                case 5:
-                    tileColors.put(tile, Color.GRAY);
-                    break;
-                default:
-                    tileColors.put(tile, Color.BLACK);
-                    break;
-            }
+    private TileType getTileType(int resourceType) {
+        switch (resourceType) {
+            case 1:
+                return TileType.WOOD;
+            case 2:
+                return TileType.WHEAT;
+            case 3:
+                return TileType.CLAY;
+            case 4:
+                return TileType.WOOL;
+            case 5:
+                return TileType.ORE;
+            default:
+                return TileType.DESERT;
         }
     }
 
@@ -198,26 +275,55 @@ public class GameBoard implements Serializable {
                 && Math.abs(p1.getY() - p2.getY()) < epsilon;
     }
 
+    public BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
+        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2d = outputImage.createGraphics();
+        g2d.drawImage(resultingImage, 0, 0, null);
+        g2d.dispose();
+
+        return outputImage;
+    }
+
     private void drawVertices(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(Color.BLACK); // Color for the vertices
+        // Draw the vertices
+        for (Point vertex : verticesMap.keySet()) {
+            if (verticesMap.get(vertex).getBuilding() != null) {
+                g2d.setColor(verticesMap.get(vertex).getBuilding().getColorInAwt());
+                g2d.fillOval((int) vertex.getX() - 4, (int) vertex.getY() - 4, 8, 8);
+            } else {
+                g2d.setColor(Color.BLACK);
+                g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
+            }
+        }
+    }
 
-        for (Map.Entry<Tile, Color> entry : tileColors.entrySet()) {
-            Tile tile = entry.getKey();
-            Color color = entry.getValue();
-            CubeCoordinates cubeCoord = tile.getCoordinates();
-            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
-
-            g2d.setColor(color);
+    public void drawImagesInHexes(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
+            Tile tile = entry.getValue();
             Polygon hexagon = new Polygon();
+            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
+            boolean highlight = false;
+
             for (Point vertex : hexagonVertices) {
                 hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
             }
-            g2d.fillPolygon(hexagon);
-        }
-        // Draw the vertices
-        g2d.setColor(Color.BLACK); // Color for the vertices
-        for (Point vertex : verticesMap.keySet()) {
-            g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
+            Rectangle bounds = hexagon.getBounds();
+            BufferedImage img;
+            if (thiefMode && highlightedTile == tile) {
+                img = tileImagesS.get(tile.getResourceType());
+            } else {
+                img = tileImages.get(tile.getResourceType());
+            }
+
+            int imgX = bounds.x + (bounds.width - img.getWidth()) / 2;
+            int imgY = bounds.y + (bounds.height - img.getHeight()) / 2;
+
+            g2d.drawImage(img, imgX, imgY, null);
         }
     }
 
@@ -225,6 +331,13 @@ public class GameBoard implements Serializable {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK); // Couleur des arêtes
         for (TileEdge edge : edgesMap.values()) {
+            if (edge.getBuilding() != null) {
+                g2d.setColor(edge.getBuilding().getColorInAwt());
+                g2d.setStroke(new BasicStroke(6));
+            } else {
+                g2d.setColor(Color.black);
+                g2d.setStroke(new BasicStroke(2));
+            }
             g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
                     (int) edge.getEnd().getX(),
                     (int) edge.getEnd().getY()); // Dessiner l'arête
@@ -232,9 +345,9 @@ public class GameBoard implements Serializable {
     }
 
     public void drawBoard(Graphics g) {
-
         drawVertices(g);
         drawEdges(g);
+        drawImagesInHexes(g);
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
             drawText(g, entry.getValue().getDiceValue() + "", layout.cubeToPixel(layout, cubeCoord));
@@ -258,30 +371,69 @@ public class GameBoard implements Serializable {
                     (int) edge.getEnd().getY());
         } catch (Exception e) { // null seulement la première fois qu'on survole un hexagone
         }
+        drawThief(g);
+    }
+
+    public void drawThief(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        Point p = layout.cubeToPixel(layout, thief.getTile().getCoordinates());
+        g2d.setColor(Color.white);
+        g2d.fillOval((int) p.getX() - 10, (int) p.getY() - 10, 20, 20);
     }
 
     public void mouseMoved(MouseEvent e) {
         mousePosition = new Point(e.getX(), e.getY());
         minDistanceToVertex = Double.MAX_VALUE;
         minDistanceToEdge = Double.MAX_VALUE;
+        minDistanceToCenterTile = Double.MAX_VALUE;
         closestVertex = null;
         closestEdge = null;
-        for (Point vertex : this.verticesMap.keySet()) {
-            double distance = vertex.distance(mousePosition);
-            if (distance < minDistanceToVertex) {
-                minDistanceToVertex = distance;
-                closestVertex = vertex;
-                this.closestVertex = closestVertex;
+
+        if (lookingForVertex) {
+            closestTileVertex = findClosestVertex();
+        } else if (lookingForEdge) {
+            closestTileEdge = findClosestEdge();
+        } else if (thiefMode) {
+            for (CubeCoordinates coordinatesTile : this.board.keySet()) {
+                double distance = layout.cubeToPixel(layout, coordinatesTile).distance(mousePosition);
+                if (distance < minDistanceToCenterTile) {
+                    minDistanceToCenterTile = distance;
+                    highlightedTile = board.get(coordinatesTile);
+                }
             }
         }
+
+    }
+
+    public void changeThief(MouseEvent e) {
+        thief.setTile(highlightedTile);
+        thiefMode = false;
+    }
+
+    public TileEdge findClosestEdge() {
+        TileEdge closestTileEdge = new TileEdge();
         for (Point edge : this.edgesMap.keySet()) {
             double distance = edge.distance(mousePosition);
             if (distance < minDistanceToEdge) {
                 minDistanceToEdge = distance;
                 closestEdge = edge;
-                this.closestEdge = closestEdge;
+                closestTileEdge = this.edgesMap.get(edge);
             }
         }
+        return closestTileEdge;
+    }
+
+    public TileVertex findClosestVertex() {
+        TileVertex closestTileVertex = new TileVertex();
+        for (Point vertex : this.verticesMap.keySet()) {
+            double distance = vertex.distance(mousePosition);
+            if (distance < minDistanceToVertex) {
+                minDistanceToVertex = distance;
+                closestVertex = vertex;
+                closestTileVertex = this.verticesMap.get(vertex);
+            }
+        }
+        return this.verticesMap.get(this.closestVertex);
     }
 
     private void drawText(Graphics g, String text, Point center) {

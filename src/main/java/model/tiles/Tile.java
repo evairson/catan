@@ -3,12 +3,13 @@ package model.tiles;
 import java.io.Serializable;
 
 import model.geometry.CubeCoordinates;
+import view.TileType;
 
 public class Tile implements Serializable {
     private int q;
     private int r;
     private int diceValue;
-    private int resourceType;
+    private TileType resourceType;
 
     public Tile(int q, int r) {
         this.q = q;
@@ -22,18 +23,18 @@ public class Tile implements Serializable {
         this.diceValue = diceValue;
     }
 
-    public Tile(int q, int r, int diceValue, int resourceType) {
+    public Tile(int q, int r, int diceValue, TileType resourceType) {
         this.q = q;
         this.r = r;
         this.diceValue = diceValue;
         this.resourceType = resourceType;
     }
 
-    public int getResourceType() {
+    public TileType getResourceType() {
         return resourceType;
     }
 
-    public void setResourceType(int resourceType) {
+    public void setResourceType(TileType resourceType) {
         this.resourceType = resourceType;
     }
 

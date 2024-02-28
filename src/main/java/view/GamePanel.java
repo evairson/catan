@@ -4,6 +4,7 @@ import controler.KeyBoardInputs;
 import controler.MouseInputs;
 import model.App;
 import others.Constants;
+import view.utilities.Resolution;
 
 import javax.swing.*;
 
@@ -24,9 +25,12 @@ public class GamePanel extends JPanel {
         addMouseMotionListener(mouseInputs);
 
         addKeyListener(new KeyBoardInputs());
-
         setPanelSize();
         setOpaque(true);
+        int[] coords = Resolution.calculateResolution(100, 50);
+        int xCoord = coords[0];
+        int yCoord = coords[1];
+//        setBounds(xCoord, yCoord, (int) (1150 / Resolution.divider()), (int) (900 / Resolution.divider()));
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
     }
 
@@ -46,5 +50,7 @@ public class GamePanel extends JPanel {
         revalidate();
         game.render(g);
     }
+
+
 }
 
