@@ -70,10 +70,40 @@ public class Constants {
 
         public static final int BASE_WIDTH = 1280;
         public static final int BASE_HEIGHT = 720;
-        public static final double BASE_DIAGONAL = 1468.6047; // Th. de Pytaghore
+        public static final double BASE_DIAGONAL = Math.sqrt(Math.pow(BASE_WIDTH, 2)
+                + Math.pow(BASE_HEIGHT, 2));
         public static final int BASE_DIVIDER_IMAGE = 2;
-        public static final int WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        public static final int HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+
+        private static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+        public static final Dimension ADJUSTED_SIZE = adjustToAspectRatio(SCREEN_SIZE);
+        public static final int WIDTH = ADJUSTED_SIZE.width;
+        public static final int HEIGHT = ADJUSTED_SIZE.height;
+
+        private static Dimension adjustToAspectRatio(Dimension screenSize) {
+            // Ratio cible 16:9
+            double targetRatio = 16.0 / 9.0;
+            // Ratio actuel de l'écran
+            double currentRatio = (double) screenSize.width / screenSize.height;
+
+            int width;
+            int height;
+
+            if (currentRatio > targetRatio) {
+                width = (int) (screenSize.height * targetRatio);
+                height = screenSize.height;
+            } else if (currentRatio < targetRatio) {
+                width = screenSize.width;
+                height = (int) (screenSize.width / targetRatio);
+            } else {
+                return screenSize;
+            }
+
+            // Assurer que la nouvelle dimension est inférieure ou égale à la taille de l'écran actuel
+            width = Math.min(width, screenSize.width);
+            height = Math.min(height, screenSize.height);
+
+            return new Dimension(width, height);
+        }
     }
 
     public static class BoardConstants {
@@ -131,5 +161,4 @@ public class Constants {
     public static class Others {
         public static final String MUSIC_DIRECTORY = "";
     }
-
 }
