@@ -13,6 +13,7 @@ import model.cards.DevelopmentCard;
 
 public class Player implements Serializable {
     static final int NUMBER_DICE = 6;
+    private static final long serialVersionUID = 1L;
 
     public enum Color {
         RED,
