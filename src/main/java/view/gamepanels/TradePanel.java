@@ -40,20 +40,120 @@ public class TradePanel extends JPanel {
         initializeUI();
         initializeResourceNameMap();
         setLayout(null);
-        loadBackgroundImage("src/main/resources/tradePanel.png");
+
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+        loadBackgroundImage("src/main/resources/tradePanel.png");
         createResourceButtons();
         createTradeButtons();
         createPlayersButtons();
         initializeSelectedPlayerImage();
         updateProposeButtonState();
     }
-    private void initializeResourceNameMap() {
-        resourceNameToTileType.put("clay", TileType.CLAY);
-        resourceNameToTileType.put("ore", TileType.ORE);
-        resourceNameToTileType.put("wheat", TileType.WHEAT);
-        resourceNameToTileType.put("wood", TileType.WOOD);
-        resourceNameToTileType.put("wool", TileType.WOOL);
+
+    // -------- Fonctions affichant les boutons ressources et leurs labels respectifs -------- //
+
+    private void createResourceButtons() {
+        String basePath = "src/main/resources/resources/";
+        for (int i = 0; i < resourceNames.length; i++) {
+            playerOneButtons[i] = createButtonImage(basePath + resourceNames[i] + ".png",
+                    357, buttonYPositions[i]);
+            playerOneLabels[i] = createCounterLabel(400, buttonYPositions[i],
+                    playerOneButtons[i].getHeight());
+
+            playerTwoButtons[i] = createButtonImage(basePath + resourceNames[i] + ".png",
+                    888, buttonYPositions[i]);
+            playerTwoLabels[i] = createCounterLabel(865, buttonYPositions[i],
+                    playerTwoButtons[i].getHeight());
+            TileType type = resourceNameToTileType.get(resourceNames[i]);
+            configurePlayerOneButton(playerOneButtons[i], playerOneLabels[i], type);
+            configurePlayerTwoButton(playerTwoButtons[i], playerTwoLabels[i], type);
+        }
+    }
+    private JLabel createCounterLabel(int x, int y, int height) {
+        int[] coords = Resolution.calculateResolution(x, y);
+        JLabel label = new JLabel("0", SwingConstants.CENTER);
+        label.setForeground(Color.RED);
+        label.setBounds(coords[0], coords[1], 20, height);
+        int scale = (int) (32 / Resolution.divider());
+        label.setFont(new Font("SansSerif", Font.BOLD, scale));
+        add(label);
+        return label;
+    }
+
+    // -------- Fonctions configurant les boutons ressources et leurs labels respectifs -------- //
+
+    private void configurePlayerOneButton(ButtonImage button, JLabel counterLabel,
+                                          TileType resourceType) {
+        Player currentPlayer = listPlayers.getCurrentPlayer();
+        button.addActionListener(e -> {
+            int currentValue = Integer.parseInt(counterLabel.getText());
+            int playerResourceAmount = currentPlayer.getResources().getOrDefault(resourceType, 0);
+            if (currentValue < playerResourceAmount) {
+                currentValue++;
+                counterLabel.setText(String.valueOf(currentValue));
+                updateProposeButtonState();
+            }
+        });
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int value = Integer.parseInt(counterLabel.getText()) - 1;
+                    counterLabel.setText(String.valueOf(Math.max(0, value))); // Évite les valeurs négatives
+                    updateProposeButtonState();
+                }
+            }
+        });
+    }
+    private void configurePlayerTwoButton(ButtonImage button, JLabel counterLabel,
+                                          TileType resourceType) {
+        button.addActionListener(e -> {
+            int currentValue = Integer.parseInt(counterLabel.getText());
+            currentValue++;
+            counterLabel.setText(String.valueOf(currentValue));
+            updateProposeButtonState();
+        });
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int value = Integer.parseInt(counterLabel.getText()) - 1;
+                    counterLabel.setText(String.valueOf(Math.max(0, value))); // Évite les valeurs négatives
+                    updateProposeButtonState();
+                }
+            }
+        });
+    }
+
+    // -------- Fonctions affichant les boutons d'échanges (Propose, Accept, Decline) -------- //
+
+        // TODO : simplifier cette merde !
+    private void createTradeButtons() {
+        proposeButton = new ButtonImage("src/main/resources/proposeButton.png",
+                "src/main/resources/proposeButton.png", 605,
+                629, 0.69, this::proposeAction, null);
+        add(proposeButton);
+        createTradeButton("src/main/resources/acceptButton.png", 320, 629);
+        createTradeButton("src/main/resources/refuseButton.png", 830, 629);
+    }
+    private ButtonImage createTradeButton(String imagePath, int x, int y) {
+        ButtonImage button = new ButtonImage(imagePath, imagePath, x, y, 0.69, this::closeTradePanel, null);
+        add(button);
+        return button;
+    }
+
+    // -------- Fonctions traitant les mécanismes des boutons d'échange -------- //
+
+    private void proposeAction() {
+        resourcesRequested.clear();
+        for (int i = 0; i < playerTwoLabels.length; i++) {
+            TileType resourceType = resourceNameToTileType.get(resourceNames[i]);
+            int amount = Integer.parseInt(playerTwoLabels[i].getText());
+            if (amount > 0) {
+                resourcesRequested.put(resourceType, amount);
+            }
+        }
+        displayResourcesRequested(resourcesRequested);
     }
     private void updateProposeButtonState() {
         boolean isPlayerSelected = selectedPlayer != null;
@@ -74,71 +174,9 @@ public class TradePanel extends JPanel {
         boolean hasValidResourceValues = hasValidResourceValuesP1 && hasValidResourceValuesP2;
         proposeButton.setEnabled(isPlayerSelected && hasValidResourceValues);
     }
-    public GameWindow getParentFrame() {
-        return (GameWindow) SwingUtilities.getWindowAncestor(this);
-    }
-    public void closeTradePanel() {
-        GameWindow parentFrame = getParentFrame();
-        if (parentFrame != null) {
-            this.setVisible(false);
-            parentFrame.getActionPlayer().setComponentsEnabled(true);
-            parentFrame.getActionPlayer().setVisible(true);
-        }
-    }
-    private void initializeUI() {
-        selectedPlayerLabel = new JLabel("<html><div style='text-align: center;'>"
-                + "AUCUN JOUEUR<br/>SÉLECTIONNÉ</div></html>");
-        selectedPlayerLabel.setHorizontalAlignment(JLabel.CENTER);
-        int[] coords = Resolution.calculateResolution(565, 225);
-        selectedPlayerLabel.setBounds(coords[0], coords[1], (int) (325 / Resolution.divider()),
-                (int) (100 / Resolution.divider()));
-        selectedPlayerLabel.setFont(new Font("SansSerif", Font.BOLD, (int) (40 / Resolution.divider())));
-        add(selectedPlayerLabel);
-    }
-    private void initializeSelectedPlayerImage() {
-        selectedPlayerLabelIcon = new JLabel();
-        int[] coords1 = Resolution.calculateResolution(630, 280);
-        int xCoord = coords1[0];
-        int yCoord = coords1[1];
-        selectedPlayerLabelIcon.setBounds(xCoord, yCoord, (int) (75 / Resolution.divider()),
-                (int) (80 / Resolution.divider()));
-        add(selectedPlayerLabelIcon);
-    }
-    private void updateSelectedPlayerImage(String imagePath) {
-        try {
-            playerIcon = ImgService.loadImage(imagePath, 5.0);
-            selectedPlayerLabelIcon.setIcon(new ImageIcon(playerIcon));
-            repaint();
-        } catch (IOException e) {
-            e.printStackTrace();
-            selectedPlayerLabelIcon.setIcon(null);
-        }
-    }
-    private void actionPlayerButton(Player player) {
-        selectedPlayer = player;
-        selectedPlayerLabel.setText("<html><div style='text-align: center;'>"
-                + "ÉCHANGE AVEC<br/>" + player.getName().toUpperCase() + "</div></html>");
-        updateSelectedPlayerImage("src/main/resources/pion/pion"
-                + player.getColorString() + ".png");
-        updateProposeButtonState();
-    }
-    private void createResourceButtons() {
-        String basePath = "src/main/resources/resources/";
-        for (int i = 0; i < resourceNames.length; i++) {
-            playerOneButtons[i] = createButtonImage(basePath + resourceNames[i] + ".png",
-                    357, buttonYPositions[i]);
-            playerOneLabels[i] = createCounterLabel(400, buttonYPositions[i],
-                    playerOneButtons[i].getHeight());
 
-            playerTwoButtons[i] = createButtonImage(basePath + resourceNames[i] + ".png",
-                    888, buttonYPositions[i]);
-            playerTwoLabels[i] = createCounterLabel(865, buttonYPositions[i],
-                    playerTwoButtons[i].getHeight());
-            TileType type = resourceNameToTileType.get(resourceNames[i]);
-            configurePlayerOneButton(playerOneButtons[i], playerOneLabels[i], type);
-            configurePlayerTwoButton(playerTwoButtons[i], playerTwoLabels[i], type);
-        }
-    }
+    // -------- Fonctions affichant et traitant les boutons et leur mécanisme pour la séléction des joueurs -------- //
+
     private void createPlayersButtons() {
         int spacing = 100; // Espacement entre chaque bouton de joueur
         int initialX = 520;
@@ -170,92 +208,92 @@ public class TradePanel extends JPanel {
                 (int) (170 / Resolution.divider()), (int) (35 / Resolution.divider()));
         return playerName;
     }
+
+    private void actionPlayerButton(Player player) {
+        selectedPlayer = player;
+        selectedPlayerLabel.setText("<html><div style='text-align: center;'>"
+                + "ÉCHANGE AVEC<br/>" + player.getName().toUpperCase() + "</div></html>");
+        updateSelectedPlayerImage("src/main/resources/pion/pion"
+                + player.getColorString() + ".png");
+        updateProposeButtonState();
+    }
+
+    // -------- Fonctions affichant et update le panel du joueur sélectionné -------- //
+
+    private void initializeUI() {
+        selectedPlayerLabel = new JLabel("<html><div style='text-align: center;'>"
+                + "AUCUN JOUEUR<br/>SÉLECTIONNÉ</div></html>");
+        selectedPlayerLabel.setHorizontalAlignment(JLabel.CENTER);
+        int[] coords = Resolution.calculateResolution(565, 225);
+        selectedPlayerLabel.setBounds(coords[0], coords[1], (int) (325 / Resolution.divider()),
+                (int) (100 / Resolution.divider()));
+        selectedPlayerLabel.setFont(new Font("SansSerif", Font.BOLD, (int) (40 / Resolution.divider())));
+        add(selectedPlayerLabel);
+    }
+    private void initializeSelectedPlayerImage() {
+        selectedPlayerLabelIcon = new JLabel();
+        int[] coords1 = Resolution.calculateResolution(630, 280);
+        int xCoord = coords1[0];
+        int yCoord = coords1[1];
+        selectedPlayerLabelIcon.setBounds(xCoord, yCoord, (int) (75 / Resolution.divider()),
+                (int) (80 / Resolution.divider()));
+        add(selectedPlayerLabelIcon);
+    }
+    private void updateSelectedPlayerImage(String imagePath) {
+        try {
+            playerIcon = ImgService.loadImage(imagePath, 5.0);
+            selectedPlayerLabelIcon.setIcon(new ImageIcon(playerIcon));
+            repaint();
+        } catch (IOException e) {
+            e.printStackTrace();
+            selectedPlayerLabelIcon.setIcon(null);
+        }
+    }
+
+    // -------- Fonctions utilitaires pour tout le monde -------- //
+
     private ButtonImage createButtonImage(String imagePath, int x, int y) {
         ButtonImage button = new ButtonImage(imagePath, imagePath, x, y, 5, () -> { }, null);
         add(button);
         return button;
     }
-    private void createTradeButtons() {
-        proposeButton = new ButtonImage("src/main/resources/proposeButton.png",
-                "src/main/resources/proposeButton.png", 605,
-                629, 0.69, this::proposeAction, null);
-        add(proposeButton);
-        createTradeButton("src/main/resources/acceptButton.png", 320, 629);
-        createTradeButton("src/main/resources/refuseButton.png", 830, 629);
-    }
-    private ButtonImage createTradeButton(String imagePath, int x, int y) {
-        ButtonImage button = new ButtonImage(imagePath, imagePath, x, y, 0.69, this::closeTradePanel, null);
-        add(button);
-        return button;
-    }
-    private void configurePlayerOneButton(ButtonImage button, JLabel counterLabel,
-                                 TileType resourceType) {
-        Player currentPlayer = listPlayers.getCurrentPlayer();
-        button.addActionListener(e -> {
-            int currentValue = Integer.parseInt(counterLabel.getText());
-            int playerResourceAmount = currentPlayer.getResources().getOrDefault(resourceType, 0);
-            if (currentValue < playerResourceAmount) {
-                currentValue++;
-                counterLabel.setText(String.valueOf(currentValue));
-                updateProposeButtonState();
-            }
-        });
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    int value = Integer.parseInt(counterLabel.getText()) - 1;
-                    counterLabel.setText(String.valueOf(Math.max(0, value))); // Évite les valeurs négatives
-                    updateProposeButtonState();
-                }
-            }
-        });
+    private void initializeResourceNameMap() {
+        resourceNameToTileType.put("clay", TileType.CLAY);
+        resourceNameToTileType.put("ore", TileType.ORE);
+        resourceNameToTileType.put("wheat", TileType.WHEAT);
+        resourceNameToTileType.put("wood", TileType.WOOD);
+        resourceNameToTileType.put("wool", TileType.WOOL);
     }
 
-    private void configurePlayerTwoButton(ButtonImage button, JLabel counterLabel,
-                                          TileType resourceType) {
-        button.addActionListener(e -> {
-            int currentValue = Integer.parseInt(counterLabel.getText());
-            currentValue++;
-            counterLabel.setText(String.valueOf(currentValue));
-            updateProposeButtonState();
-        });
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    int value = Integer.parseInt(counterLabel.getText()) - 1;
-                    counterLabel.setText(String.valueOf(Math.max(0, value))); // Évite les valeurs négatives
-                    updateProposeButtonState();
-                }
-            }
-        });
+    // -------- Fonctions utilitaires qui servent au panel seulement -------- //
+
+    public GameWindow getParentFrame() {
+        return (GameWindow) SwingUtilities.getWindowAncestor(this);
+    }
+    public void closeTradePanel() {
+        GameWindow parentFrame = getParentFrame();
+        if (parentFrame != null) {
+            this.setVisible(false);
+            parentFrame.getActionPlayer().setComponentsEnabled(true);
+            parentFrame.getActionPlayer().setVisible(true);
+        }
     }
 
-    private JLabel createCounterLabel(int x, int y, int height) {
-        int[] coords = Resolution.calculateResolution(x, y);
-        JLabel label = new JLabel("0", SwingConstants.CENTER);
-        label.setForeground(Color.RED);
-        label.setBounds(coords[0], coords[1], 20, height);
-        int scale = (int) (32 / Resolution.divider());
-        label.setFont(new Font("SansSerif", Font.BOLD, scale));
-        add(label);
-        return label;
-    }
+    // -------- Fonctions d'affichage du panel et de son background -------- //
 
-    private void setSelectedPlayer() {
-
-    }
     private void loadBackgroundImage(String path) {
         ImageIcon icon = new ImageIcon(path);
-        backgroundImage = icon.getImage().getScaledInstance(Constants.Game.WIDTH,
-                Constants.Game.HEIGHT, Image.SCALE_SMOOTH);
+        backgroundImage = icon.getImage().getScaledInstance(this.getWidth(),
+                this.getHeight(), Image.SCALE_SMOOTH);
+        System.out.println("derchos" + Constants.Game.WIDTH + " ; " + Constants.Game.HEIGHT);
     }
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(backgroundImage, 0, 0, this);
     }
+
+    // -------- Fonctions de tests -------- //
 
     public void displayResourcesRequested(Map<TileType, Integer> resourcesRequested) {
         if (resourcesRequested.isEmpty()) {
@@ -266,17 +304,5 @@ public class TradePanel extends JPanel {
         for (Map.Entry<TileType, Integer> entry : resourcesRequested.entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
-    }
-
-    private void proposeAction() {
-        resourcesRequested.clear();
-        for (int i = 0; i < playerTwoLabels.length; i++) {
-            TileType resourceType = resourceNameToTileType.get(resourceNames[i]);
-            int amount = Integer.parseInt(playerTwoLabels[i].getText());
-            if (amount > 0) {
-                resourcesRequested.put(resourceType, amount);
-            }
-        }
-        displayResourcesRequested(resourcesRequested);
     }
 }
