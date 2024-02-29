@@ -70,7 +70,7 @@ public class ActionPlayerPanel extends JPanel {
         initializeShopPanel(game);
         initializeDeckPanel();
         createButton();
-        updateTurn();
+        update();
     }
 
     private void initializeRollingDicePanel() {
@@ -246,7 +246,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void changeTurn() {
-        game.endTurn();
+        game.serverEndTurn();
         update();
     }
 
@@ -333,12 +333,18 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void createNamePlayer() throws IOException {
+        Player player;
+        if (Main.hasServer()) {
+            player = game.getPlayerClient();
+        } else {
+            player = game.getCurrentPlayer();
+        }
         String src = "src/main/resources/pion/pion";
-        String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
+        String imagePath = src + player.getColorString() + ".png";
         Image origiImg = ImageIO.read(new File(imagePath));
         int scale = (int) (40 / Resolution.divider());
         Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
-        String text = game.getCurrentPlayer().getName().toUpperCase();
+        String text = player.getName().toUpperCase();
         namePlayer = new JLabel(" " + text, new ImageIcon(buttonImage), JLabel.CENTER);
         namePlayer.setVerticalTextPosition(JLabel.CENTER);
         namePlayer.setHorizontalTextPosition(JLabel.RIGHT);
@@ -385,9 +391,13 @@ public class ActionPlayerPanel extends JPanel {
     public void update() {
         Player currentPlayer = game.getCurrentPlayer();
         dice.newPlayer(currentPlayer);
-        resourcesPanel.updateResourceLabels(currentPlayer);
 
-        namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
+        if (!Main.hasServer()) {
+            resourcesPanel.updateResourceLabels(currentPlayer);
+            namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
+        } else {
+            resourcesPanel.updateResourceLabels(game.getPlayerClient());
+        }
         for (int i = 0; i < game.getPlayers().size(); i++) {
             String text = game.getPlayers().get(i).getName().toUpperCase();
             Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();

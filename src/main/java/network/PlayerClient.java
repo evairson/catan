@@ -52,6 +52,9 @@ public class PlayerClient extends Player {
                                 HashSet<Player> hashSet = (HashSet<Player>) networkObjet.getObject();
                                 app.startGame(hashSet);
                             }
+                            if (networkObjet.getMessage().equals("changeTurn")) {
+                                app.getGame().endTurn();
+                            }
                             break;
                         default:
                             break;

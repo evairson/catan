@@ -12,9 +12,12 @@ import model.geometry.Point;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
+import network.NetworkObject;
 import network.PlayerClient;
+import network.NetworkObject.TypeObject;
 import others.Constants;
 import others.ListPlayers;
+import start.Main;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -49,9 +52,25 @@ public class Game implements StateMethods, Serializable {
         return thief;
     }
 
+    public void serverEndTurn() {
+        if (Main.hasServer()) {
+            try {
+                int id = playerClient.getId();
+                NetworkObject object = new NetworkObject(TypeObject.Message, "changeTurn", id, null);
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
+        } else {
+            endTurn();
+        }
+    }
+
     public void endTurn() {
         players.next();
         resourcesGiven = false;
+        App.getActionPlayerPanel().update();
     }
 
     public ListPlayers getPlayers() {
@@ -61,7 +80,6 @@ public class Game implements StateMethods, Serializable {
     public Player getCurrentPlayer() {
         return players.getCurrentPlayer();
     }
-
 
     public GameBoard getBoard() {
         return board;
@@ -73,6 +91,10 @@ public class Game implements StateMethods, Serializable {
 
     public void draw(Graphics g) {
         board.draw(g);
+    }
+
+    public PlayerClient getPlayerClient() {
+        return playerClient;
     }
 
 

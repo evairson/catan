@@ -16,7 +16,7 @@ import network.NetworkObject.TypeObject;
 
 public class App implements Runnable {
     private GamePanel gamePanel;
-    private ActionPlayerPanel actionPlayer;
+    private static ActionPlayerPanel actionPlayer;
     private GameWindow gameWindow;
     private Thread gameThread;
     private static GameBoard board;
@@ -26,6 +26,10 @@ public class App implements Runnable {
 
     public static GameBoard getBoard() {
         return board;
+    }
+
+    public static ActionPlayerPanel getActionPlayerPanel() {
+        return actionPlayer;
     }
 
     public MainMenu getMainMenu() {
@@ -68,7 +72,6 @@ public class App implements Runnable {
             gameObject = new NetworkObject(TypeObject.Message, "tryStartGame", player.getId(), null);
             player.getOut().writeUnshared(gameObject);
             player.getOut().flush();
-            System.out.println("ca c'est bon");
         } catch (Exception e) {
             e.getStackTrace();
         }

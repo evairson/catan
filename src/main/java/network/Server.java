@@ -72,6 +72,7 @@ public class Server {
                         out.writeUnshared(input);
                         out.flush();
                     } else {
+                        System.out.println(((NetworkObject) input).getMessage());
                         synchronized (writers) {
                             for (ObjectOutputStream writer : writers) {
                                 writer.writeUnshared(input);
