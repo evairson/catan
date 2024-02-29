@@ -175,7 +175,8 @@ public class TradePanel extends JPanel {
         proposeButton.setEnabled(isPlayerSelected && hasValidResourceValues);
     }
 
-    // -------- Fonctions affichant et traitant les boutons et leur mécanisme pour la séléction des joueurs -------- //
+    // -------- Fonctions affichant et traitant les boutons
+    // et leur mécanisme pour la séléction des joueurs -------- //
 
     private void createPlayersButtons() {
         int spacing = 100; // Espacement entre chaque bouton de joueur
@@ -193,7 +194,7 @@ public class TradePanel extends JPanel {
         ButtonImage button = createButtonImage(pionPathImg, x, y - (int) (20 / Resolution.divider()));
         button.setAction(() -> actionPlayerButton(player));
         JLabel playerName = createPlayerNameLabel(player.getName().toUpperCase(), x,
-                y + (int) (30 / Resolution.divider()));
+                y + (int) (35 / Resolution.divider()));
         add(playerName);
     }
     private JLabel createPlayerNameLabel(String name, int x, int y) {
@@ -205,7 +206,7 @@ public class TradePanel extends JPanel {
         int newX = coords[0];
         int newY = coords[1];
         playerName.setBounds(newX - (int) (50 / Resolution.divider()), newY,
-                (int) (170 / Resolution.divider()), (int) (35 / Resolution.divider()));
+                (int) (170 / Resolution.divider()), (int) (30 / Resolution.divider()));
         return playerName;
     }
 
