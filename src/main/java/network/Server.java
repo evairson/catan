@@ -6,12 +6,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashSet;
 
+import model.Player;
 import network.NetworkObject.TypeObject;
 
 public class Server {
     private static final int PORT = 8000;
     private static HashSet<ObjectOutputStream> writers = new HashSet<>();
-    private static HashSet<String> players = new HashSet<>();
+    private static HashSet<Player> players = new HashSet<>();
 
     public Server() throws Exception {
         System.out.println("Le serveur est démarré sur le port " + PORT);
@@ -53,7 +54,8 @@ public class Server {
                 out.flush();
 
                 NetworkObject name = (NetworkObject) in.readObject();
-                players.add(name.getMessage());
+                Player player = new Player(Player.Color.RED, name.getMessage(), id);
+                players.add(player);
                 System.out.println(name.getMessage() + " est bien connecté(e) au serveur.");
                 // Ajouter le flux de sortie à l'ensemble des écrivains
                 synchronized (writers) {

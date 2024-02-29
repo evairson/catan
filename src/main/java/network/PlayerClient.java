@@ -16,8 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class PlayerClient extends Player {
-    private int id;
-    private App app;
+    private static App app;
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -40,6 +39,7 @@ public class PlayerClient extends Player {
                     switch (networkObjet.getType()) {
                         case Game:
                             if (networkObjet.getMessage().equals("startGame")) {
+                                System.out.println("tes");
                                 app.getMainMenu().startapp((Game) (networkObjet.getObject()));
                             }
                             break;
@@ -49,7 +49,7 @@ public class PlayerClient extends Player {
                                 System.out.println("Je suis le joueur numéro : " + id);
                             }
                             if (networkObjet.getMessage().equals("NamePlayers")) {
-                                HashSet<String> hashSet = (HashSet<String>) networkObjet.getObject();
+                                HashSet<Player> hashSet = (HashSet<Player>) networkObjet.getObject();
                                 app.startGame(hashSet);
                             }
                             break;
@@ -84,5 +84,9 @@ public class PlayerClient extends Player {
 
     public ObjectInputStream getIn() {
         return in;
+    }
+
+    public boolean isMyTurn(Game game) {
+        return id == game.getCurrentPlayer().getId();
     }
 }

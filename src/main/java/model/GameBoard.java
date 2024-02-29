@@ -36,8 +36,8 @@ public class GameBoard implements Serializable {
     private double minDistanceToCenterTile;
     private Thief thief;
     private boolean thiefMode;
-    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages(false);
-    private Map<TileType, BufferedImage> tileImagesS = TileImageLoader.loadAndResizeTileImages(true);
+    private Map<TileType, BufferedImage> tileImages;
+    private Map<TileType, BufferedImage> tileImagesS;
     private boolean lookingForVertex = false;
     private boolean lookingForEdge = false;
     private boolean placingRoad = false;
@@ -186,8 +186,6 @@ public class GameBoard implements Serializable {
                 }
             }
         }
-        initialiseVertices();
-        initialiseEdges();
     }
 
     private TileType getTileType(int resourceType) {
@@ -457,5 +455,12 @@ public class GameBoard implements Serializable {
         int startY = (int) center.getY() + textHeight / 2;
 
         g2d.drawString(text, startX, startY);
+    }
+
+    public void initialiseBoardAfterTransfer() {
+        initialiseVertices();
+        initialiseEdges();
+        tileImages = TileImageLoader.loadAndResizeTileImages(false);
+        tileImagesS = TileImageLoader.loadAndResizeTileImages(true);
     }
 }

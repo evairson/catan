@@ -51,4 +51,8 @@ public class Main {
             }
         }
     }
+
+    public static boolean hasServer() {
+        return true;
+    }
 }

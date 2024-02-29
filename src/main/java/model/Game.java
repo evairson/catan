@@ -12,6 +12,7 @@ import model.geometry.Point;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
+import network.PlayerClient;
 import others.Constants;
 import others.ListPlayers;
 
@@ -24,15 +25,13 @@ public class Game implements StateMethods, Serializable {
     private CardStack stack;
     private Thief thief;
     private boolean resourcesGiven;
+    private PlayerClient playerClient;
 
-    Game(HashSet<String> names) {
-        HashSet<Player> playersSet = new HashSet<>();
-        for (String name : names) {
-            Player player = new Player(Player.Color.RED, name);
+    Game(HashSet<Player> playersSet) {
+        for (Player player : playersSet) {
             playersSet.add(player);
         }
         players = new ListPlayers(0, playersSet);
-
         Point point1 = new Point(400, 400);
         Point point2 = new Point(70, 70);
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
@@ -256,6 +255,23 @@ public class Game implements StateMethods, Serializable {
         // rajouter un if ça a marché (transformer Player.buildCity en boolean)
         board.setLookingForVertex(false);
         board.setPlacingCity(false);
+    }
+
+    public void initialiseGameAfterTransfer() {
+        board.initialiseBoardAfterTransfer();
+        for (Player player : players) {
+            if (player.getId() == playerClient.getId()) {
+                player = playerClient;
+            }
+        }
+    }
+
+    public void setPlayerClient(PlayerClient player) {
+        playerClient = player;
+    }
+
+    public boolean isMyTurn() {
+        return playerClient.isMyTurn(this);
     }
 
 }

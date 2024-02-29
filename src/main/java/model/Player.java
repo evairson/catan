@@ -8,13 +8,11 @@ import model.buildings.*;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
 import view.TileType;
-import model.buildings.Building;
 import model.cards.CardStack;
 import model.cards.DevelopmentCard;
 
 public class Player implements Serializable {
     static final int NUMBER_DICE = 6;
-    private static final long serialVersionUID = 1L;
 
     public enum Color {
         RED,
@@ -23,15 +21,31 @@ public class Player implements Serializable {
         GREEN
     }
 
+    protected int id;
     protected Color color;
     protected Boolean turn;
     protected int dice1;
     protected int dice2;
     protected String name;
     protected Boolean hasThrowDices;
-    private HashMap<TileType, Integer> resources;
+    protected HashMap<TileType, Integer> resources;
     protected ArrayList<DevelopmentCard> cardsDev;
     protected ArrayList<Building> buildings;
+
+    public Player(Color c, String name, int id) {
+        this.id = id;
+        color = c;
+        this.name = name;
+        resources = new HashMap<>();
+        resources.put(TileType.CLAY, 1);
+        resources.put(TileType.ORE, 8);
+        resources.put(TileType.WHEAT, 8);
+        resources.put(TileType.WOOD, 3);
+        resources.put(TileType.WOOL, 3);
+        buildings = new ArrayList<>();
+        cardsDev = new ArrayList<>();
+        hasThrowDices = false;
+    }
 
     public Player(Color c, String name) {
         color = c;
@@ -143,6 +157,10 @@ public class Player implements Serializable {
 
     public void setCardsDev(ArrayList<DevelopmentCard> cardsDev) {
         this.cardsDev = cardsDev;
+    }
+
+    public int getId() {
+        return id;
     }
 
     /**

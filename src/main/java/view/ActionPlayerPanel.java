@@ -21,6 +21,7 @@ import model.cards.DevelopmentCard;
 import model.cards.KnightCard;
 import model.cards.ProgessCard;
 import others.Constants;
+import start.Main;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
@@ -404,6 +405,16 @@ public class ActionPlayerPanel extends JPanel {
         }
         revalidate();
         repaint();
+    }
+
+    public void updateTurn() {
+        if (Main.hasServer()) {
+            if (game.isMyTurn()) {
+                shopPanel.setEnabled(true);
+            } else {
+                shopPanel.setEnabled(true);
+            }
+        }
     }
 
 }
