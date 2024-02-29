@@ -31,6 +31,8 @@ public class TradePanel extends JPanel {
     private JLabel selectedPlayerLabel;
     private JLabel selectedPlayerLabelIcon;
     private ButtonImage proposeButton;
+    private ButtonImage acceptButton;
+    private ButtonImage declineButton;
     private Image playerIcon;
     private Map<String, TileType> resourceNameToTileType = new HashMap<>();
     private HashMap<TileType, Integer> resourcesRequested = new HashMap<>();
@@ -132,14 +134,15 @@ public class TradePanel extends JPanel {
         proposeButton = new ButtonImage("src/main/resources/proposeButton.png",
                 "src/main/resources/proposeButton.png", 605,
                 629, 0.69, this::proposeAction, null);
+        acceptButton = new ButtonImage("src/main/resources/acceptButton.png",
+                "src/main/resources/acceptButton.png", 320,
+                629, 0.69, this::acceptAction, null);
+        declineButton = new ButtonImage("src/main/resources/refuseButton.png",
+                "src/main/resources/refuseButton.png", 830,
+                629, 0.69, this::declineAction, null);
         add(proposeButton);
-        createTradeButton("src/main/resources/acceptButton.png", 320, 629);
-        createTradeButton("src/main/resources/refuseButton.png", 830, 629);
-    }
-    private ButtonImage createTradeButton(String imagePath, int x, int y) {
-        ButtonImage button = new ButtonImage(imagePath, imagePath, x, y, 0.69, this::closeTradePanel, null);
-        add(button);
-        return button;
+        add(acceptButton);
+        add(declineButton);
     }
 
     // -------- Fonctions traitant les mécanismes des boutons d'échange -------- //
@@ -154,6 +157,33 @@ public class TradePanel extends JPanel {
             }
         }
         displayResourcesRequested(resourcesRequested);
+
+        toggleTradeInterface(false);
+        notifyOfferToPlayer(selectedPlayer);
+    }
+    private void notifyOfferToPlayer(Player player) {
+        // TODO : Implémentez la notification pour le joueur sélectionné.
+        // Cela peut être un changement de couleur, un message pop-up, etc.
+    }
+    private void acceptAction() {
+        performTrade();
+        closeTradePanel();
+    }
+    private void declineAction() {
+        toggleTradeInterface(true);
+    }
+    private void performTrade() {
+        // TODO : Transférer ressources
+    }
+    private void toggleTradeInterface(boolean enable) {
+        for (ButtonImage button : playerOneButtons) {
+            button.setEnabled(enable);
+        }
+        for (ButtonImage button : playerTwoButtons) {
+            button.setEnabled(enable);
+        }
+        declineButton.setEnabled(enable);
+        proposeButton.setEnabled(enable);
     }
     private void updateProposeButtonState() {
         boolean isPlayerSelected = selectedPlayer != null;

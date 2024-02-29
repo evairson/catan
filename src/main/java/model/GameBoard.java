@@ -7,6 +7,7 @@ import others.Constants;
 import view.TileImageLoader;
 import view.TileType;
 import model.geometry.CubeCoordinates;
+//import view.utilities.Resolution;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -270,16 +271,19 @@ public class GameBoard {
                 && Math.abs(p1.getY() - p2.getY()) < epsilon;
     }
 
-    public BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
-        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+    private BufferedImage resizeImage(BufferedImage originalImage, double scale) {
+        int newWidth = (int) (originalImage.getWidth() * scale);
+        int newHeight = (int) (originalImage.getHeight() * scale);
+        Image tmp = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+        BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
 
-        Graphics2D g2d = outputImage.createGraphics();
-        g2d.drawImage(resultingImage, 0, 0, null);
+        Graphics2D g2d = resizedImage.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
         g2d.dispose();
 
-        return outputImage;
+        return resizedImage;
     }
+
 
     private void drawVertices(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -295,9 +299,18 @@ public class GameBoard {
             }
         }
     }
+    private double calculateScaleFactor() {
+        // Calculez le facteur de mise à l'échelle basé sur la résolution de l'écran
+        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
+        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
+        // Utilisez le plus petit facteur de mise à l'échelle pour éviter de déformer l'image
+        return Math.min(scaleFactorX, scaleFactorY);
+    }
 
     public void drawImagesInHexes(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
+        double scale = calculateScaleFactor();
+
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             Tile tile = entry.getValue();
             Polygon hexagon = new Polygon();
@@ -317,7 +330,6 @@ public class GameBoard {
 
             int imgX = bounds.x + (bounds.width - img.getWidth()) / 2;
             int imgY = bounds.y + (bounds.height - img.getHeight()) / 2;
-
             g2d.drawImage(img, imgX, imgY, null);
         }
     }
