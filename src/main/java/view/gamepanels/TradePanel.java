@@ -191,7 +191,7 @@ public class TradePanel extends JPanel {
     }
     private void addPlayerButton(Player player, int x, int y) {
         String pionPathImg = "src/main/resources/pion/pion" + player.getColorString() + ".png";
-        ButtonImage button = createButtonImage(pionPathImg, x, y - (int) (20 / Resolution.divider()));
+        ButtonImage button = createButtonImage(pionPathImg, x, y - 15);
         button.setAction(() -> actionPlayerButton(player));
         JLabel playerName = createPlayerNameLabel(player.getName().toUpperCase(), x,
                 y + (int) (35 / Resolution.divider()));
@@ -209,7 +209,6 @@ public class TradePanel extends JPanel {
                 (int) (170 / Resolution.divider()), (int) (30 / Resolution.divider()));
         return playerName;
     }
-
     private void actionPlayerButton(Player player) {
         selectedPlayer = player;
         selectedPlayerLabel.setText("<html><div style='text-align: center;'>"
