@@ -281,9 +281,16 @@ public class Game implements StateMethods, Serializable {
 
     public void initialiseGameAfterTransfer() {
         board.initialiseBoardAfterTransfer();
-        for (Player player : players) {
-            if (player.getId() == playerClient.getId()) {
-                player = playerClient;
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).getId() == playerClient.getId()) {
+                Boolean isCurrentPlayer = false;
+                if (getCurrentPlayer() == players.get(i)) {
+                    isCurrentPlayer = true;
+                }
+                players.set(i, playerClient);
+                if (isCurrentPlayer) {
+                    players.setCurrentPlayer(playerClient);
+                }
             }
         }
     }

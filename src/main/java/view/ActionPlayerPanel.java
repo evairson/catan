@@ -261,12 +261,19 @@ public class ActionPlayerPanel extends JPanel {
         if (cardsPanel != null) {
             remove(cardsPanel);
         }
+        Player player;
+        if (Main.hasServer()) {
+            player = game.getPlayerClient();
+            System.out.println(game.getPlayerClient() == game.getCurrentPlayer());
+        } else {
+            player = game.getCurrentPlayer();
+        }
         cardsPanel = new JPanel();
         cardsPanel.setLayout(null);
         cardsPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         String basePath = "src/main/resources/";
-        for (int i = 0; i < game.getCurrentPlayer().getCardsDev().size(); i++) {
-            String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(i));
+        for (int i = 0; i < player.getCardsDev().size(); i++) {
+            String card = cardImageUrl(player.getCardsDev().get(i));
             ButtonImage b = new ButtonImage(basePath + card, basePath + card,
                     300 + i * 100, 250, 1.5, this::useCard, null);
             cardsPanel.add(b);

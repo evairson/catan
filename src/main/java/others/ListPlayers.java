@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import model.Player;
+import network.PlayerClient;
 
 public class ListPlayers extends ArrayList<Player> {
 
@@ -35,6 +36,16 @@ public class ListPlayers extends ArrayList<Player> {
             currentPlayerIndex++;
         }
         currentPlayer = this.get(currentPlayerIndex);
+        System.out.println(currentPlayer instanceof PlayerClient);
         return currentPlayer;
+    }
+
+    public void setCurrentPlayer(Player p) {
+        currentPlayer = p;
+        for (int i = 0; i < size(); i++) {
+            if (get(i) == p) {
+                currentPlayerIndex = i;
+            }
+        }
     }
 }
