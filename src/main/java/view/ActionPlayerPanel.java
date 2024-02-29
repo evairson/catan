@@ -162,7 +162,7 @@ public class ActionPlayerPanel extends JPanel {
         JFrame mainFrame = getMainFrame();
         JLayeredPane layeredPane = mainFrame.getLayeredPane();
         ListPlayers listPlayers = game.getPlayers();
-        TradePanel tradePanel = new TradePanel(listPlayers);
+        TradePanel tradePanel = new TradePanel(listPlayers, resourcesPanel);
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);
         setComponentsEnabled(false);

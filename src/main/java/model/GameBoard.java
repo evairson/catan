@@ -309,7 +309,8 @@ public class GameBoard {
 
     public void drawImagesInHexes(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        double scale = calculateScaleFactor();
+        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
+        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
 
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             Tile tile = entry.getValue();
@@ -328,9 +329,15 @@ public class GameBoard {
                 img = tileImages.get(tile.getResourceType());
             }
 
-            int imgX = bounds.x + (bounds.width - img.getWidth()) / 2;
-            int imgY = bounds.y + (bounds.height - img.getHeight()) / 2;
-            g2d.drawImage(img, imgX, imgY, null);
+            Image scaledImg = img.getScaledInstance(
+                    (int) (img.getWidth() * scaleFactorX / 1.5),
+                    (int) (img.getHeight() * scaleFactorY / 1.5),
+                    Image.SCALE_SMOOTH
+            );
+
+            int imgX = bounds.x + (bounds.width - scaledImg.getWidth(null)) / 2;
+            int imgY = bounds.y + (bounds.height - scaledImg.getHeight(null)) / 2;
+            g2d.drawImage(scaledImg, imgX, imgY, null);
         }
     }
 
