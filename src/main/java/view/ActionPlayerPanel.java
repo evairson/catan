@@ -70,7 +70,7 @@ public class ActionPlayerPanel extends JPanel {
         initializeShopPanel(game);
         initializeDeckPanel();
         createButton();
-
+        updateTurn();
     }
 
     private void initializeRollingDicePanel() {
@@ -403,6 +403,7 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        updateTurn();
         revalidate();
         repaint();
     }
@@ -410,9 +411,15 @@ public class ActionPlayerPanel extends JPanel {
     public void updateTurn() {
         if (Main.hasServer()) {
             if (game.isMyTurn()) {
-                shopPanel.setEnabled(true);
+                shopPanel.setEnabledPanel(true);
+                endTurn.setEnabled(true);
+                tradeButton.setEnabled(true);
+                dice.setEnabledPanel(true);
             } else {
-                shopPanel.setEnabled(true);
+                shopPanel.setEnabledPanel(false);
+                endTurn.setEnabled(false);
+                tradeButton.setEnabled(false);
+                dice.setEnabledPanel(false);
             }
         }
     }

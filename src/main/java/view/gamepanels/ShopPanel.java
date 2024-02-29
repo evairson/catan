@@ -55,4 +55,12 @@ public class ShopPanel extends JPanel {
         add(card);
     }
 
+    public void setEnabledPanel(boolean b) {
+        card.setEnabled(b);
+        road.setEnabled(b);
+        city.setEnabled(b);
+        colony.setEnabled(b);
+        repaint();
+    }
+
 }

@@ -119,4 +119,9 @@ public class RollingDice extends JPanel {
         this.player = player;
         rollButton.setEnabled(true);
     }
+
+    public void setEnabledPanel(boolean b) {
+        rollButton.setEnabled(b);
+        repaint();
+    }
 }
