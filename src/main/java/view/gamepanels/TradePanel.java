@@ -194,7 +194,7 @@ public class TradePanel extends JPanel {
         ButtonImage button = createButtonImage(pionPathImg, x, y - 15);
         button.setAction(() -> actionPlayerButton(player));
         JLabel playerName = createPlayerNameLabel(player.getName().toUpperCase(), x,
-                y + (int) (35 / Resolution.divider()));
+                y + 26);
         add(playerName);
     }
     private JLabel createPlayerNameLabel(String name, int x, int y) {
