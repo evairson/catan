@@ -73,7 +73,14 @@ public class Constants {
         public static final double BASE_DIAGONAL = Math.sqrt(Math.pow(BASE_WIDTH, 2)
                 + Math.pow(BASE_HEIGHT, 2));
         public static final int BASE_DIVIDER_IMAGE = 2;
-
+        private static final Dimension[] TEST_SCREEN_SIZES = {
+            new Dimension(1024, 768),    // 4:3
+            new Dimension(1280, 800),    // 16:10
+            new Dimension(1366, 768),    // ~16:9
+            new Dimension(1440, 900),    // 16:10
+            new Dimension(1600, 900),    // 16:9
+            new Dimension(1920, 1080),   // 16:9
+        };
         private static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
         public static final Dimension ADJUSTED_SIZE = adjustToAspectRatio(SCREEN_SIZE);
         public static final int WIDTH = ADJUSTED_SIZE.width;
