@@ -20,7 +20,8 @@ import view.gamepanels.TradePanel;
 import model.cards.DevelopmentCard;
 import model.cards.KnightCard;
 import model.cards.Monopoly;
-import model.cards.ProgressCard;
+import model.cards.RoadBuilding;
+import model.cards.YearOfPlenty;
 import others.Constants;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
@@ -280,7 +281,7 @@ public class ActionPlayerPanel extends JPanel {
                     300 + i * 100, 250, 1.5,
                 switch (card.getClass().getSimpleName()) {
                     case "KnightCard": yield (this::useKnight);
-                    case "ProgressCard": yield (this::useMonopoly);
+                    case "Monopoly": yield (this::useMonopoly);
                     default: yield null;
                 }, null);
             cardsPanel.add(b);
@@ -315,7 +316,6 @@ public class ActionPlayerPanel extends JPanel {
             }
         }
         game.getBoard().setThiefMode(true);
-        System.out.println("knigh");
     }
 
     private void useMonopoly() {
@@ -329,7 +329,6 @@ public class ActionPlayerPanel extends JPanel {
             }
         }
         game.getBoard().setWaitingChoice(true);
-        System.out.println("progress");
     }
 
     private void useCard() {
@@ -339,8 +338,12 @@ public class ActionPlayerPanel extends JPanel {
     private String cardImageUrl(DevelopmentCard card) {
         if (card instanceof KnightCard) {
             return "cards/knight.png";
-        } else if (card instanceof ProgressCard) {
-            return "cards/progress.png";
+        } else if (card instanceof Monopoly) {
+            return "cards/monopoly.png";
+        } else if (card instanceof RoadBuilding) {
+            return "cards/roadbuilding.png";
+        } else if (card instanceof YearOfPlenty) {
+            return "cards/yearofplenty.png";
         } else {
             return "cards/point.png";
         }

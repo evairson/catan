@@ -58,7 +58,11 @@ public class ButtonImage extends JButton {
             });
             addMouseListener(hoverEvent);
 
-            addActionListener(e -> action.run());
+            addActionListener(e -> {
+                if (action != null) {
+                    action.run();
+                }
+            });
 
             setPreferredSize(new Dimension(scaledWidth, scaledHeight));
             setBorderPainted(false);

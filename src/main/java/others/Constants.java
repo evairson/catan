@@ -129,7 +129,7 @@ public class Constants {
     }
 
     public static class Others {
-        public static final String MUSIC_DIRECTORY = "";
+        public static final String MUSIC_DIRECTORY = "src/main/resources/music";
     }
 
 }

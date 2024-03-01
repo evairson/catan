@@ -35,11 +35,11 @@ public class Player {
         color = c;
         this.name = name;
         resources = new HashMap<>();
-        resources.put(TileType.CLAY, 1);
-        resources.put(TileType.ORE, 8);
-        resources.put(TileType.WHEAT, 8);
-        resources.put(TileType.WOOD, 3);
-        resources.put(TileType.WOOL, 3);
+        resources.put(TileType.CLAY, 0);
+        resources.put(TileType.ORE, 0);
+        resources.put(TileType.WHEAT, 0);
+        resources.put(TileType.WOOD, 0);
+        resources.put(TileType.WOOL, 0);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;

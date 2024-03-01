@@ -26,7 +26,7 @@ public class Music {
             if (i >= musicToPlay.size()) {
                 i = 0;
             }
-            //System.out.println("Playing " + musicToPlay.get(i));
+            System.out.println("Playing " + musicToPlay.get(i));
             currentClip = playMusic(MUSIC_DIRECTORY + "/" + musicToPlay.get(i));
             i++;
         } catch (Exception e) {

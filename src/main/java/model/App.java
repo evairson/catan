@@ -1,6 +1,7 @@
 package model;
 
 import others.Constants;
+import others.Music;
 import view.ActionPlayerPanel;
 import view.GamePanel;
 import view.GameWindow;
@@ -73,6 +74,7 @@ public class App implements Runnable {
 
     public void update() {
         game.update();
+        Music.update();
     }
 
     public void render(Graphics g) {
