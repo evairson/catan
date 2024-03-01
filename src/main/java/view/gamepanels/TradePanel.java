@@ -170,8 +170,8 @@ public class TradePanel extends JPanel {
                 "src/main/resources/refuseButton.png", 830,
                 629, 0.69, this::declineAction, null);
         bankTradeButton = new ButtonImage("src/main/resources/bankButton.png",
-                "src/main/resources/bankButton.png", 726,
-                633, 6.9, this::bankTradeAction, null);
+                "src/main/resources/bankButton.png", 711,
+                618, 0.45, this::bankTradeAction, null);
         add(bankTradeButton);
         add(proposeButton);
         add(acceptButton);
@@ -290,9 +290,6 @@ public class TradePanel extends JPanel {
 
         // Mettre à jour l'affichage des ressources pour les joueurs impliqués
         resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
-        if (!isBank) {
-            resourcesPanel.updateResourceLabels(selectedPlayer);
-        }
     }
     private void toggleTradeInterface(boolean enable) {
         for (ButtonImage button : playerOneButtons) {
