@@ -82,7 +82,7 @@ public class Constants {
             new Dimension(1920, 1080),   // 16:9        5
         };
         private static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-        public static final Dimension ADJUSTED_SIZE = adjustToAspectRatio(TEST_SCREEN_SIZES[3]);
+        public static final Dimension ADJUSTED_SIZE = adjustToAspectRatio(SCREEN_SIZE);
         public static final int WIDTH = ADJUSTED_SIZE.width;
         public static final int HEIGHT = ADJUSTED_SIZE.height;
 
