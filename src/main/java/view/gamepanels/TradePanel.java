@@ -44,7 +44,7 @@ public class TradePanel extends JPanel {
     public TradePanel(ListPlayers listPlayers, ResourcesPanel resourcesPanel) {
         this.listPlayers = listPlayers;
         this.resourcesPanel = resourcesPanel;
-        initializeUI();
+        initializeSelectedPlayerLabel();
         initializeResourceNameMap();
         setLayout(null);
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -323,18 +323,13 @@ public class TradePanel extends JPanel {
         return false;
     }
     private void updateAcceptButtonState() {
-        boolean isPlayerSelected = selectedPlayer != null;
-
         if (isBank) {
-//            boolean isUniqueResourceType = isFourOfSameTypeSelected(playerOneLabels);
-//            int uniqueResourceTypeSelected = getTotalSelectedResources(playerTwoLabels);
-//            boolean validResourceSelection = isUniqueResourceType && uniqueResourceTypeSelected == 1;
             acceptButton.setEnabled(isValidBankTrade());
         }
     }
 
     private boolean isValidBankTrade() {
-        gatherResourcesOffered(); // Assurez-vous que resourcesOffered est à jour.
+        gatherResourcesOffered();
         gatherResourcesRequested();
         int totalMultiplesOfFour = 0;
         for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
@@ -397,7 +392,7 @@ public class TradePanel extends JPanel {
 
     // -------- Fonctions affichant et update le panel du joueur sélectionné -------- //
 
-    private void initializeUI() {
+    private void initializeSelectedPlayerLabel() {
         selectedPlayerLabel = new JLabel("<html><div style='text-align: center;'>"
                 + "AUCUN JOUEUR<br/>SÉLECTIONNÉ</div></html>");
         selectedPlayerLabel.setHorizontalAlignment(JLabel.CENTER);
