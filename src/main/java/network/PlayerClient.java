@@ -5,6 +5,8 @@ import java.net.Socket;
 import model.App;
 import model.Game;
 import model.Player;
+import model.tiles.TileEdge;
+import model.tiles.TileVertex;
 import network.NetworkObject.TypeObject;
 
 import java.net.InetAddress;
@@ -39,7 +41,6 @@ public class PlayerClient extends Player {
                     switch (networkObjet.getType()) {
                         case Game:
                             if (networkObjet.getMessage().equals("startGame")) {
-                                System.out.println("tes");
                                 app.getMainMenu().startapp((Game) (networkObjet.getObject()));
                             }
                             break;
@@ -56,6 +57,22 @@ public class PlayerClient extends Player {
                                 app.getGame().endTurn();
                             }
                             break;
+                        case Board:
+                            if (networkObjet.getMessage().equals("buildCity")) {
+                                System.out.println("derchos");
+                                TileVertex cVertex = (TileVertex) networkObjet.getObject();
+                                app.getGame().buildCity(cVertex);
+                            }
+                            if (networkObjet.getMessage().equals("buildColony")) {
+                                System.out.println("derchos");
+                                TileVertex cVertex = (TileVertex) networkObjet.getObject();
+                                //app.getGame().buildColony(cVertex);
+                            }
+                            if (networkObjet.getMessage().equals("buildRoad")) {
+                                System.out.println("derchos");
+                                TileEdge cEdge = (TileEdge) networkObjet.getObject();
+                                app.getGame().buildRoad(cEdge);
+                            }
                         default:
                             break;
                     }

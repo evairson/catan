@@ -139,13 +139,13 @@ public class Game implements StateMethods, Serializable {
     public void mouseClicked(MouseEvent e) {
         System.out.println("Mouse clicked");
         if (board.isPlacingCity()) {
-            buildCity();
+            networkBuildCity();
             System.out.println("Building city");
         } else if (board.isPlacingColony()) {
             buildColony();
             System.out.println("Building colony");
         } else if (board.isPlacingRoad()) {
-            buildRoad();
+            networkBuildRoad();
             System.out.println("Building road");
         } else if (board.getThiefMode()) {
             board.changeThief(e);
@@ -259,24 +259,75 @@ public class Game implements StateMethods, Serializable {
         board.setPlacingColony(false);
     }
 
-    public void buildRoad() {
+    public void networkBuildRoad() {
+        TileEdge cEdge = null;
         if (board.isLookingForEdge()) {
-            TileEdge cEdge = board.getClosestTileEdge();
-            getCurrentPlayer().buildRoad(cEdge);
+            cEdge = board.getClosestTileEdge();
+        }
+        if (Main.hasServer()) {
+            if (cEdge != null) {
+                try {
+                    int id = playerClient.getId();
+                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildRoad", id, cEdge);
+                    playerClient.getOut().writeUnshared(object);
+                    playerClient.getOut().flush();
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+            }
+        } else {
+            if (cEdge != null) {
+                buildRoad(cEdge);
+            }
         }
         // rajouter un if ça a marché (transformer Player.buildRoad en boolean)
         board.setLookingForEdge(false);
         board.setPlacingRoad(false);
     }
 
-    public void buildCity() {
+    public void buildRoad(TileEdge cEdge) {
+        TileEdge currentEdge = cEdge;
+        for (TileEdge edge : board.getEdgeMap().values()) {
+            if (edge.getStart().getX() == cEdge.getStart().getX()
+                && edge.getStart().getY() == cEdge.getStart().getY()
+                && edge.getEnd().getX() == cEdge.getEnd().getX()
+                && edge.getEnd().getY() == cEdge.getEnd().getY()) {
+                System.out.println("yeah !");
+                currentEdge = edge;
+            }
+        }
+        getCurrentPlayer().buildRoad(currentEdge);
+    }
+
+    public void networkBuildCity() {
+        TileVertex cVertex = null;
         if (board.isLookingForVertex()) {
-            TileVertex cVertex = board.getClosestTileVertex();
-            getCurrentPlayer().buildCity(cVertex);
+            cVertex = board.getClosestTileVertex();
+        }
+        if (Main.hasServer()) {
+            if (cVertex != null) {
+                try {
+                    int id = playerClient.getId();
+                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity", id, cVertex);
+                    playerClient.getOut().writeUnshared(object);
+                    playerClient.getOut().flush();
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+            }
+        } else {
+            if (cVertex != null) {
+                buildCity(cVertex);
+            }
         }
         // rajouter un if ça a marché (transformer Player.buildCity en boolean)
         board.setLookingForVertex(false);
         board.setPlacingCity(false);
+
+    }
+
+    public void buildCity(TileVertex cVertex) {
+        getCurrentPlayer().buildCity(cVertex);
     }
 
     public void initialiseGameAfterTransfer() {

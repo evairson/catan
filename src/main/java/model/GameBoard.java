@@ -125,6 +125,14 @@ public class GameBoard implements Serializable {
         return lookingForEdge;
     }
 
+    public HashMap<Point, TileEdge> getEdgeMap() {
+        return edgesMap;
+    }
+
+    public HashMap<Point, TileVertex> getVerticesMap() {
+        return verticesMap;
+    }
+
     public void addTile(Tile t) {
         int q = t.getQ();
         int r = t.getR();

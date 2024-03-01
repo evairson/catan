@@ -9,7 +9,7 @@ public class NetworkObject implements Serializable {
     private TypeObject type;
 
     public enum TypeObject {
-        Message, Game,
+        Message, Game, Board,
     }
 
     public TypeObject getType() {
