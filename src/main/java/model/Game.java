@@ -14,6 +14,7 @@ import model.tiles.TileEdge;
 import model.tiles.TileVertex;
 import others.Constants;
 import others.ListPlayers;
+//import view.utilities.Resolution;
 
 public class Game implements StateMethods {
     private static GameBoard board;
@@ -29,8 +30,19 @@ public class Game implements StateMethods {
         Player player4 = new Player(Player.Color.GREEN, "Player4");
         players = new ListPlayers(0, player1, player2, player3, player4);
 
-        Point point1 = new Point(400, 400);
-        Point point2 = new Point(70, 70);
+        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
+        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
+        System.out.println(scaleFactorX + " et " + scaleFactorY);
+        Point point1 = new Point(
+                (int) (267 * scaleFactorX),
+                (int) (267 * scaleFactorY)
+        );
+        System.out.println((int) (267 * scaleFactorX) + " et  ; " + (int) (47 * scaleFactorX));
+        Point point2 = new Point(
+                (int) (47 * scaleFactorX),
+                (int) (47 * scaleFactorY)
+        );
+//        Point point2 = new Point((int) (93 / Resolution.divider()), (int) (93 / Resolution.divider()));
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
         thief = new Thief();
         board = new GameBoard(layout, thief);
@@ -257,5 +269,4 @@ public class Game implements StateMethods {
         board.setLookingForVertex(false);
         board.setPlacingCity(false);
     }
-
 }

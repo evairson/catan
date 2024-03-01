@@ -1,6 +1,7 @@
 package view;
 
 import others.Constants;
+import view.gamepanels.TradePanel;
 import view.menu.MainMenu;
 
 import javax.swing.*;
@@ -13,6 +14,11 @@ public class GameWindow extends JFrame {
     private GamePanel gamePanel;
 
     private ActionPlayerPanel actionPlayer;
+
+    public ActionPlayerPanel getActionPlayer() {
+        return actionPlayer;
+    }
+
     private MainMenu mainMenu;
     private TradePanel tradePanel;
     private CardLayout layout;
