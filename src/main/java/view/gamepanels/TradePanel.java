@@ -47,7 +47,6 @@ public class TradePanel extends JPanel {
         initializeUI();
         initializeResourceNameMap();
         setLayout(null);
-
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         loadBackgroundImage("src/main/resources/tradePanel.png");
         createResourceButtons(false);
@@ -170,9 +169,9 @@ public class TradePanel extends JPanel {
         declineButton = new ButtonImage("src/main/resources/refuseButton.png",
                 "src/main/resources/refuseButton.png", 830,
                 629, 0.69, this::declineAction, null);
-        bankTradeButton = new ButtonImage("src/main/resources/tradeButton.png",
-                "src/main/resources/tradeButton.png", 405,
-                560, 4, this::bankTradeAction, null);
+        bankTradeButton = new ButtonImage("src/main/resources/bankButton.png",
+                "src/main/resources/bankButton.png", 726,
+                633, 6.9, this::bankTradeAction, null);
         add(bankTradeButton);
         add(proposeButton);
         add(acceptButton);
@@ -184,8 +183,9 @@ public class TradePanel extends JPanel {
     // -------- Fonctions traitant les mécanismes des boutons d'échange -------- //
 
     private boolean canSelectedPlayerFulfillRequest() {
-        if (selectedPlayer == null) return false;
-
+        if (selectedPlayer == null) {
+            return false;
+        }
         HashMap<TileType, Integer> selectedPlayerResources = selectedPlayer.getResources();
         for (Map.Entry<TileType, Integer> entry : resourcesRequested.entrySet()) {
             TileType requestedResource = entry.getKey();
@@ -325,55 +325,34 @@ public class TradePanel extends JPanel {
         }
         return false;
     }
-
-    private boolean isFourOfSameTypeSelected(JLabel[] resourceLabels) {
-        int count = 0;
-        TileType selectedType = null;
-
-        for (int i = 0; i < resourceLabels.length; i++) {
-            int amount = Integer.parseInt(resourceLabels[i].getText());
-            if (amount > 0) {
-                if (selectedType == null) {
-                    selectedType = resourceNameToTileType.get(resourceNames[i]); // Détermine le type de ressource sélectionné pour la première fois.
-                    count = amount;
-                } else if (resourceNameToTileType.get(resourceNames[i]) == selectedType) {
-                    count += amount; // Incrémente le compteur si le même type est sélectionné.
-                } else {
-                    return false; // Plus d'un type de ressource a été sélectionné.
-                }
-            }
-        }
-
-        return count == 4; // Vérifie si exactement 4 ressources du même type ont été sélectionnées.
-    }
     private void updateAcceptButtonState() {
         boolean isPlayerSelected = selectedPlayer != null;
 
         if (isBank) {
-            boolean isUniqueResourceType = isFourOfSameTypeSelected(playerOneLabels);
-            int uniqueResourceTypeSelected = getTotalSelectedResources(playerTwoLabels);
-            boolean validResourceSelection = isUniqueResourceType && uniqueResourceTypeSelected == 1;
-            acceptButton.setEnabled(validResourceSelection && isValidBankTrade());
+//            boolean isUniqueResourceType = isFourOfSameTypeSelected(playerOneLabels);
+//            int uniqueResourceTypeSelected = getTotalSelectedResources(playerTwoLabels);
+//            boolean validResourceSelection = isUniqueResourceType && uniqueResourceTypeSelected == 1;
+            acceptButton.setEnabled(isValidBankTrade());
         }
     }
 
     private boolean isValidBankTrade() {
         gatherResourcesOffered(); // Assurez-vous que resourcesOffered est à jour.
+        gatherResourcesRequested();
         int totalMultiplesOfFour = 0;
         for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
             if (entry.getValue() % 4 != 0) {
                 // Si l'une des ressources offertes n'est pas un multiple de 4, l'échange n'est pas valide.
                 return false;
             }
-            totalMultiplesOfFour += entry.getValue() / 4; // Ajoute le nombre de multiples de 4 pour chaque ressource offerte.
+            totalMultiplesOfFour += entry.getValue() / 4;
         }
 
         // Calcul du nombre total de ressources demandées.
-        int totalRequestedResources = resourcesRequested.values().stream().mapToInt(Integer::intValue).sum();
+        int totalRequestedResources = getTotalSelectedResources(playerTwoLabels);
 
-        // Le nombre total de multiples de 4 dans les ressources offertes doit correspondre au nombre total de ressources demandées.
         // Et il doit y avoir exactement k types de ressources demandées pour k multiples de 4 offerts.
-        return totalMultiplesOfFour == totalRequestedResources && resourcesRequested.size() == totalMultiplesOfFour;
+        return totalMultiplesOfFour == totalRequestedResources;
     }
     // -------- Fonctions affichant et traitant les boutons
     // et leur mécanisme pour la séléction des joueurs -------- //
