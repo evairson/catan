@@ -31,7 +31,6 @@ public class Music {
             currentClip = playMusic(MUSIC_DIRECTORY + "/" + musicToPlay.get(i));
             i++;
         } catch (Exception e) {
-            return;
         }
     }
 
@@ -58,7 +57,7 @@ public class Music {
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioInput);
                 FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(-10.0f);
+                gainControl.setValue(-20.0f);
                 clip.start();
                 return clip;
             }
