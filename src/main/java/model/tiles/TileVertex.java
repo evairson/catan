@@ -8,6 +8,7 @@ import model.buildings.Building;
 public class TileVertex implements Serializable {
     private Set<Tile> tiles;
     private Building building;
+    private int id;
 
     public TileVertex() {
         tiles = new HashSet<>();

@@ -327,6 +327,10 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void buildCity(TileVertex cVertex) {
+        TileVertex currentVertex = cVertex;
+        for (TileVertex vertex : board.getVerticesMap().values()) {
+            // TODO :
+        }
         getCurrentPlayer().buildCity(cVertex);
     }
 
