@@ -38,11 +38,11 @@ public class Player {
         color = c;
         this.name = name;
         resources = new HashMap<>();
-        resources.put(TileType.CLAY, 1);
-        resources.put(TileType.ORE, 8);
-        resources.put(TileType.WHEAT, 8);
-        resources.put(TileType.WOOD, 3);
-        resources.put(TileType.WOOL, 3);
+        resources.put(TileType.CLAY, 40);
+        resources.put(TileType.ORE, 40);
+        resources.put(TileType.WHEAT, 40);
+        resources.put(TileType.WOOD, 40);
+        resources.put(TileType.WOOL, 40);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;
@@ -192,9 +192,6 @@ public class Player {
         if (edge.getBuilding() == null) {
             Road r = new Road(this);
             r.buyAndPlace(this, edge);
-            System.out.println("Road built");
-        } else {
-            System.out.println("Road not built");
         }
     }
 
@@ -202,11 +199,8 @@ public class Player {
         if (vertex.getBuilding() == null) {
             Colony c = new Colony(this);
             if (c.buyAndPlace(this, false, vertex)) {
-                System.out.println("Colony built");
+                points++;
             }
-            points++;
-        } else {
-            System.out.println("Colony not built");
         }
     }
 
@@ -215,12 +209,10 @@ public class Player {
             if (vertex.getBuilding().getOwner().equals(this)) {
                 Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
-                    System.out.println("City built");
+                    points++;
                 }
-                points++;
+                
             }
-        } else {
-            System.out.println("City not built");
         }
     }
 

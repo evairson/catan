@@ -34,4 +34,8 @@ public class Point {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+
+    public boolean equals(Point p) {
+        return this.x == p.x && this.y == p.y;
+    }
 }
