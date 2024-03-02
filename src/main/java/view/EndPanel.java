@@ -47,8 +47,8 @@ public class EndPanel extends JPanel {
         String basePath = "src/main/resources/";
         returnBt = new ButtonImage(basePath + "backMainMenu.png", basePath + "backMainMenu.png",
                 350, 460, 1, this::returnToMainMenu, null);
-        quitBtn = new ButtonImage(basePath + "quitButton.png", basePath + "quitButtonHover.png",
-                750, 450, 1, this::quitapp, null);
+        quitBtn = new ButtonImage(basePath + "quitButton2.png", basePath + "quitButton2.png",
+                750, 460, 1, this::quitapp, null);
         add(returnBt);
         add(quitBtn);
     }
