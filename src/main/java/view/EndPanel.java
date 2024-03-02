@@ -35,8 +35,6 @@ public class EndPanel extends JPanel {
         ImageIcon icon = new ImageIcon(path);
         int width = Constants.Game.WIDTH;
         int height = Constants.Game.HEIGHT;
-        System.out.println(width);
-        System.out.println(height);
         backgroundImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
     protected void paintComponent(Graphics g) {
