@@ -64,6 +64,7 @@ public class Colony extends Building {
             vertex.setBuilding(colony);
             // faudrait check si c'est un port aussi là
             player.getBuildings().add(colony);
+            System.out.println(colony);
             return true;
         }
         return false;

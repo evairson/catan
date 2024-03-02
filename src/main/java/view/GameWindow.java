@@ -23,9 +23,7 @@ public class GameWindow extends JFrame {
     private TradePanel tradePanel;
     private CardLayout layout;
 
-    public GameWindow(GamePanel gamePanel, ActionPlayerPanel actionPlayer, MainMenu mainMenu) {
-        this.actionPlayer = actionPlayer;
-        this.gamePanel = gamePanel;
+    public GameWindow(MainMenu mainMenu) {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
 
@@ -52,15 +50,15 @@ public class GameWindow extends JFrame {
         //add(actionPlayer, BorderLayout.CENTER);
         //GameBoard board = new GameBoard(null);
         //add(board);
-
-
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(Constants.Game.WIDTH, Constants.Game.HEIGHT);
         setVisible(true);
         setResizable(false);
+    }
 
-        System.out.println(Constants.Game.WIDTH + " " + Constants.Game.HEIGHT);
+    public void addPanels(ActionPlayerPanel actionPlayer, GamePanel gamePanel) {
+        this.actionPlayer = actionPlayer;
+        this.gamePanel = gamePanel;
     }
     public void close(int i) {
         System.exit(i);

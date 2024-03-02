@@ -146,19 +146,17 @@ public class GameBoard {
     public TileVertex[] getNeighbourTileVerticesToVertex(TileVertex vertex) {
         TileVertex[] neighbours = new TileVertex[3];
         int index = 0;
-        System.out.println("/////Vertex: " + vertex.getCoordinates()+"/////");
         for (TileEdge edge : edgesMap.values()) {
-            System.out.println("Edge: (" + edge.getStart() + " " + edge.getEnd()+")");
             if (edge.getStart().equals(vertex.getCoordinates())) {
                 for( TileVertex v : verticesMap.values()){
                     if(v.getCoordinates().equals(edge.getEnd())){
                         TileVertex neighbour = v;
-                        for(TileVertex n : neighbours){
-                            if(!(n != null && n.getCoordinates().equals(neighbour.getCoordinates()))){
-                                neighbours[index] = neighbour;
-                                System.out.println("added: " + edge.getEnd());
-                                index++;
+                        if(neighbour != null){
+                            if(checkIfNeighbourInArray(neighbours, neighbour)){
+                                continue;
                             }
+                            neighbours[index] = neighbour;
+                            index++;
                         }
                     }
                 }   
@@ -167,12 +165,14 @@ public class GameBoard {
                 for( TileVertex v : verticesMap.values()){
                     if(v.getCoordinates().equals(edge.getStart())){
                         TileVertex neighbour = v;
-                        for(TileVertex n : neighbours){
-                            if(!(n != null && n.getCoordinates().equals(neighbour.getCoordinates()))){
-                                neighbours[index] = neighbour;
-                                System.out.println("added: " + edge.getStart());
-                                index++;
+                        if(neighbour != null){
+                            if(checkIfNeighbourInArray(neighbours, neighbour)){
+                                continue;
+
                             }
+                            neighbours[index] = neighbour;
+                            
+                            index++;
                         }  
                     }
                 }
@@ -186,6 +186,16 @@ public class GameBoard {
         return neighbours;
     }
 
+    public boolean checkIfNeighbourInArray(TileVertex[] neighbours, TileVertex vertex) {
+        for (TileVertex v : neighbours) {
+            if (v != null) {
+                if (v.getCoordinates().equals(vertex.getCoordinates())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     public TileEdge[] getNeighbourTileEdgesToVertex(TileVertex vertex) {
         TileEdge[] neighbours = new TileEdge[3];
         int i = 0;
