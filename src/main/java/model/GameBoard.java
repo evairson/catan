@@ -1,5 +1,7 @@
 package model;
 
+import model.buildings.Building;
+import model.buildings.Colony;
 import model.geometry.*;
 import model.geometry.Point;
 import model.tiles.*;
@@ -7,11 +9,16 @@ import others.Constants;
 import view.TileImageLoader;
 import view.TileType;
 import model.geometry.CubeCoordinates;
+import view.utilities.Resolution;
 //import view.utilities.Resolution;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -271,17 +278,39 @@ public class GameBoard {
                 && Math.abs(p1.getY() - p2.getY()) < epsilon;
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage, double scale) {
-        int newWidth = (int) (originalImage.getWidth() * scale);
-        int newHeight = (int) (originalImage.getHeight() * scale);
-        Image tmp = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-        BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+    private String getImagePathForBuilding(Building building) {
+        String basePath = "src/main/resources/building/pions/";
+        String color = building.getOwner().getColorString();
+        String buildingType;
+        if (building instanceof Colony) {
+            Colony colony = (Colony) building;
+            if (colony.getIsCity()) {
+                buildingType = "city";
+            } else {
+                buildingType = "colony";
+            }
+        } else {
+            buildingType = "colony";
+        }
+        return basePath + color + "/" + buildingType + ".png";
+    }
 
-        Graphics2D g2d = resizedImage.createGraphics();
-        g2d.drawImage(tmp, 0, 0, null);
-        g2d.dispose();
+    private void drawBuildingImage(Graphics2D g2d, String imagePath, Point vertex) {
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File(imagePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Image scaledImage = img.getScaledInstance((int) (67 / Resolution.divider()),
+                (int) (67 / Resolution.divider()), Image.SCALE_SMOOTH);
+        g2d.drawImage(scaledImage, (int) vertex.getX() - (int) (34 / Resolution.divider()),
+                (int) vertex.getY() - (int) (34 / Resolution.divider()), null);
+    }
 
-        return resizedImage;
+    private void drawVertexCircle(Graphics2D g2d, Point vertex) {
+        g2d.setColor(Color.BLACK);
+        g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
     }
 
 
@@ -290,12 +319,11 @@ public class GameBoard {
         g2d.setColor(Color.BLACK); // Color for the vertices
         // Draw the vertices
         for (Point vertex : verticesMap.keySet()) {
-            if (verticesMap.get(vertex).getBuilding() != null) {
-                g2d.setColor(verticesMap.get(vertex).getBuilding().getColorInAwt());
-                g2d.fillOval((int) vertex.getX() - 4, (int) vertex.getY() - 4, 8, 8);
+            Building building = verticesMap.get(vertex).getBuilding();
+            if (building != null) {
+                drawBuildingImage(g2d, getImagePathForBuilding(building), vertex);
             } else {
-                g2d.setColor(Color.BLACK);
-                g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
+                drawVertexCircle(g2d, vertex);
             }
         }
     }
@@ -359,9 +387,9 @@ public class GameBoard {
     }
 
     public void drawBoard(Graphics g) {
-        drawVertices(g);
-        drawEdges(g);
         drawImagesInHexes(g);
+        drawEdges(g);
+        drawVertices(g);
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
             drawText(g, entry.getValue().getDiceValue() + "", layout.cubeToPixel(layout, cubeCoord));

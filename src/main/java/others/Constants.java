@@ -82,9 +82,22 @@ public class Constants {
             new Dimension(1920, 1080),   // 16:9        5
         };
         private static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-        public static final Dimension ADJUSTED_SIZE = adjustToAspectRatio(SCREEN_SIZE);
+        public static final Dimension ADJUSTED_SIZE = adjustToAspectRatio(checkIfWindows(SCREEN_SIZE));
         public static final int WIDTH = ADJUSTED_SIZE.width;
         public static final int HEIGHT = ADJUSTED_SIZE.height;
+
+        private static Dimension checkIfWindows(Dimension screenSize) {
+            String osName = System.getProperty("os.name").toLowerCase();
+            double width = screenSize.getWidth();
+            double height = screenSize.getHeight();
+
+            if (osName.contains("win")) {
+                Rectangle winSize = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                        .getMaximumWindowBounds();
+                height = winSize.getHeight();
+            }
+            return new Dimension((int) width, (int) height);
+        }
 
         private static Dimension adjustToAspectRatio(Dimension screenSize) {
             // Ratio cible 16:9
