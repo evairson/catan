@@ -9,17 +9,16 @@ import java.awt.*;
 public class App implements Runnable {
     private GamePanel gamePanel;
     private ActionPlayerPanel actionPlayer;
-    private WinPanel winPanel;
+    private EndPanel endPanel;
     private GameWindow gameWindow;
     private Thread gameThread;
     private static GameBoard board;
     private Game game;
     private MainMenu mainMenu;
+    private boolean playing;
     public static GameBoard getBoard() {
         return board;
     }
-
-
     public static void setBoard(GameBoard board) {
         App.board = board;
     }
@@ -29,14 +28,11 @@ public class App implements Runnable {
         gamePanel = new GamePanel(this);
         createNewGame();
         actionPlayer = new ActionPlayerPanel(this);
-        winPanel = new WinPanel(this);
         gameWindow = new GameWindow(gamePanel, actionPlayer, mainMenu);
 
         mainMenu.requestFocus();
 
         actionPlayer.update();
-
-        startGameLoop();
     }
     public void createNewGame() {
         this.game = new Game();
@@ -50,8 +46,14 @@ public class App implements Runnable {
     public final GamePanel getGamePanel() {
         return gamePanel;
     }
+    public boolean isPlaying() {
+        return playing;
+    }
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
 
-    private void startGameLoop() {
+    public void startGameLoop() {
         gameThread = new Thread(this);
         gameThread.start();
     }
@@ -63,19 +65,24 @@ public class App implements Runnable {
         actionPlayer.add(gamePanel);
         gameWindow.getContentPane().add(mainMenu, "mainMenu");
         gameWindow.getContentPane().add(actionPlayer, "actionPlayerPanel");
-        gameWindow.getContentPane().add(winPanel, "winPanel");
     }
 
     public void update() {
-        game.update();
-        checkWin();
+        if (playing) {
+            game.update();
+            checkWin();
+        }
     }
     public void checkWin() {
         if (game.getCurrentPlayer().hasWon()) {
+            endPanel = new EndPanel(this, true, game.getCurrentPlayer());
+            gameWindow.getContentPane().add(endPanel, "endPanel");
             stopGameLoop();
+            endPanel.updatePanel();
             Container contentPane = getGameWindow().getContentPane();
             CardLayout layout = getGameWindow().getLayout();
-            layout.show(contentPane, "winPanel");
+            playing = false;
+            layout.show(contentPane, "endPanel");
         }
     }
 

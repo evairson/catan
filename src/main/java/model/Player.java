@@ -134,6 +134,10 @@ public class Player {
         return dice2;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
     public ArrayList<Building> getBuildings() {
         return buildings;
     }
