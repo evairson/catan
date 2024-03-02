@@ -46,7 +46,7 @@ public class Player {
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;
-        points = 10;
+        points = 0;
         hasBiggestArmy = false;
         hasLongestRoute = false;
     }
