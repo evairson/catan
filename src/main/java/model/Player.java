@@ -153,6 +153,10 @@ public class Player {
         return dice2;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
     public ArrayList<Building> getBuildings() {
         return buildings;
     }
@@ -216,9 +220,6 @@ public class Player {
                 return;
             }
             r.buyAndPlace(this, edge);
-            System.out.println("Road built");
-        } else {
-            System.out.println("Road not built");
         }
     }
 
@@ -231,11 +232,8 @@ public class Player {
                 c.place(this, false, vertex);
             }
             if (c.buyAndPlace(this, false, vertex)) {
-                System.out.println("Colony built");
+                points++;
             }
-            points++;
-        } else {
-            System.out.println("Colony not built");
         }
     }
 
@@ -244,12 +242,9 @@ public class Player {
             if (vertex.getBuilding().getOwner().equals(this)) {
                 Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
-                    System.out.println("City built");
+                    points++;
                 }
-                points++;
             }
-        } else {
-            System.out.println("City not built");
         }
     }
 
