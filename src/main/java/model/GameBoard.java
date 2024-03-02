@@ -53,15 +53,49 @@ public class GameBoard {
     private TileEdge closestTileEdge = new TileEdge();
 
     private Tile highlightedTile;
+    private Map<String, BufferedImage> loadedImages;
 
     public GameBoard(Layout layout, Thief thief) {
+        loadImages();
         this.thief = thief;
         board = new HashMap<CubeCoordinates, Tile>();
         this.layout = layout;
         this.initialiseBoard();
-        // rendre la centre et la taille de la grille dynamique
-
     }
+    private void loadImages() {
+        loadedImages = new HashMap<>();
+
+        String basePath = "src/main/resources/building/pions/";
+        String[] colors = {"Blue", "Green", "Red", "Yellow"};
+        String[] buildingTypes = {"city", "colony", "road"};
+
+        for (String color : colors) {
+            for (String type : buildingTypes) {
+                String path = basePath + color + "/" + type + ".png";
+                try {
+                    BufferedImage image = ImageIO.read(new File(path));
+                    loadedImages.put(color + "_" + type, image);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private BufferedImage getImageForBuilding(Building building) {
+        String color = building.getOwner().getColorString();
+        String type = "colony";
+        if (building instanceof Road) {
+            type = "road";
+        } else if (building instanceof Colony) {
+            Colony colony = (Colony) building;
+            if (colony.getIsCity()) {
+                type = "city";
+            }
+        }
+        return loadedImages.get(color + "_" + type);
+    }
+
 
     public void setThiefMode(boolean b) {
         thiefMode = b;
@@ -369,31 +403,12 @@ public class GameBoard {
 
     private boolean buildingIsCity(Building building) {
         if (building instanceof Colony) {
-            Colony colony = (Colony) building;
             return ((Colony) building).getIsCity();
         }
         return false;
     }
-
-    private String getImagePathForBuilding(Building building) {
-        String basePath = "src/main/resources/building/pions/";
-        String color = building.getOwner().getColorString();
-        if (building instanceof Road) {
-            return basePath + color + "/road.png";
-        } else {
-            String buildingType = buildingIsCity(building) ? "city" : "colony";
-            return basePath + color + "/" + buildingType + ".png";
-        }
-    }
-
     private void drawBuildingImage(Graphics2D g2d, Building building, Point vertex) {
-        BufferedImage img = null;
-        String imagePath = getImagePathForBuilding(building);
-        try {
-            img = ImageIO.read(new File(imagePath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BufferedImage img = getImageForBuilding(building);
         boolean isCity = buildingIsCity(building);
         int size = (isCity ? 90 : 60);
         int placement = (isCity ? 40 : 30);
@@ -487,13 +502,7 @@ public class GameBoard {
         g2d.setColor(Color.black);
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getBuilding() != null) {
-                BufferedImage edgeImage = null;
-                try {
-                    edgeImage = ImageIO.read(
-                            new File(getImagePathForBuilding(edge.getBuilding())));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                BufferedImage edgeImage = getImageForBuilding(edge.getBuilding());
                 drawEdgeWithImage(g2d, edge.getStart(), edge.getEnd(), edgeImage);
             }
         }
