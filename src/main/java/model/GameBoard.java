@@ -148,32 +148,32 @@ public class GameBoard {
         int index = 0;
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getStart().equals(vertex.getCoordinates())) {
-                for( TileVertex v : verticesMap.values()){
-                    if(v.getCoordinates().equals(edge.getEnd())){
+                for (TileVertex v : verticesMap.values()) {
+                    if (v.getCoordinates().equals(edge.getEnd())) {
                         TileVertex neighbour = v;
-                        if(neighbour != null){
-                            if(checkIfNeighbourInArray(neighbours, neighbour)){
+                        if (neighbour != null) {
+                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
                                 continue;
                             }
                             neighbours[index] = neighbour;
                             index++;
                         }
                     }
-                }   
+                }
             }
             if (edge.getEnd().equals(vertex.getCoordinates())) {
-                for( TileVertex v : verticesMap.values()){
-                    if(v.getCoordinates().equals(edge.getStart())){
+                for (TileVertex v : verticesMap.values()) {
+                    if (v.getCoordinates().equals(edge.getStart())) {
                         TileVertex neighbour = v;
-                        if(neighbour != null){
-                            if(checkIfNeighbourInArray(neighbours, neighbour)){
+                        if (neighbour != null) {
+                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
                                 continue;
 
                             }
                             neighbours[index] = neighbour;
-                            
+
                             index++;
-                        }  
+                        }
                     }
                 }
             }
@@ -196,12 +196,28 @@ public class GameBoard {
         }
         return false;
     }
-    public TileEdge[] getNeighbourTileEdgesToVertex(TileVertex vertex) {
-        TileEdge[] neighbours = new TileEdge[3];
+
+    public boolean checkIfNeighbourInArray(TileEdge[] neighbours, TileEdge edge) {
+        for (TileEdge e : neighbours) {
+            if (e != null) {
+                if (e.getStart().equals(edge.getStart()) && e.getEnd().equals(edge.getEnd())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public TileVertex[] getNeighbourTileVerticesToEdge(TileEdge edge) {
+        TileVertex[] neighbours = new TileVertex[2];
         int i = 0;
-        for (TileEdge edge : edgesMap.values()) {
-            if (edge.getStart().equals(vertex.getCoordinates()) || edge.getEnd().equals(vertex.getCoordinates())) {
-                neighbours[i] = edge;
+        for (TileVertex vertex : verticesMap.values()) {
+            if (vertex.getCoordinates().equals(edge.getStart())) {
+                neighbours[i] = vertex;
+                i++;
+            }
+            if (vertex.getCoordinates().equals(edge.getEnd())) {
+                neighbours[i] = vertex;
                 i++;
             }
         }
@@ -212,12 +228,16 @@ public class GameBoard {
         TileEdge[] neighbours = new TileEdge[4];
         int i = 0;
         for (TileEdge e : edgesMap.values()) {
-            if (e.getStart().equals(edge.getStart()) || e.getEnd().equals(edge.getStart())
-                    || e.getStart().equals(edge.getEnd()) || e.getEnd().equals(edge.getEnd())) {
-                if (!e.equals(edge)) {
-                    neighbours[i] = e;
-                    i++;
-                }
+            if (checkIfNeighbourInArray(neighbours, e)) {
+                continue;
+            }
+            if (e.getStart().equals(edge.getStart()) && !e.getEnd().equals(edge.getEnd())) {
+                neighbours[i] = e;
+                i++;
+            }
+            if (e.getEnd().equals(edge.getEnd()) && !e.getStart().equals(edge.getStart())) {
+                neighbours[i] = e;
+                i++;
             }
         }
         return neighbours;
@@ -225,12 +245,67 @@ public class GameBoard {
 
     public boolean isVertexTwoRoadsAwayFromCities(TileVertex vertex) {
         TileVertex[] neighbours = getNeighbourTileVerticesToVertex(vertex);
-        for (TileVertex neighbour : neighbours) {
-            if (neighbour.getBuilding() != null) {
-                return false;
+        for (TileVertex v : neighbours) {
+            if(v != null){
+                if (v.getBuilding() != null) {
+                        return false;
+                }
             }
         }
         return true;
+    }
+    public boolean isRoadNextToCity(TileEdge edge,Player player) {
+        TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
+        for (TileVertex v : neighbours) {
+            if(v != null){
+                if (v.getBuilding() != null) {
+                    System.out.println("Neighbour building owner: " + v.getBuilding().getOwner().getName() + " Player: " + player.getName());
+                    if (v.getBuilding().getOwner() == player) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isRoadNextToRoad(TileEdge edge, Player player) {
+        TileEdge[] neighbours = getNeighbourTileEdgesToEdge(edge);
+        for (TileEdge e : neighbours) {
+            if(e != null){
+                if (e.getBuilding() != null) {
+                    if (e.getBuilding().getOwner() == player) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+
+    public boolean canPlaceColony(TileVertex vertex, Player player) {
+        if (vertex.getBuilding() != null) {
+            return false;
+        }
+        if(!isVertexTwoRoadsAwayFromCities(vertex)){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean canPlaceRoad(TileEdge edge, Player player) {
+        if (edge.getBuilding() != null) {
+            return false;
+        }
+        if (isRoadNextToCity(edge,player)) {
+            return true;
+        }
+        if (isRoadNextToRoad(edge,player)) {
+            return true;
+        }
+        System.out.println("Road not next to road");
+        return false;
     }
 
     public void addTile(int q, int r, int diceValue, TileType resourceType) {
@@ -376,7 +451,6 @@ public class GameBoard {
         return resizedImage;
     }
 
-
     private void drawVertices(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK); // Color for the vertices
@@ -391,11 +465,13 @@ public class GameBoard {
             }
         }
     }
+
     private double calculateScaleFactor() {
         // Calculez le facteur de mise à l'échelle basé sur la résolution de l'écran
         double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
         double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
-        // Utilisez le plus petit facteur de mise à l'échelle pour éviter de déformer l'image
+        // Utilisez le plus petit facteur de mise à l'échelle pour éviter de déformer
+        // l'image
         return Math.min(scaleFactorX, scaleFactorY);
     }
 
@@ -424,8 +500,7 @@ public class GameBoard {
             Image scaledImg = img.getScaledInstance(
                     (int) (img.getWidth() * scaleFactorX / 1.5),
                     (int) (img.getHeight() * scaleFactorY / 1.5),
-                    Image.SCALE_SMOOTH
-            );
+                    Image.SCALE_SMOOTH);
 
             int imgX = bounds.x + (bounds.width - scaledImg.getWidth(null)) / 2;
             int imgY = bounds.y + (bounds.height - scaledImg.getHeight(null)) / 2;

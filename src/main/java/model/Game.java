@@ -238,7 +238,7 @@ public class Game implements StateMethods {
     public void buildColony() {
         if (board.isLookingForVertex()) {
             TileVertex cVertex = board.getClosestTileVertex();
-            if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+            if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                 getCurrentPlayer().buildColony(cVertex);
             }   
         }
@@ -250,7 +250,9 @@ public class Game implements StateMethods {
     public void buildRoad() {
         if (board.isLookingForEdge()) {
             TileEdge cEdge = board.getClosestTileEdge();
-            getCurrentPlayer().buildRoad(cEdge);
+            if(board.canPlaceRoad(cEdge, getCurrentPlayer())) {
+                getCurrentPlayer().buildRoad(cEdge);
+            }
         }
         // rajouter un if ça a marché (transformer Player.buildRoad en boolean)
         board.setLookingForEdge(false);
@@ -260,7 +262,7 @@ public class Game implements StateMethods {
     public void buildCity() {
         if (board.isLookingForVertex()) {
             TileVertex cVertex = board.getClosestTileVertex();
-            if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+            if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                 getCurrentPlayer().buildCity(cVertex);
             }
         }
