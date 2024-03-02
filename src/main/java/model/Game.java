@@ -27,6 +27,7 @@ public class Game implements StateMethods {
     private boolean backwards = false;
     private boolean playingVoleur = false;
     private App app;
+    private boolean blankTurn = false;
 
     public Game(App app) {
         this.app = app;
@@ -63,6 +64,10 @@ public class Game implements StateMethods {
 
     public Thief getThief() {
         return thief;
+    }
+
+    public boolean getBlankTurn() {
+        return blankTurn;
     }
 
     public boolean canPass() {
@@ -106,7 +111,7 @@ public class Game implements StateMethods {
             players.next();
         }
 
-        if (!start && !backwards) {
+        if (!start && !backwards && !blankTurn) {
             app.getActionPlayerPanel().getRollingDice().setButtonIsOn(true);
         }
         System.out.println("It's " + getCurrentPlayer() .getName() + "'s turn");
@@ -119,6 +124,9 @@ public class Game implements StateMethods {
     }
 
     public boolean canDraw() {
+        if (blankTurn) {
+            return false;
+        }
         int[] t = {0, 1, 1, 0, 1};
         return getCurrentPlayer().hasEnough(t) && !start && !backwards;
     }
@@ -234,69 +242,98 @@ public class Game implements StateMethods {
 
     // Build methods ---------------
     public void buildCityButtonAction() {
-        if (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources()) && resourcesGiven) {
-            if (getCurrentPlayer().hasColony()) {
-                if (board.isLookingForVertex()) {
-                    board.setLookingForVertex(!board.isLookingForVertex());
-                    board.setPlacingCity(false);
-                    board.setPlacingRoad(false);
-                    board.setPlacingColony(false);
-                } else {
-                    board.setPlacingCity(true);
-                    board.setPlacingRoad(false);
-                    board.setPlacingColony(false);
-                    board.setLookingForVertex(true);
-                }
-                if (board.isLookingForEdge()) {
-                    board.setLookingForEdge(!board.isLookingForEdge());
-                    board.setPlacingRoad(false);
-                    board.setPlacingColony(false);
-                }
-            }
+        if (blankTurn) {
+            return;
+        }
+        if (!Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) {
+            return;
+        }
+        if (!resourcesGiven) {
+            return;
+        }
+        if (!getCurrentPlayer().hasColony()) {
+            return;
+        }
+
+        if (board.isLookingForVertex()) {
+            board.setLookingForVertex(!board.isLookingForVertex());
+            board.setPlacingCity(false);
+            board.setPlacingRoad(false);
+            board.setPlacingColony(false);
+        } else {
+            board.setPlacingCity(true);
+            board.setPlacingRoad(false);
+            board.setPlacingColony(false);
+            board.setLookingForVertex(true);
+        }
+        if (board.isLookingForEdge()) {
+            board.setLookingForEdge(!board.isLookingForEdge());
+            board.setPlacingRoad(false);
+            board.setPlacingColony(false);
         }
     }
 
     public void buildColonyButtonAction() {
-        if ((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources()) && resourcesGiven)
-            || getCurrentPlayer().getFreeColony()) {
-            if (board.isLookingForVertex()) {
-                board.setLookingForVertex(!board.isLookingForVertex());
-                board.setPlacingCity(false);
-                board.setPlacingRoad(false);
-                board.setPlacingColony(false);
-            } else {
-                board.setPlacingCity(false);
-                board.setPlacingRoad(false);
-                board.setPlacingColony(true);
-                board.setLookingForVertex(true);
-            }
-            if (board.isLookingForEdge()) {
-                board.setLookingForEdge(!board.isLookingForEdge());
-                board.setPlacingRoad(false);
-                board.setPlacingCity(false);
-            }
+        if (blankTurn) {
+            return;
+        }
+        if (!Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) {
+            return;
+        }
+        if (!resourcesGiven) {
+            return;
+        }
+        if (!getCurrentPlayer().getFreeColony()) {
+            return;
+        }
+
+        if (board.isLookingForVertex()) {
+            board.setLookingForVertex(!board.isLookingForVertex());
+            board.setPlacingCity(false);
+            board.setPlacingRoad(false);
+            board.setPlacingColony(false);
+        } else {
+            board.setPlacingCity(false);
+            board.setPlacingRoad(false);
+            board.setPlacingColony(true);
+            board.setLookingForVertex(true);
+        }
+        if (board.isLookingForEdge()) {
+            board.setLookingForEdge(!board.isLookingForEdge());
+            board.setPlacingRoad(false);
+            board.setPlacingCity(false);
         }
     }
 
     public void buildRoadButtonAction() {
-        if ((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources()) && resourcesGiven)
-            || getCurrentPlayer().getFreeRoad()) {
-            if (board.isLookingForEdge()) {
-                board.setLookingForEdge(!board.isLookingForEdge());
-                board.setPlacingCity(false);
-                board.setPlacingColony(false);
-                board.setPlacingRoad(false);
-            } else {
-                board.setPlacingCity(false);
-                board.setPlacingColony(false);
-                board.setPlacingRoad(true);
-                board.setLookingForEdge(true);
-            }
-            if (board.isLookingForVertex()) {
-                board.setLookingForVertex(!board.isLookingForVertex());
-                board.setPlacingCity(false);
-                board.setPlacingColony(false);
-            }
+        if (blankTurn) {
+            return;
+        }
+        if (!Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) {
+            return;
+        }
+        if (!resourcesGiven) {
+            return;
+        }
+        if (!getCurrentPlayer().getFreeRoad()) {
+            return;
+        }
+
+        if (board.isLookingForEdge()) {
+            board.setLookingForEdge(!board.isLookingForEdge());
+            board.setPlacingCity(false);
+            board.setPlacingColony(false);
+            board.setPlacingRoad(false);
+        } else {
+            board.setPlacingCity(false);
+            board.setPlacingColony(false);
+            board.setPlacingRoad(true);
+            board.setLookingForEdge(true);
+        }
+        if (board.isLookingForVertex()) {
+            board.setLookingForVertex(!board.isLookingForVertex());
+            board.setPlacingCity(false);
+            board.setPlacingColony(false);
         }
     }
 

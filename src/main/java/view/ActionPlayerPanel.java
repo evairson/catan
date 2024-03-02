@@ -250,6 +250,9 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void addCardsPanel() {
+        if (game.getBlankTurn()) {
+            return;
+        }
         if (cardsPanel != null) {
             remove(cardsPanel);
         }
