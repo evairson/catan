@@ -25,18 +25,18 @@ public class App implements Runnable {
 
     public App() {
         mainMenu = new MainMenu(this);
-        gamePanel = new GamePanel(this);
-        createNewGame();
-        actionPlayer = new ActionPlayerPanel(this);
-        gameWindow = new GameWindow(gamePanel, actionPlayer, mainMenu);
-
+        this.gameWindow = new GameWindow(mainMenu);
         mainMenu.requestFocus();
-
-        actionPlayer.update();
     }
     public void createNewGame() {
         this.game = new Game();
+        this.actionPlayer = new ActionPlayerPanel(this);
+        this.gamePanel = new GamePanel(this);
+        this.gameWindow.addPanels(this.actionPlayer, this.gamePanel);
+        actionPlayer.update();
+        startGameLoop();
     }
+
     public Game getGame() {
         return game;
     }

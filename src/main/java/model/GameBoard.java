@@ -69,18 +69,23 @@ public class GameBoard {
     public void setPlacingRoad(boolean placingRoad) {
         this.placingRoad = placingRoad;
     }
+
     public void setPlacingColony(boolean placingColony) {
         this.placingColony = placingColony;
     }
+
     public void setPlacingCity(boolean placingCity) {
         this.placingCity = placingCity;
     }
+
     public boolean isPlacingRoad() {
         return placingRoad;
     }
+
     public boolean isPlacingColony() {
         return placingColony;
     }
+
     public boolean isPlacingCity() {
         return placingCity;
     }
@@ -138,6 +143,96 @@ public class GameBoard {
         board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue));
     }
 
+    public TileVertex[] getNeighbourTileVerticesToVertex(TileVertex vertex) {
+        TileVertex[] neighbours = new TileVertex[3];
+        int index = 0;
+        for (TileEdge edge : edgesMap.values()) {
+            if (edge.getStart().equals(vertex.getCoordinates())) {
+                for( TileVertex v : verticesMap.values()){
+                    if(v.getCoordinates().equals(edge.getEnd())){
+                        TileVertex neighbour = v;
+                        if(neighbour != null){
+                            if(checkIfNeighbourInArray(neighbours, neighbour)){
+                                continue;
+                            }
+                            neighbours[index] = neighbour;
+                            index++;
+                        }
+                    }
+                }   
+            }
+            if (edge.getEnd().equals(vertex.getCoordinates())) {
+                for( TileVertex v : verticesMap.values()){
+                    if(v.getCoordinates().equals(edge.getStart())){
+                        TileVertex neighbour = v;
+                        if(neighbour != null){
+                            if(checkIfNeighbourInArray(neighbours, neighbour)){
+                                continue;
+
+                            }
+                            neighbours[index] = neighbour;
+                            
+                            index++;
+                        }  
+                    }
+                }
+            }
+        }
+        for (TileVertex v : neighbours) {
+            if (v != null) {
+                System.out.println("Neighbour: " + v.getCoordinates());
+            }
+        }
+        return neighbours;
+    }
+
+    public boolean checkIfNeighbourInArray(TileVertex[] neighbours, TileVertex vertex) {
+        for (TileVertex v : neighbours) {
+            if (v != null) {
+                if (v.getCoordinates().equals(vertex.getCoordinates())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public TileEdge[] getNeighbourTileEdgesToVertex(TileVertex vertex) {
+        TileEdge[] neighbours = new TileEdge[3];
+        int i = 0;
+        for (TileEdge edge : edgesMap.values()) {
+            if (edge.getStart().equals(vertex.getCoordinates()) || edge.getEnd().equals(vertex.getCoordinates())) {
+                neighbours[i] = edge;
+                i++;
+            }
+        }
+        return neighbours;
+    }
+
+    public TileEdge[] getNeighbourTileEdgesToEdge(TileEdge edge) {
+        TileEdge[] neighbours = new TileEdge[4];
+        int i = 0;
+        for (TileEdge e : edgesMap.values()) {
+            if (e.getStart().equals(edge.getStart()) || e.getEnd().equals(edge.getStart())
+                    || e.getStart().equals(edge.getEnd()) || e.getEnd().equals(edge.getEnd())) {
+                if (!e.equals(edge)) {
+                    neighbours[i] = e;
+                    i++;
+                }
+            }
+        }
+        return neighbours;
+    }
+
+    public boolean isVertexTwoRoadsAwayFromCities(TileVertex vertex) {
+        TileVertex[] neighbours = getNeighbourTileVerticesToVertex(vertex);
+        for (TileVertex neighbour : neighbours) {
+            if (neighbour.getBuilding() != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void addTile(int q, int r, int diceValue, TileType resourceType) {
         int s = -q - r;
         Tile tile = new Tile(q, r, diceValue, resourceType);
@@ -176,9 +271,6 @@ public class GameBoard {
                     }
                     addTile(q, r, tileDiceValue, getTileType(tileResourceType));
                     presetTileDiceValue++;
-
-                    System.out.println("Tile (" + q + ", " + r + ", " + s + "), Ressource Type: "
-                            + tileResourceType + " added to the board");
                 }
             }
         }
@@ -234,12 +326,12 @@ public class GameBoard {
                     tileVertex.addTile(tile);
                     // Mettre ce sommet dans la map avec comme valeur l'objet TileVertex
                     vertex = new Point((Math.round(vertex.getX())), (Math.round(vertex.getY())));
+                    tileVertex.setCoordinates(vertex);
                     // Arrondir les coordonnées pour éviter les erreurs d'arrondi
                     verticesMap.put(vertex, tileVertex);
                 }
             }
         }
-
     }
 
     private void initialiseEdges() {

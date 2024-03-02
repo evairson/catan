@@ -22,6 +22,7 @@ public class Game implements StateMethods {
     private CardStack stack;
     private Thief thief;
     private boolean resourcesGiven;
+
     public Game() {
         resourcesGiven = false;
         Player player1 = new Player(Player.Color.RED, "Player1");
@@ -60,6 +61,7 @@ public class Game implements StateMethods {
 
     public void endTurn() {
         players.next();
+        System.out.println("It's " + getCurrentPlayer() .getName() + "'s turn");
         resourcesGiven = false;
     }
 
@@ -70,7 +72,6 @@ public class Game implements StateMethods {
     public Player getCurrentPlayer() {
         return players.getCurrentPlayer();
     }
-
 
     public GameBoard getBoard() {
         return board;
@@ -87,7 +88,6 @@ public class Game implements StateMethods {
     public void draw(Graphics g) {
         board.draw(g);
     }
-
 
     // Player action : -----------------
 
@@ -128,16 +128,12 @@ public class Game implements StateMethods {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("Mouse clicked");
         if (board.isPlacingCity()) {
             buildCity();
-            System.out.println("Building city");
         } else if (board.isPlacingColony()) {
             buildColony();
-            System.out.println("Building colony");
         } else if (board.isPlacingRoad()) {
             buildRoad();
-            System.out.println("Building road");
         } else if (board.getThiefMode()) {
             board.changeThief(e);
         }
@@ -177,7 +173,6 @@ public class Game implements StateMethods {
     public void buildCityButtonAction() {
         if (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) {
             if (getCurrentPlayer().hasColony()) {
-                System.out.println("You can build a city");
                 if (board.isLookingForVertex()) {
                     board.setLookingForVertex(!board.isLookingForVertex());
                     board.setPlacingCity(false);
@@ -243,7 +238,9 @@ public class Game implements StateMethods {
     public void buildColony() {
         if (board.isLookingForVertex()) {
             TileVertex cVertex = board.getClosestTileVertex();
-            getCurrentPlayer().buildColony(cVertex);
+            if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+                getCurrentPlayer().buildColony(cVertex);
+            }   
         }
         // rajouter un if ça a marché (transformer Player.buildColony en boolean)
         board.setLookingForVertex(false);
@@ -263,7 +260,9 @@ public class Game implements StateMethods {
     public void buildCity() {
         if (board.isLookingForVertex()) {
             TileVertex cVertex = board.getClosestTileVertex();
-            getCurrentPlayer().buildCity(cVertex);
+            if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+                getCurrentPlayer().buildCity(cVertex);
+            }
         }
         // rajouter un if ça a marché (transformer Player.buildCity en boolean)
         board.setLookingForVertex(false);
