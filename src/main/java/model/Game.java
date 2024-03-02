@@ -240,7 +240,7 @@ public class Game implements StateMethods {
             TileVertex cVertex = board.getClosestTileVertex();
             if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
                 getCurrentPlayer().buildColony(cVertex);
-            }   
+            }
         }
         // rajouter un if ça a marché (transformer Player.buildColony en boolean)
         board.setLookingForVertex(false);

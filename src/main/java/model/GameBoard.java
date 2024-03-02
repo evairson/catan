@@ -148,32 +148,31 @@ public class GameBoard {
         int index = 0;
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getStart().equals(vertex.getCoordinates())) {
-                for( TileVertex v : verticesMap.values()){
-                    if(v.getCoordinates().equals(edge.getEnd())){
+                for (TileVertex v : verticesMap.values()) {
+                    if (v.getCoordinates().equals(edge.getEnd())) {
                         TileVertex neighbour = v;
-                        if(neighbour != null){
-                            if(checkIfNeighbourInArray(neighbours, neighbour)){
+                        if (neighbour != null) {
+                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
                                 continue;
                             }
                             neighbours[index] = neighbour;
                             index++;
                         }
                     }
-                }   
+                }
             }
             if (edge.getEnd().equals(vertex.getCoordinates())) {
-                for( TileVertex v : verticesMap.values()){
-                    if(v.getCoordinates().equals(edge.getStart())){
+                for (TileVertex v : verticesMap.values()) {
+                    if (v.getCoordinates().equals(edge.getStart())) {
                         TileVertex neighbour = v;
-                        if(neighbour != null){
-                            if(checkIfNeighbourInArray(neighbours, neighbour)){
+                        if (neighbour != null) {
+                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
                                 continue;
 
                             }
                             neighbours[index] = neighbour;
-                            
                             index++;
-                        }  
+                        }
                     }
                 }
             }
@@ -200,7 +199,8 @@ public class GameBoard {
         TileEdge[] neighbours = new TileEdge[3];
         int i = 0;
         for (TileEdge edge : edgesMap.values()) {
-            if (edge.getStart().equals(vertex.getCoordinates()) || edge.getEnd().equals(vertex.getCoordinates())) {
+            if (edge.getStart().equals(vertex.getCoordinates())
+                    || edge.getEnd().equals(vertex.getCoordinates())) {
                 neighbours[i] = edge;
                 i++;
             }
