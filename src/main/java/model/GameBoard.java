@@ -62,14 +62,6 @@ public class GameBoard {
         return thiefMode;
     }
 
-    public void setWaitingChoice(boolean b) {
-        waitingChoice = b;
-    }
-
-    public boolean getWaitngChoice() {
-        return waitingChoice;
-    }
-
     public Layout getLayout() {
         return layout;
     }

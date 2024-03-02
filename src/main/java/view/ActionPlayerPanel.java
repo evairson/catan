@@ -6,7 +6,6 @@ import java.io.File;
 import java.awt.*;
 import javax.swing.*;
 import javax.imageio.ImageIO;
-import java.lang.*;
 import java.util.ArrayList;
 import java.io.IOException;
 
@@ -26,6 +25,7 @@ import others.Constants;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
+import java.util.concurrent.*;
 
 public class ActionPlayerPanel extends JPanel {
     private ButtonImage endTurn;
@@ -166,7 +166,7 @@ public class ActionPlayerPanel extends JPanel {
     private void initializeResourcesPanel() {
         int xCoord = Resolution.calculateResolution(180, 620)[0];
         int yCoord = Resolution.calculateResolution(180, 620)[1];
-        resourcesPanel = new ResourcesPanel();
+        resourcesPanel = new ResourcesPanel(game);
         createPlayerPanel();
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
@@ -282,6 +282,8 @@ public class ActionPlayerPanel extends JPanel {
                 switch (card.getClass().getSimpleName()) {
                     case "KnightCard": yield (this::useKnight);
                     case "Monopoly": yield (this::useMonopoly);
+                    case "YearOfPlenty": yield (this::useYearOfPlenty);
+                    case "RoadBuilding": yield (this::useRoadBuilding);
                     default: yield null;
                 }, null);
             cardsPanel.add(b);
@@ -328,7 +330,31 @@ public class ActionPlayerPanel extends JPanel {
                 break;
             }
         }
-        game.getBoard().setWaitingChoice(true);
+    }
+
+    private void useRoadBuilding() {
+        removeCardsPanel();
+        cardPlayed = true;
+        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i) instanceof RoadBuilding) {
+                cards.remove(i);
+                break;
+            }
+        }
+        game.getCurrentPlayer().setFreeRoad(true);
+    }
+
+    private void useYearOfPlenty() {
+        removeCardsPanel();
+        cardPlayed = true;
+        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i) instanceof YearOfPlenty) {
+                cards.remove(i);
+                break;
+            }
+        }
     }
 
     private void useCard() {

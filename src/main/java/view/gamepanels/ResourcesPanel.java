@@ -2,6 +2,7 @@ package view.gamepanels;
 
 import javax.swing.*;
 
+import model.Game;
 import model.Player;
 import view.TileType;
 import view.utilities.ButtonImage;
@@ -23,6 +24,7 @@ public class ResourcesPanel extends JPanel {
     private ButtonImage wool;
     private MouseAdapter animMouse;
     private boolean isMouseInside = false;
+    private Game game;
     public void setAnimMouse(MouseAdapter animMouse) {
         this.animMouse = animMouse;
     }
@@ -34,7 +36,8 @@ public class ResourcesPanel extends JPanel {
         return isMouseInside;
     }
 
-    public ResourcesPanel() {
+    public ResourcesPanel(Game game) {
+        this.game = game;
         setLayout(null);
         createResourceButtons();
     }
