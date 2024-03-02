@@ -245,31 +245,25 @@ public class Game implements StateMethods {
         if (blankTurn) {
             return;
         }
-        if (!Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) {
-            return;
-        }
-        if (!resourcesGiven) {
-            return;
-        }
-        if (!getCurrentPlayer().hasColony()) {
-            return;
-        }
-
-        if (board.isLookingForVertex()) {
-            board.setLookingForVertex(!board.isLookingForVertex());
-            board.setPlacingCity(false);
-            board.setPlacingRoad(false);
-            board.setPlacingColony(false);
-        } else {
-            board.setPlacingCity(true);
-            board.setPlacingRoad(false);
-            board.setPlacingColony(false);
-            board.setLookingForVertex(true);
-        }
-        if (board.isLookingForEdge()) {
-            board.setLookingForEdge(!board.isLookingForEdge());
-            board.setPlacingRoad(false);
-            board.setPlacingColony(false);
+        if ((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven) {
+            if (getCurrentPlayer().hasColony()) {
+                if (board.isLookingForVertex()) {
+                    board.setLookingForVertex(!board.isLookingForVertex());
+                    board.setPlacingCity(false);
+                    board.setPlacingRoad(false);
+                    board.setPlacingColony(false);
+                } else {
+                    board.setPlacingCity(true);
+                    board.setPlacingRoad(false);
+                    board.setPlacingColony(false);
+                    board.setLookingForVertex(true);
+                }
+                if (board.isLookingForEdge()) {
+                    board.setLookingForEdge(!board.isLookingForEdge());
+                    board.setPlacingRoad(false);
+                    board.setPlacingColony(false);
+                }
+            }
         }
     }
 
@@ -277,31 +271,24 @@ public class Game implements StateMethods {
         if (blankTurn) {
             return;
         }
-        if (!Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) {
-            return;
-        }
-        if (!resourcesGiven) {
-            return;
-        }
-        if (!getCurrentPlayer().getFreeColony()) {
-            return;
-        }
-
-        if (board.isLookingForVertex()) {
-            board.setLookingForVertex(!board.isLookingForVertex());
-            board.setPlacingCity(false);
-            board.setPlacingRoad(false);
-            board.setPlacingColony(false);
-        } else {
-            board.setPlacingCity(false);
-            board.setPlacingRoad(false);
-            board.setPlacingColony(true);
-            board.setLookingForVertex(true);
-        }
-        if (board.isLookingForEdge()) {
-            board.setLookingForEdge(!board.isLookingForEdge());
-            board.setPlacingRoad(false);
-            board.setPlacingCity(false);
+        if (((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
+            || getCurrentPlayer().getFreeColony()) {
+            if (board.isLookingForVertex()) {
+                board.setLookingForVertex(!board.isLookingForVertex());
+                board.setPlacingCity(false);
+                board.setPlacingRoad(false);
+                board.setPlacingColony(false);
+            } else {
+                board.setPlacingCity(false);
+                board.setPlacingRoad(false);
+                board.setPlacingColony(true);
+                board.setLookingForVertex(true);
+            }
+            if (board.isLookingForEdge()) {
+                board.setLookingForEdge(!board.isLookingForEdge());
+                board.setPlacingRoad(false);
+                board.setPlacingCity(false);
+            }
         }
     }
 
@@ -309,31 +296,24 @@ public class Game implements StateMethods {
         if (blankTurn) {
             return;
         }
-        if (!Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) {
-            return;
-        }
-        if (!resourcesGiven) {
-            return;
-        }
-        if (!getCurrentPlayer().getFreeRoad()) {
-            return;
-        }
-
-        if (board.isLookingForEdge()) {
-            board.setLookingForEdge(!board.isLookingForEdge());
-            board.setPlacingCity(false);
-            board.setPlacingColony(false);
-            board.setPlacingRoad(false);
-        } else {
-            board.setPlacingCity(false);
-            board.setPlacingColony(false);
-            board.setPlacingRoad(true);
-            board.setLookingForEdge(true);
-        }
-        if (board.isLookingForVertex()) {
-            board.setLookingForVertex(!board.isLookingForVertex());
-            board.setPlacingCity(false);
-            board.setPlacingColony(false);
+        if (((!Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
+            || getCurrentPlayer().getFreeRoad()) {
+            if (board.isLookingForEdge()) {
+                board.setLookingForEdge(!board.isLookingForEdge());
+                board.setPlacingCity(false);
+                board.setPlacingColony(false);
+                board.setPlacingRoad(false);
+            } else {
+                board.setPlacingCity(false);
+                board.setPlacingColony(false);
+                board.setPlacingRoad(true);
+                board.setLookingForEdge(true);
+            }
+            if (board.isLookingForVertex()) {
+                board.setLookingForVertex(!board.isLookingForVertex());
+                board.setPlacingCity(false);
+                board.setPlacingColony(false);
+            }
         }
     }
 

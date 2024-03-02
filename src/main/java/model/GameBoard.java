@@ -1,5 +1,8 @@
 package model;
 
+import model.buildings.Building;
+import model.buildings.Colony;
+import model.buildings.Road;
 import model.geometry.*;
 import model.geometry.Point;
 import model.tiles.*;
@@ -7,11 +10,17 @@ import others.Constants;
 import view.TileImageLoader;
 import view.TileType;
 import model.geometry.CubeCoordinates;
+import view.utilities.Resolution;
 //import view.utilities.Resolution;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,16 +55,50 @@ public class GameBoard {
     private TileEdge closestTileEdge = new TileEdge();
 
     private Tile highlightedTile;
+    private Map<String, BufferedImage> loadedImages;
 
     public GameBoard(Layout layout, Thief thief, Game game) {
+        loadImages();
         this.thief = thief;
         this.game = game;
         board = new HashMap<CubeCoordinates, Tile>();
         this.layout = layout;
         this.initialiseBoard();
-        // rendre la centre et la taille de la grille dynamique
-
     }
+    private void loadImages() {
+        loadedImages = new HashMap<>();
+
+        String basePath = "src/main/resources/building/pions/";
+        String[] colors = {"Blue", "Green", "Red", "Yellow"};
+        String[] buildingTypes = {"city", "colony", "road"};
+
+        for (String color : colors) {
+            for (String type : buildingTypes) {
+                String path = basePath + color + "/" + type + ".png";
+                try {
+                    BufferedImage image = ImageIO.read(new File(path));
+                    loadedImages.put(color + "_" + type, image);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private BufferedImage getImageForBuilding(Building building) {
+        String color = building.getOwner().getColorString();
+        String type = "colony";
+        if (building instanceof Road) {
+            type = "road";
+        } else if (building instanceof Colony) {
+            Colony colony = (Colony) building;
+            if (colony.getIsCity()) {
+                type = "city";
+            }
+        }
+        return loadedImages.get(color + "_" + type);
+    }
+
 
     public void setThiefMode(boolean b) {
         thiefMode = b;
@@ -151,31 +194,26 @@ public class GameBoard {
         int index = 0;
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getStart().equals(vertex.getCoordinates())) {
-                for (TileVertex v : verticesMap.values()) {
-                    if (v.getCoordinates().equals(edge.getEnd())) {
-                        TileVertex neighbour = v;
-                        if (neighbour != null) {
-                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
-                                continue;
-                            }
-                            neighbours[index] = neighbour;
-                            index++;
+                for (TileVertex neighbour : verticesMap.values()) {
+                    if (neighbour.getCoordinates().equals(edge.getEnd())) {
+                        if (checkIfNeighbourInArray(neighbours, neighbour)) {
+                            continue;
                         }
+                        neighbours[index] = neighbour;
+                        index++;
                     }
                 }
             }
             if (edge.getEnd().equals(vertex.getCoordinates())) {
-                for (TileVertex v : verticesMap.values()) {
-                    if (v.getCoordinates().equals(edge.getStart())) {
-                        TileVertex neighbour = v;
-                        if (neighbour != null) {
-                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
-                                continue;
+                for (TileVertex neighbour : verticesMap.values()) {
+                    if (neighbour.getCoordinates().equals(edge.getStart())) {
+                        if (checkIfNeighbourInArray(neighbours, neighbour)) {
+                            continue;
 
-                            }
-                            neighbours[index] = neighbour;
-                            index++;
                         }
+                        neighbours[index] = neighbour;
+
+                        index++;
                     }
                 }
             }
@@ -366,17 +404,26 @@ public class GameBoard {
                 && Math.abs(p1.getY() - p2.getY()) < epsilon;
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage, double scale) {
-        int newWidth = (int) (originalImage.getWidth() * scale);
-        int newHeight = (int) (originalImage.getHeight() * scale);
-        Image tmp = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-        BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+    private boolean buildingIsCity(Building building) {
+        if (building instanceof Colony) {
+            return ((Colony) building).getIsCity();
+        }
+        return false;
+    }
+    private void drawBuildingImage(Graphics2D g2d, Building building, Point vertex) {
+        BufferedImage img = getImageForBuilding(building);
+        boolean isCity = buildingIsCity(building);
+        int size = (isCity ? 90 : 60);
+        int placement = (isCity ? 40 : 30);
+        Image scaledImage = img.getScaledInstance((int) (size / Resolution.divider()),
+                (int) (size / Resolution.divider()), Image.SCALE_SMOOTH);
+        g2d.drawImage(scaledImage, (int) vertex.getX() - (int) (placement / Resolution.divider()),
+                (int) vertex.getY() - (int) (placement / Resolution.divider()), null);
+    }
 
-        Graphics2D g2d = resizedImage.createGraphics();
-        g2d.drawImage(tmp, 0, 0, null);
-        g2d.dispose();
-
-        return resizedImage;
+    private void drawVertexCircle(Graphics2D g2d, Point vertex) {
+        g2d.setColor(Color.BLACK);
+        g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
     }
 
 
@@ -385,21 +432,11 @@ public class GameBoard {
         g2d.setColor(Color.BLACK); // Color for the vertices
         // Draw the vertices
         for (Point vertex : verticesMap.keySet()) {
-            if (verticesMap.get(vertex).getBuilding() != null) {
-                g2d.setColor(verticesMap.get(vertex).getBuilding().getColorInAwt());
-                g2d.fillOval((int) vertex.getX() - 4, (int) vertex.getY() - 4, 8, 8);
-            } else {
-                g2d.setColor(Color.BLACK);
-                g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
+            Building building = verticesMap.get(vertex).getBuilding();
+            if (building != null) {
+                drawBuildingImage(g2d, building, vertex);
             }
         }
-    }
-    private double calculateScaleFactor() {
-        // Calculez le facteur de mise à l'échelle basé sur la résolution de l'écran
-        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
-        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
-        // Utilisez le plus petit facteur de mise à l'échelle pour éviter de déformer l'image
-        return Math.min(scaleFactorX, scaleFactorY);
     }
 
     public void drawImagesInHexes(Graphics g) {
@@ -411,7 +448,6 @@ public class GameBoard {
             Tile tile = entry.getValue();
             Polygon hexagon = new Polygon();
             ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
-            boolean highlight = false;
 
             for (Point vertex : hexagonVertices) {
                 hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
@@ -436,27 +472,49 @@ public class GameBoard {
         }
     }
 
+    private void drawEdgeWithImage(Graphics2D g2d, Point start, Point end, BufferedImage edgeImage) {
+        // Sauvegarder l'état actuel du contexte Graphics2D
+        AffineTransform oldTransform = g2d.getTransform();
+
+        // Calculer le milieu de l'arête et l'angle de rotation
+        int midX = (int) ((start.getX() + end.getX()) / 2);
+        int midY = (int) ((start.getY() + end.getY()) / 2);
+        double angle = Math.atan2(end.getY() - start.getY(), end.getX() - start.getX()) + Math.PI / 2;
+
+        // Mise à l'échelle de l'image
+        int scaledWidth = (int) (edgeImage.getWidth(null) * 0.38 / Resolution.divider());
+        int scaledHeight = (int) (edgeImage.getHeight(null) * 0.38 / Resolution.divider());
+        Image scaledImage = edgeImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+
+        // Appliquer la transformation
+        AffineTransform transform = new AffineTransform();
+        transform.translate(midX, midY);
+        transform.rotate(angle);
+        g2d.setTransform(transform);
+
+        // Dessiner l'image
+        g2d.drawImage(scaledImage, -scaledWidth / 2, -scaledHeight / 2, null);
+
+        // Rétablir l'état original du contexte Graphics2D
+        g2d.setTransform(oldTransform);
+    }
+
+
     private void drawEdges(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLACK); // Couleur des arêtes
+        g2d.setColor(Color.black);
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getBuilding() != null) {
-                g2d.setColor(edge.getBuilding().getColorInAwt());
-                g2d.setStroke(new BasicStroke(6));
-            } else {
-                g2d.setColor(Color.black);
-                g2d.setStroke(new BasicStroke(2));
+                BufferedImage edgeImage = getImageForBuilding(edge.getBuilding());
+                drawEdgeWithImage(g2d, edge.getStart(), edge.getEnd(), edgeImage);
             }
-            g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
-                    (int) edge.getEnd().getX(),
-                    (int) edge.getEnd().getY()); // Dessiner l'arête
         }
     }
 
     public void drawBoard(Graphics g) {
-        drawVertices(g);
-        drawEdges(g);
         drawImagesInHexes(g);
+        drawEdges(g);
+        drawVertices(g);
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
             drawText(g, entry.getValue().getDiceValue() + "", layout.cubeToPixel(layout, cubeCoord));
