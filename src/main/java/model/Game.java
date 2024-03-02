@@ -21,6 +21,7 @@ public class Game implements StateMethods {
     private CardStack stack;
     private Thief thief;
     private boolean resourcesGiven;
+
     public Game() {
         resourcesGiven = false;
         Player player1 = new Player(Player.Color.RED, "Player1");
@@ -59,7 +60,6 @@ public class Game implements StateMethods {
         return players.getCurrentPlayer();
     }
 
-
     public GameBoard getBoard() {
         return board;
     }
@@ -75,7 +75,6 @@ public class Game implements StateMethods {
     public void draw(Graphics g) {
         board.draw(g);
     }
-
 
     // Player action : -----------------
 
@@ -230,7 +229,12 @@ public class Game implements StateMethods {
 
     public void buildColony() {
         if (board.isLookingForVertex()) {
-            TileVertex cVertex = board.getClosestTileVertex();
+            // TileVertex cVertex = board.getClosestTileVertex();
+            // if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+            //     System.out.println("ZEJfqdilhefhiazlehfapzouehflkazheglfiazhomh");
+            //     getCurrentPlayer().buildColony(cVertex);
+            // }
+            TileVertex cVertex=board.getClosestTileVertex();
             getCurrentPlayer().buildColony(cVertex);
         }
         // rajouter un if ça a marché (transformer Player.buildColony en boolean)
@@ -251,7 +255,9 @@ public class Game implements StateMethods {
     public void buildCity() {
         if (board.isLookingForVertex()) {
             TileVertex cVertex = board.getClosestTileVertex();
-            getCurrentPlayer().buildCity(cVertex);
+            if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+                getCurrentPlayer().buildCity(cVertex);
+            }
         }
         // rajouter un if ça a marché (transformer Player.buildCity en boolean)
         board.setLookingForVertex(false);
