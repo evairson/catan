@@ -33,7 +33,7 @@ public class Game implements StateMethods {
         Player player3 = new Player(Player.Color.BLUE, "Player3");
         Player player4 = new Player(Player.Color.GREEN, "Player4");
         players = new ListPlayers(0, player1, player2, player3, player4);
-
+        player1.setFreeColony(true);
         Point point1 = new Point(400, 400);
         Point point2 = new Point(70, 70);
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
@@ -53,6 +53,12 @@ public class Game implements StateMethods {
 
     public void endTurn() {
         if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
+            //obligation de jouer les dés après les turn de setup
+            return;
+        }
+        if ((start || backwards)
+            && (getCurrentPlayer().getFreeRoad() || getCurrentPlayer().getFreeColony())) {
+            //obligation de poser les trucs free
             return;
         }
 
@@ -72,6 +78,10 @@ public class Game implements StateMethods {
         }
         resourcesGiven = false;
         app.getActionPlayerPanel().getRollingDice().newPlayer(getCurrentPlayer());
+
+        if (start || backwards) {
+            getCurrentPlayer().setFreeColony(true);
+        }
     }
 
     public ListPlayers getPlayers() {
@@ -190,7 +200,7 @@ public class Game implements StateMethods {
 
     // Build methods ---------------
     public void buildCityButtonAction() {
-        if (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) {
+        if (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources()) && resourcesGiven) {
             if (getCurrentPlayer().hasColony()) {
                 System.out.println("You can build a city");
                 if (board.isLookingForVertex()) {
@@ -214,7 +224,8 @@ public class Game implements StateMethods {
     }
 
     public void buildColonyButtonAction() {
-        if (Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) {
+        if ((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources()) && resourcesGiven)
+            || getCurrentPlayer().getFreeColony()) {
             if (board.isLookingForVertex()) {
                 board.setLookingForVertex(!board.isLookingForVertex());
                 board.setPlacingCity(false);
@@ -235,7 +246,8 @@ public class Game implements StateMethods {
     }
 
     public void buildRoadButtonAction() {
-        if (Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) {
+        if ((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources()) && resourcesGiven)
+            || getCurrentPlayer().getFreeRoad()) {
             if (board.isLookingForEdge()) {
                 board.setLookingForEdge(!board.isLookingForEdge());
                 board.setPlacingCity(false);

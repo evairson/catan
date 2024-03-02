@@ -26,10 +26,12 @@ public class Player {
     private int dice1;
     private int dice2;
     private String name;
-    private Boolean hasThrowDices;
+    private Boolean hasThrowDices = false;
     private HashMap<TileType, Integer> resources;
     private ArrayList<DevelopmentCard> cardsDev;
     private ArrayList<Building> buildings;
+    private Boolean freeRoad = false;
+    private Boolean freeColony = false;
 
     public Player(Color c, String name) {
         color = c;
@@ -42,13 +44,28 @@ public class Player {
         resources.put(TileType.WOOL, 0);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
-        hasThrowDices = false;
     }
 
     public void printBuildings() {
         for (Building b : buildings) {
             System.out.println(b);
         }
+    }
+
+    public boolean getFreeRoad() {
+        return freeRoad;
+    }
+
+    public void setFreeRoad(boolean b) {
+        freeRoad = b;
+    }
+
+    public boolean getFreeColony() {
+        return freeColony;
+    }
+
+    public void setFreeColony(boolean b) {
+        freeColony = b;
     }
 
     public boolean hasColony() {
@@ -176,6 +193,11 @@ public class Player {
     public void buildRoad(TileEdge edge) {
         if (edge.getBuilding() == null) {
             Road r = new Road(this);
+            if (freeRoad) {
+                freeRoad = false;
+                r.place(this, edge);
+                return;
+            }
             r.buyAndPlace(this, edge);
             System.out.println("Road built");
         } else {
@@ -186,6 +208,11 @@ public class Player {
     public void buildColony(TileVertex vertex) {
         if (vertex.getBuilding() == null) {
             Colony c = new Colony(this);
+            if (freeColony) {
+                freeColony = false;
+                freeRoad = true;
+                c.place(this, false, vertex);
+            }
             if (c.buyAndPlace(this, false, vertex)) {
                 System.out.println("Colony built");
             }
