@@ -3,6 +3,7 @@ package model;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import model.buildings.Building;
 import model.buildings.Colony;
@@ -24,6 +25,7 @@ public class Game implements StateMethods {
     private boolean resourcesGiven;
     private boolean start = true;
     private boolean backwards = false;
+    private boolean playingVoleur = false;
     private App app;
 
     public Game(App app) {
@@ -50,7 +52,7 @@ public class Game implements StateMethods {
 //        Point point2 = new Point((int) (93 / Resolution.divider()), (int) (93 / Resolution.divider()));
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
         thief = new Thief();
-        board = new GameBoard(layout, thief);
+        board = new GameBoard(layout, thief, this);
 
         stack = new CardStack();
     }
@@ -63,15 +65,34 @@ public class Game implements StateMethods {
         return thief;
     }
 
-    public void endTurn() {
+    public boolean canPass() {
         if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
-            //obligation de jouer les dés après les turn de setup
-            return;
+            return false;
         }
         if ((start || backwards)
             && (getCurrentPlayer().getFreeRoad() || getCurrentPlayer().getFreeColony())) {
-            //obligation de poser les trucs free
+            return false;
+        }
+        if (playingVoleur) {
+            return false;
+        }
+        return true;
+    }
+
+    public void endTurn() {
+        if (!canPass()) {
             return;
+        }
+
+        if (start || backwards) {
+            ArrayList<Colony> colony = getCurrentPlayer().getColony();
+            if (colony.size() >= 2) {
+                for (Colony c: colony) {
+                    for (Tile t : c.getVertex().getTiles()) {
+                        getCurrentPlayer().addResource(t.getResourceType(), 1);
+                    }
+                }
+            }
         }
 
         if (start && getCurrentPlayer().getName().equals("Player4")) {
@@ -97,6 +118,11 @@ public class Game implements StateMethods {
         }
     }
 
+    public boolean canDraw() {
+        int[] t = {0, 1, 1, 0, 1};
+        return getCurrentPlayer().hasEnough(t) && !start && !backwards;
+    }
+
     public ListPlayers getPlayers() {
         return players;
     }
@@ -114,6 +140,7 @@ public class Game implements StateMethods {
     }
 
     public void setThiefMode(boolean b) {
+        playingVoleur = b;
         board.setThiefMode(b);
     }
 
@@ -252,7 +279,6 @@ public class Game implements StateMethods {
     }
 
     public void buildRoadButtonAction() {
-        System.out.println(getCurrentPlayer().getFreeRoad());
         if ((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources()) && resourcesGiven)
             || getCurrentPlayer().getFreeRoad()) {
             if (board.isLookingForEdge()) {

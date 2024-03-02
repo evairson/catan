@@ -301,7 +301,7 @@ public class ActionPlayerPanel extends JPanel {
                 break;
             }
         }
-        game.getBoard().setThiefMode(true);
+        game.setThiefMode(true);
     }
 
     private void useMonopoly() {
@@ -360,6 +360,9 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void drawCard() {
+        if (!game.canDraw()) {
+            return;
+        }
         game.getCurrentPlayer().drawCard(game.getStack());
         if (cardPanel != null) {
             remove(cardPanel);

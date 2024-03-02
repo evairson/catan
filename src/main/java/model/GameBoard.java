@@ -40,14 +40,16 @@ public class GameBoard {
     private boolean placingColony = false;
     private boolean placingCity = false;
     private boolean waitingChoice = false;
+    private Game game;
 
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
 
     private Tile highlightedTile;
 
-    public GameBoard(Layout layout, Thief thief) {
+    public GameBoard(Layout layout, Thief thief, Game game) {
         this.thief = thief;
+        this.game = game;
         board = new HashMap<CubeCoordinates, Tile>();
         this.layout = layout;
         this.initialiseBoard();
@@ -514,6 +516,7 @@ public class GameBoard {
 
     public void changeThief() {
         thief.setTile(highlightedTile);
+        game.setThiefMode(false);
         thiefMode = false;
     }
 

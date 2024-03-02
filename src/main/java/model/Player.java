@@ -161,6 +161,26 @@ public class Player {
         return buildings;
     }
 
+    public ArrayList<Colony> getColony() {
+        ArrayList<Colony> array = new ArrayList<>();
+        for (Building b : getBuildings()) {
+            if (b instanceof Colony) {
+                array.add((Colony) b);
+            }
+        }
+        return array;
+    }
+
+    public ArrayList<Road> getRoads() {
+        ArrayList<Road> array = new ArrayList<>();
+        for (Building b : getBuildings()) {
+            if (b instanceof Road) {
+                array.add((Road) b);
+            }
+        }
+        return array;
+    }
+
     public HashMap<TileType, Integer> getResources() {
         return resources;
     }
