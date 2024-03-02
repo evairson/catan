@@ -12,10 +12,8 @@ import java.io.IOException;
 import model.App;
 import model.Game;
 import model.Player;
-import view.gamepanels.DeckPanel;
-import view.gamepanels.ResourcesPanel;
-import view.gamepanels.ShopPanel;
-import view.gamepanels.TradePanel;
+import others.ListPlayers;
+import view.gamepanels.*;
 import model.cards.DevelopmentCard;
 import model.cards.KnightCard;
 import model.cards.Monopoly;
@@ -29,25 +27,15 @@ import java.util.concurrent.*;
 
 public class ActionPlayerPanel extends JPanel {
     private ButtonImage endTurn;
-    private ButtonImage tradeButton;
-
-    private ButtonImage city;
-    private ButtonImage colony;
-    private ButtonImage road;
-
-    private ButtonImage plus;
-
-    private ButtonImage card;
-
     private JLabel namePlayer;
     private App app;
     private Game game;
     private ResourcesPanel resourcesPanel;
     private ShopPanel shopPanel;
+    private TradeButtonPanel tradeButtonPanel;
     private TradePanel tradePanel;
     private DeckPanel deckPanel;
     private Animation animate = new Animation();
-
     private JPanel cardsPanel;
     private JPanel cardPanel;
     private JPanel playersPanel;
@@ -68,7 +56,7 @@ public class ActionPlayerPanel extends JPanel {
             e.printStackTrace();
         }
         initializeRollingDicePanel();
-        initializeTradePanel();
+        initializeTradeButtonPanel();
         initializeResourcesPanel();
         initializeShopPanel(game);
         initializeDeckPanel();
@@ -163,6 +151,37 @@ public class ActionPlayerPanel extends JPanel {
         add(shopPanel);
     }
 
+    private void initializeTradePanel() {
+        showTradePanel();
+    }
+
+    private JFrame getMainFrame() {
+        Container current = this;
+        while (current.getParent() != null) {
+            current = current.getParent();
+            if (current instanceof JFrame) {
+                return (JFrame) current;
+            }
+        }
+        return null; // Si le JFrame n'est pas trouvé (ce qui ne devrait pas arriver)
+    }
+
+    private void showTradePanel() {
+        JFrame mainFrame = getMainFrame();
+        JLayeredPane layeredPane = mainFrame.getLayeredPane();
+        ListPlayers listPlayers = game.getPlayers();
+        TradePanel tradePanel = new TradePanel(listPlayers, resourcesPanel);
+        layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
+        tradePanel.setVisible(true);
+        setComponentsEnabled(false);
+    }
+
+    public void setComponentsEnabled(boolean enabled) {
+        for (Component comp : this.getComponents()) {
+            comp.setEnabled(enabled);
+        }
+    }
+
     private void initializeResourcesPanel() {
         int xCoord = Resolution.calculateResolution(180, 620)[0];
         int yCoord = Resolution.calculateResolution(180, 620)[1];
@@ -197,59 +216,27 @@ public class ActionPlayerPanel extends JPanel {
         resourcesPanel.setBounds(xCoord, yCoord, (int) (1040 / Resolution.divider()),
                 (int) (500 / Resolution.divider()));
         resourcesPanel.addMouseListener(animMouse);
+//        resourcesPanel.setBackground(Color.YELLOW);
+//        resourcesPanel.setOpaque(true);
         add(resourcesPanel);
     }
 
-    private void initializeTradePanel() {
+    private void initializeTradeButtonPanel() {
         int xCoord = Resolution.calculateResolution(50, 560)[0];
         int yCoord = Resolution.calculateResolution(50, 560)[1];
-        tradePanel = new TradePanel(this::trade);
-        tradePanel.setVisible(true);
-        tradePanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
+        tradeButtonPanel = new TradeButtonPanel(this::initializeTradePanel);
+        tradeButtonPanel.setVisible(true);
+        tradeButtonPanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
                 (int) (185 / Resolution.divider()));
-        add(tradePanel);
-        tradePanel.setOpaque(false);
+        add(tradeButtonPanel);
+        tradeButtonPanel.setOpaque(false);
     }
 
     private void createButton() {
         String basePath = "src/main/resources/";
         endTurn = new ButtonImage(basePath + "endTurn.png", basePath + "endTurn.png",
                 960, 600, 1.5, this::changeTurn, null);
-        tradeButton = new ButtonImage(basePath + "tradeButton.png", basePath + "tradeButton.png",
-                50, 560, 5, this::trade, null);
-
-        card = new ButtonImage(basePath + "card.png", basePath + "card.png",
-                770, 560, 3, null, null);
-
-        //
-        // city = new ButtonImage(basePath + "building/city.png", basePath +
-        // "building/city.png",
-        // 1150, 20, 2, cityRunnable, null);
-        //
-        //
-        // colony = new ButtonImage(basePath + "building/colony.png", basePath +
-        // "building/colony.png",
-        // 1150, 130, 2, colonyRunnable, null);
-        //
-        //
-        // road = new ButtonImage(basePath + "building/road.png", basePath +
-        // "building/road.png",
-        // 1150, 220, 2, roadRunnable, null);
-
-        /*
-         * plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
-         * 1160, 310, 8, null, null);
-         */
-
-        // add(city);
-        // add(colony);
-        // add(road);
-
-        // add(plus);
-
-        add(tradeButton);
         add(endTurn);
-        // add(card);
     }
 
     private void changeTurn() {
@@ -259,10 +246,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void trade() {
-        Container contentPane = this.app.getGameWindow().getContentPane();
-        CardLayout layout = this.app.getGameWindow().getLayout();
-        app.createTradePanel();
-        layout.show(contentPane, "tradePanel");
+
     }
 
     private void addCardsPanel() {
@@ -342,7 +326,7 @@ public class ActionPlayerPanel extends JPanel {
                 break;
             }
         }
-        game.getCurrentPlayer().setFreeRoad(true);
+        //game.getCurrentPlayer().setFreeRoad(true);
     }
 
     private void useYearOfPlenty() {

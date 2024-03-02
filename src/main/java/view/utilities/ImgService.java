@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -24,6 +25,23 @@ public class ImgService {
             System.out.println("Error" + e);
             return null;
         }
+    }
+
+    public static Image loadImage(String imagePath, double scale) throws IOException {
+
+        // Nouveau diviseur pour la résolution cible
+        double divider = scale * Resolution.divider();
+
+        // Charger l'image originale pour obtenir ses dimensions
+        Image originalImage = ImageIO.read(new File(imagePath));
+        int originalWidth = originalImage.getWidth(null);
+        int originalHeight = originalImage.getHeight(null);
+
+        // Calculer les dimensions de l'image après division
+        int scaledWidth = (int) (originalWidth / divider);
+        int scaledHeight = (int) (originalHeight / divider);
+
+        return originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
     }
 
     public static void updateImage(JLabel label, String imagePath, double scale) {
