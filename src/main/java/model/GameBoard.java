@@ -515,9 +515,41 @@ public class GameBoard {
         drawImagesInHexes(g);
         drawEdges(g);
         drawVertices(g);
+
+        int circleDiameter = 30; // Diamètre de base pour les cercles
+        Font baseFont = new Font("SansSerif", Font.BOLD, 14); // Police de base
+
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
-            drawText(g, entry.getValue().getDiceValue() + "", layout.cubeToPixel(layout, cubeCoord));
+            if (!thief.getTile().equals(entry.getValue())) {
+                Point pixel = layout.cubeToPixel(layout, cubeCoord);
+                int diceValue = entry.getValue().getDiceValue();
+                int circleRadius = circleDiameter / 2;
+
+                // Dessiner un cercle blanc
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(Color.WHITE);
+                g2d.fillOval((int) (pixel.getX() - circleRadius), (int) (pixel.getY() - circleRadius),
+                        circleDiameter, circleDiameter);
+
+                // Ajustez la taille du cercle et de la police en fonction de la valeur du dé
+                if (diceValue == 6 || diceValue == 8) {
+                    g2d.setColor(Color.red);
+                    baseFont = baseFont.deriveFont(Font.BOLD, 18f); // Augmentez la taille de la police
+                } else {
+                    g2d.setColor(Color.BLACK);
+                    baseFont = baseFont.deriveFont(Font.BOLD, 14f); // Taille de police de base
+                }
+
+                // Dessiner le numéro sur le cercle
+                String diceValueStr = String.valueOf(diceValue);
+                FontMetrics metrics = g.getFontMetrics(baseFont);
+                int xText = (int) (pixel.getX() - metrics.stringWidth(diceValueStr) / 2);
+                int yText = (int) (pixel.getY() - metrics.getHeight() / 2 + metrics.getAscent());
+
+                g2d.setFont(baseFont);
+                g2d.drawString(diceValueStr, xText, yText);
+            }
         }
     }
 
@@ -544,7 +576,7 @@ public class GameBoard {
     public void drawThief(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         Point p = layout.cubeToPixel(layout, thief.getTile().getCoordinates());
-        g2d.setColor(Color.white);
+        g2d.setColor(Color.black);
         g2d.fillOval((int) p.getX() - 10, (int) p.getY() - 10, 20, 20);
     }
 

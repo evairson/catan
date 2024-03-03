@@ -46,9 +46,7 @@ public class ActionPlayerPanel extends JPanel {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         this.app = app;
         game = app.getGame();
-
         setLayout(null);
-        setOpaque(true);
         try {
             createNamePlayer();
         } catch (IOException e) {
@@ -60,7 +58,7 @@ public class ActionPlayerPanel extends JPanel {
         initializeShopPanel(game);
         initializeDeckPanel();
         createButton();
-
+        setVisible(true);
     }
 
     public RollingDice getRollingDice() {
@@ -219,8 +217,6 @@ public class ActionPlayerPanel extends JPanel {
         resourcesPanel.setBounds(xCoord, yCoord, (int) (1040 / Resolution.divider()),
                 (int) (500 / Resolution.divider()));
         resourcesPanel.addMouseListener(animMouse);
-//        resourcesPanel.setBackground(Color.YELLOW);
-//        resourcesPanel.setOpaque(true);
         add(resourcesPanel);
     }
 
@@ -447,6 +443,7 @@ public class ActionPlayerPanel extends JPanel {
             }
             playersPanel.add(panel);
         }
+        playersPanel.setOpaque(false);
         add(playersPanel);
     }
 

@@ -128,9 +128,6 @@ public class App implements Runnable {
             }
 
             if (deltaF >= 1) {
-                mainMenu.repaint();
-                actionPlayer.repaint();
-                gamePanel.repaint();
                 gameWindow.repaint();
                 gameWindow.revalidate();
                 deltaF--;

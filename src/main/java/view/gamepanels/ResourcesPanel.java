@@ -58,11 +58,11 @@ public class ResourcesPanel extends JPanel {
         wool = new ButtonImage(basePath + "wool.png", basePath + "wool.png",
                 420, 30, 2, () -> game.resourceClicked(TileType.WOOL), animMouse); // 600
 
-        clayLabel = createResourceLabel(220, 133, clay.getWidth());
-        oreLabel = createResourceLabel(120, 133, ore.getWidth());
-        wheatLabel = createResourceLabel(320, 133, wheat.getWidth());
-        woodLabel = createResourceLabel(20, 133, wood.getWidth());
-        woolLabel = createResourceLabel(420, 133, wool.getWidth());
+        clayLabel = createResourceLabel(220, 140, clay.getWidth());
+        oreLabel = createResourceLabel(120, 140, ore.getWidth());
+        wheatLabel = createResourceLabel(320, 140, wheat.getWidth());
+        woodLabel = createResourceLabel(20, 140, wood.getWidth());
+        woolLabel = createResourceLabel(420, 140, wool.getWidth());
         add(clayLabel);
         add(oreLabel);
         add(wheatLabel);
