@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import model.buildings.*;
 import model.cards.VictoryPointCard;
@@ -37,6 +38,7 @@ public class Player {
     private int points;
     private boolean hasBiggestArmy;
     private boolean hasLongestRoute;
+    private int resourceCap;
     public Player(Color c, String name) {
         color = c;
         this.name = name;
@@ -52,6 +54,7 @@ public class Player {
         points = 0;
         hasBiggestArmy = false;
         hasLongestRoute = false;
+        resourceCap = 7;
     }
 
     public void printBuildings() {
@@ -96,6 +99,10 @@ public class Player {
 
     public String getName() {
         return name;
+    }
+
+    public int getResourceCap() {
+        return resourceCap;
     }
 
     public void setName(String name) {
@@ -186,6 +193,13 @@ public class Player {
     }
     public int getResource(TileType t) {
         return resources.get(t);
+    }
+    public int getResourcesSum() {
+        int acc = 0;
+        for (Integer i : resources.values()) {
+            acc += i;
+        }
+        return acc;
     }
     public ArrayList<DevelopmentCard> getCardsDev() {
         return cardsDev;
@@ -309,28 +323,17 @@ public class Player {
         }
         return true;
     }
-
-    /**
-     * This method adds the amounts of resources contained in the resourcesAmountsToAdd array.
-     * @param resourceAmountsToAdd The amounts of resources we add
-     */
-    public void addResourceAmount(int[] resourceAmountsToAdd) {
-        addResource(TileType.CLAY, resourceAmountsToAdd[0]);
-        addResource(TileType.ORE, resourceAmountsToAdd[1]);
-        addResource(TileType.WHEAT, resourceAmountsToAdd[2]);
-        addResource(TileType.WOOD, resourceAmountsToAdd[3]);
-        addResource(TileType.WOOL, resourceAmountsToAdd[4]);
-    }
-
-    /**
-     * This method removes the amount of resources contained in the resourcesAmountsToRemove array.
-     * @param resourceAmountsToRemove The amounts of resources we remove
-     */
-    public void removeResourceAmount(int[] resourceAmountsToRemove) {
-        addResource(TileType.CLAY, -resourceAmountsToRemove[0]);
-        addResource(TileType.ORE, -resourceAmountsToRemove[1]);
-        addResource(TileType.WHEAT, -resourceAmountsToRemove[2]);
-        addResource(TileType.WOOD, -resourceAmountsToRemove[3]);
-        addResource(TileType.WOOL, -resourceAmountsToRemove[4]);
+    public void removeOneRandom() {
+        if (getResourcesSum() > 0) {
+            Random rd = new Random();
+            TileType[] resTList = {TileType.CLAY, TileType.ORE, TileType.WHEAT, TileType.WOOD, TileType.WOOL};
+            while (true) {
+                int k = rd.nextInt(0, 5);
+                if (resources.get(resTList[k]) > 0) {
+                    addResource(resTList[k], -1);
+                    break;
+                }
+            }
+        }
     }
 }

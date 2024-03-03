@@ -31,7 +31,6 @@ public class Music {
             currentClip = playMusic(MUSIC_DIRECTORY + "/" + musicToPlay.get(i));
             i++;
         } catch (Exception e) {
-            return;
         }
     }
 
