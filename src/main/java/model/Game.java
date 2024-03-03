@@ -150,6 +150,7 @@ public class Game implements StateMethods {
     public void setThiefMode(boolean b) {
         playingVoleur = b;
         board.setThiefMode(b);
+        divideRessourcesByTwo();
     }
 
     public void draw(Graphics g) {
@@ -165,6 +166,18 @@ public class Game implements StateMethods {
     @Override
     public void update() {
         lootResources();
+    }
+
+    public void divideRessourcesByTwo() {
+        ListPlayers pChecks = (ListPlayers) players.clone();
+        pChecks.remove(getCurrentPlayer());
+        for (Player p : pChecks) {
+            if (p.getResourcesSum() > p.getResourceCap()) {
+                for (int i = 0; i < p.getResourcesSum() / 2; i++) {
+                    p.removeOneRandom();
+                }
+            }
+        }
     }
 
     public void lootResources() {
