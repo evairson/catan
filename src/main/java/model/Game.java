@@ -142,7 +142,7 @@ public class Game implements StateMethods, Serializable {
             networkBuildCity();
             System.out.println("Building city");
         } else if (board.isPlacingColony()) {
-            buildColony();
+            networkBuildColony();
             System.out.println("Building colony");
         } else if (board.isPlacingRoad()) {
             networkBuildRoad();
@@ -249,14 +249,42 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
-    public void buildColony() {
+    public void networkBuildColony() {
+        TileVertex cVertex = null;
         if (board.isLookingForVertex()) {
-            TileVertex cVertex = board.getClosestTileVertex();
-            getCurrentPlayer().buildColony(cVertex);
+            cVertex = board.getClosestTileVertex();
         }
-        // rajouter un if ça a marché (transformer Player.buildColony en boolean)
+        if (Main.hasServer()) {
+            if (cVertex != null) {
+                try {
+                    int id = playerClient.getId();
+                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildColony", id, cVertex);
+                    playerClient.getOut().writeUnshared(object);
+                    playerClient.getOut().flush();
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+            }
+        } else {
+            if (cVertex != null) {
+                buildColony(cVertex);
+            }
+        }
+        // rajouter un if ça a marché (transformer Player.buildCity en boolean)
         board.setLookingForVertex(false);
-        board.setPlacingColony(false);
+        board.setPlacingCity(false);
+
+    }
+
+    public void buildColony(TileVertex cVertex) {
+        TileVertex currentVertex = cVertex;
+        for (TileVertex vertex : board.getVerticesMap().values()) {
+            if (vertex.getId() == cVertex.getId()) {
+                System.out.println("yeah !");
+                currentVertex = vertex;
+            }
+        }
+        getCurrentPlayer().buildColony(currentVertex);
     }
 
     public void networkBuildRoad() {
@@ -288,10 +316,7 @@ public class Game implements StateMethods, Serializable {
     public void buildRoad(TileEdge cEdge) {
         TileEdge currentEdge = cEdge;
         for (TileEdge edge : board.getEdgeMap().values()) {
-            if (edge.getStart().getX() == cEdge.getStart().getX()
-                && edge.getStart().getY() == cEdge.getStart().getY()
-                && edge.getEnd().getX() == cEdge.getEnd().getX()
-                && edge.getEnd().getY() == cEdge.getEnd().getY()) {
+            if (edge.getId() == cEdge.getId()) {
                 System.out.println("yeah !");
                 currentEdge = edge;
             }
@@ -329,7 +354,10 @@ public class Game implements StateMethods, Serializable {
     public void buildCity(TileVertex cVertex) {
         TileVertex currentVertex = cVertex;
         for (TileVertex vertex : board.getVerticesMap().values()) {
-            // TODO :
+            if (vertex.getId() == cVertex.getId()) {
+                System.out.println("yeah !");
+                currentVertex = cVertex;
+            }
         }
         getCurrentPlayer().buildCity(cVertex);
     }

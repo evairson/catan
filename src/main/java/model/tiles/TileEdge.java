@@ -12,13 +12,30 @@ public class TileEdge implements Serializable {
     private Point end;
     private Set<Tile> tiles;
     private Building building;
+    private static int idClass;
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public static int getIdClass() {
+        return idClass;
+    }
+
+    public static void addIdClass() {
+        idClass++;
+    }
 
     // make a constructor for default
     public TileEdge() {
         start = new Point(0, 0);
         end = new Point(0, 0);
         tiles = new HashSet<>();
-
     }
 
     public TileEdge(Point start, Point end) {
@@ -56,5 +73,10 @@ public class TileEdge implements Serializable {
     public void setBuilding(Building building) {
         this.building = building;
         System.out.println("Building set for TileEdge");
+    }
+
+
+    public static void resetIdClass() {
+        idClass = 0;
     }
 }

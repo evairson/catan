@@ -66,7 +66,7 @@ public class PlayerClient extends Player {
                             if (networkObjet.getMessage().equals("buildColony")) {
                                 System.out.println("derchos");
                                 TileVertex cVertex = (TileVertex) networkObjet.getObject();
-                                //app.getGame().buildColony(cVertex);
+                                app.getGame().buildColony(cVertex);
                             }
                             if (networkObjet.getMessage().equals("buildRoad")) {
                                 System.out.println("derchos");

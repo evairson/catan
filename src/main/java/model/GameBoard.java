@@ -17,15 +17,16 @@ import java.awt.Color;
 import java.awt.BasicStroke;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GameBoard implements Serializable {
-    private HashMap<CubeCoordinates, Tile> board;
+    private LinkedHashMap<CubeCoordinates, Tile> board;
     private Layout layout;
     private int gridSize = 2;
-    private HashMap<Point, TileVertex> verticesMap;
-    private HashMap<Point, TileEdge> edgesMap;
+    private LinkedHashMap<Point, TileVertex> verticesMap;
+    private LinkedHashMap<Point, TileEdge> edgesMap;
     // sert à stocker les coordonnées du sommet le plus proche de la souris
     // peut aller dans une autre classe...
     private Point closestVertex = new Point(0, 0);
@@ -51,7 +52,7 @@ public class GameBoard implements Serializable {
 
     public GameBoard(Layout layout, Thief thief) {
         this.thief = thief;
-        board = new HashMap<CubeCoordinates, Tile>();
+        board = new LinkedHashMap<CubeCoordinates, Tile>();
         this.layout = layout;
         this.initialiseBoard();
         // rendre la centre et la taille de la grille dynamique
@@ -214,7 +215,7 @@ public class GameBoard implements Serializable {
     }
 
     private void initialiseVertices() {
-        verticesMap = new HashMap<>();
+        verticesMap = new LinkedHashMap<>();
 
         // Parcourir toutes les tuiles du plateau
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
@@ -240,6 +241,8 @@ public class GameBoard implements Serializable {
                     // Si le sommet n'est pas trouvé, créer un nouvel objet TileVertex pour ce
                     // sommet
                     TileVertex tileVertex = new TileVertex();
+                    tileVertex.setId(TileVertex.getIdClass());
+                    TileVertex.addIdClass();
                     // Ajouter la tuile actuelle à la liste des tuiles associées à ce sommet
                     tileVertex.addTile(tile);
                     // Mettre ce sommet dans la map avec comme valeur l'objet TileVertex
@@ -249,11 +252,11 @@ public class GameBoard implements Serializable {
                 }
             }
         }
-
     }
 
     private void initialiseEdges() {
-        edgesMap = new HashMap<>();
+        TileEdge.resetIdClass();
+        edgesMap = new LinkedHashMap<>();
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
             Tile tile = entry.getValue();
@@ -264,6 +267,8 @@ public class GameBoard implements Serializable {
                 start = new Point((Math.round(start.getX())), (Math.round(start.getY())));
                 end = new Point((Math.round(end.getX())), (Math.round(end.getY())));
                 TileEdge edge = new TileEdge(start, end);
+                edge.setId(TileEdge.getIdClass());
+                TileEdge.addIdClass();
                 Point edgeMidPoint = new Point((int) ((start.getX() + end.getX()) / 2),
                         (int) ((start.getY() + end.getY()) / 2));
                 edgesMap.put(edgeMidPoint, edge);
