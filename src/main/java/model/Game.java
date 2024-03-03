@@ -16,6 +16,7 @@ import model.tiles.TileVertex;
 import others.Constants;
 import others.ListPlayers;
 //import view.utilities.Resolution;
+import view.TileType;
 
 public class Game implements StateMethods {
     private static GameBoard board;
@@ -28,6 +29,8 @@ public class Game implements StateMethods {
     private boolean playingVoleur = false;
     private App app;
     private boolean blankTurn = false;
+    private boolean monoWaiting = false;
+    private int yearOfPlentyWaiting = 0;
 
     public Game(App app) {
         this.app = app;
@@ -70,6 +73,34 @@ public class Game implements StateMethods {
         return blankTurn;
     }
 
+    public void setMonoWaiting(boolean b) {
+        monoWaiting = b;
+    }
+
+    public void resourceClicked(TileType t) {
+        if (monoWaiting) {
+            monopolyPlay(t);
+            return;
+        }
+        if (yearOfPlentyWaiting > 0) {
+            getCurrentPlayer().addResource(t, 1);
+            yearOfPlentyWaiting--;
+        }
+    }
+
+    public void monopolyPlay(TileType t) {
+        monoWaiting = false;
+        int amount = 0;
+        for (Player p: players) {
+            if (p != getCurrentPlayer()) {
+                amount += p.getResource(t);
+                p.addResource(t, -p.getResource(t));
+            }
+        }
+        getCurrentPlayer().addResource(t, amount);
+        System.out.println("monopoly de " + amount + " " + t);
+    }
+
     public boolean canPass() {
         if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
             return false;
@@ -79,6 +110,9 @@ public class Game implements StateMethods {
             return false;
         }
         if (playingVoleur) {
+            return false;
+        }
+        if (app.getActionPlayerPanel().getCardPlayed()) {
             return false;
         }
         return true;
@@ -124,7 +158,7 @@ public class Game implements StateMethods {
     }
 
     public boolean canDraw() {
-        if (blankTurn) {
+        if (blankTurn || !resourcesGiven) {
             return false;
         }
         int[] t = {0, 1, 1, 0, 1};

@@ -40,7 +40,6 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel cardPanel;
     private JPanel playersPanel;
     private RollingDice dice;
-
     private boolean cardPlayed = false;
 
     public ActionPlayerPanel(App app) {
@@ -66,6 +65,10 @@ public class ActionPlayerPanel extends JPanel {
 
     public RollingDice getRollingDice() {
         return dice;
+    }
+
+    public boolean getCardPlayed() {
+        return cardPlayed;
     }
 
     private void initializeRollingDicePanel() {
@@ -265,14 +268,7 @@ public class ActionPlayerPanel extends JPanel {
             String stringCard = cardImageUrl(card);
             System.out.println(card.getClass().getSimpleName());
             ButtonImage b = new ButtonImage(basePath + stringCard, basePath + stringCard,
-                    300 + i * 100, 250, 1.5,
-                switch (card.getClass().getSimpleName()) {
-                    case "KnightCard": yield (this::useKnight);
-                    case "Monopoly": yield (this::useMonopoly);
-                    case "YearOfPlenty": yield (this::useYearOfPlenty);
-                    case "RoadBuilding": yield (this::useRoadBuilding);
-                    default: yield null;
-                }, null);
+                    300 + i * 100, 250, 1.5, () -> useCard(card.getClass().getSimpleName()), null);
             cardsPanel.add(b);
         }
         cardsPanel.addMouseListener(new MouseAdapter() {
@@ -317,6 +313,7 @@ public class ActionPlayerPanel extends JPanel {
                 break;
             }
         }
+        game.setMonoWaiting(true);
     }
 
     private void useRoadBuilding() {
@@ -329,7 +326,7 @@ public class ActionPlayerPanel extends JPanel {
                 break;
             }
         }
-        //game.getCurrentPlayer().setFreeRoad(true);
+        game.getCurrentPlayer().setFreeRoad(true);
     }
 
     private void useYearOfPlenty() {
@@ -344,8 +341,14 @@ public class ActionPlayerPanel extends JPanel {
         }
     }
 
-    private void useCard() {
-        //
+    private void useCard(String s) {
+        switch (s) {
+            case "KnightCard": useKnight(); break;
+            case "Monopoly": useMonopoly(); break;
+            case "YearOfPlenty": useYearOfPlenty(); break;
+            case "RoadBuilding": useRoadBuilding();
+            default:
+        }
     }
 
     private String cardImageUrl(DevelopmentCard card) {
@@ -378,7 +381,7 @@ public class ActionPlayerPanel extends JPanel {
         int last = devCards.size();
         String card = cardImageUrl(devCards.get(last - 1));
         ButtonImage b = new ButtonImage(basePath + card, basePath + card,
-                600, 250, 1.5, this::useCard, null);
+                600, 250, 1.5, () -> { }, null);
         cardPanel.add(b);
         JPanel self = this;
         cardPanel.addMouseListener(new MouseAdapter() {
