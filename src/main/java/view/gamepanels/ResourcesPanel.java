@@ -92,6 +92,7 @@ public class ResourcesPanel extends JPanel {
         wheatLabel.setText(String.valueOf(wheatAmount));
         woodLabel.setText(String.valueOf(woodAmount));
         woolLabel.setText(String.valueOf(woolAmount));
+        repaint();
     }
     public void updateResourceLabels(Player p) {
         updateResourceLabels(p.getResources().get(TileType.CLAY),
@@ -99,5 +100,6 @@ public class ResourcesPanel extends JPanel {
                 p.getResources().get(TileType.WHEAT),
                 p.getResources().get(TileType.WOOD),
                 p.getResources().get(TileType.WOOL));
+        repaint();
     }
 }

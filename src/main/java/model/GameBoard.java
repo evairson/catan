@@ -50,6 +50,7 @@ public class GameBoard {
     private boolean placingCity = false;
     private boolean waitingChoice = false;
     private Game game;
+    private App app;
 
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
@@ -99,6 +100,9 @@ public class GameBoard {
         return loadedImages.get(color + "_" + type);
     }
 
+    public void setApp(App app) {
+        this.app = app;
+    }
 
     public void setThiefMode(boolean b) {
         thiefMode = b;
@@ -601,7 +605,7 @@ public class GameBoard {
                 }
             }
         }
-
+        app.getGamePanel().repaint();
     }
 
     public void changeThief() {

@@ -112,6 +112,7 @@ public class RollingDice extends JPanel {
                 if (player.getDice() == 7) {
                     game.setThiefMode(true);
                 }
+                game.update();
             } catch (InterruptedException e) {
                 System.out.println("Threading Error in class RollingDice " + e);
             }

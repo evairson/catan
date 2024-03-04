@@ -9,22 +9,26 @@ import view.*;
 import view.menu.MainMenu;
 
 import java.awt.*;
+import javax.swing.*;
 
-public class App implements Runnable {
+public class App {
     private GamePanel gamePanel;
     private ActionPlayerPanel actionPlayer;
     private EndPanel endPanel;
     private GameWindow gameWindow;
     private Thread gameThread;
-    private static GameBoard board;
+    private GameBoard board;
     private Game game;
     private MainMenu mainMenu;
     private boolean playing;
-    public static GameBoard getBoard() {
+    private BackgroundPanel background;
+
+    public GameBoard getBoard() {
         return board;
     }
-    public static void setBoard(GameBoard board) {
-        App.board = board;
+    public void setBoard(GameBoard board) {
+        this.board = board;
+        board.setApp(this);
     }
 
     public App() {
@@ -34,11 +38,11 @@ public class App implements Runnable {
     }
     public void createNewGame() {
         this.game = new Game(this);
+        this.background = new BackgroundPanel();
         this.actionPlayer = new ActionPlayerPanel(this);
         this.gamePanel = new GamePanel(this);
-        this.gameWindow.addPanels(this.actionPlayer, this.gamePanel);
+        this.gameWindow.addPanels(this.actionPlayer, this.gamePanel, background);
         actionPlayer.update();
-        startGameLoop();
     }
 
     public Game getGame() {
@@ -62,18 +66,15 @@ public class App implements Runnable {
         this.playing = playing;
     }
 
-    public void startGameLoop() {
-        gameThread = new Thread(this);
-        gameThread.start();
-    }
-    private void stopGameLoop() {
-        gameThread.interrupt();
-    }
-
     public void addPanels() {
-        actionPlayer.add(gamePanel);
+        JPanel panelGame = new JPanel();
+        panelGame.setLayout(null);
+        panelGame.setBounds(0, 0, Constants.Game.BASE_WIDTH, Constants.Game.BASE_HEIGHT);
+        panelGame.add(actionPlayer, 0);
+        panelGame.add(gamePanel, 1);
+        panelGame.add(background, 2);
         gameWindow.getContentPane().add(mainMenu, "mainMenu");
-        gameWindow.getContentPane().add(actionPlayer, "actionPlayerPanel");
+        gameWindow.getContentPane().add(panelGame, "actionPlayerPanel");
     }
 
     public void update() {
@@ -87,7 +88,6 @@ public class App implements Runnable {
         if (game.getCurrentPlayer().hasWon()) {
             endPanel = new EndPanel(this, true, game.getCurrentPlayer());
             gameWindow.getContentPane().add(endPanel, "endPanel");
-            stopGameLoop();
             endPanel.updatePanel();
             Container contentPane = getGameWindow().getContentPane();
             CardLayout layout = getGameWindow().getLayout();
@@ -100,47 +100,4 @@ public class App implements Runnable {
         game.draw(g);
     }
 
-    @Override
-    public final void run() {
-
-        long previousTime = System.nanoTime();
-
-        int frames = 0;
-        int updates = 0;
-        long lastCheck = System.currentTimeMillis();
-
-        double deltaU = 0;
-        double deltaF = 0;
-
-        while (true) {
-            double timePerFrame = Constants.Number.DOUBLE_BILLION / Constants.Game.FPS_SET;
-            double timePerUpdate = Constants.Number.DOUBLE_BILLION / Constants.Game.UPS_SET;
-            long currentTime = System.nanoTime();
-
-            deltaU += (currentTime - previousTime) / timePerUpdate;
-            deltaF += (currentTime - previousTime) / timePerFrame;
-            previousTime = currentTime;
-
-            if (deltaU >= 1) {
-                update();
-                updates++;
-                deltaU--;
-            }
-
-            if (deltaF >= 1) {
-                gameWindow.repaint();
-                gameWindow.revalidate();
-                deltaF--;
-                frames++;
-            }
-
-            if (System.currentTimeMillis() - lastCheck >= Constants.Number.SECOND) {
-                lastCheck = System.currentTimeMillis();
-                // System.out.println("FPS :" + frames + " | Ups " + updates);
-                updates = 0;
-                frames = 0;
-            }
-
-        }
-    }
 }

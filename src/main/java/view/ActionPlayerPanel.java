@@ -52,11 +52,13 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        setOpaque(false);
         initializeRollingDicePanel();
         initializeTradeButtonPanel();
         initializeResourcesPanel();
         initializeShopPanel(game);
         initializeDeckPanel();
+        createPlayerPanel();
         createButton();
         setVisible(true);
     }
@@ -175,6 +177,7 @@ public class ActionPlayerPanel extends JPanel {
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);
         setComponentsEnabled(false);
+        repaint();
     }
 
     public void setComponentsEnabled(boolean enabled) {
@@ -275,15 +278,14 @@ public class ActionPlayerPanel extends JPanel {
         });
         cardsPanel.setOpaque(false);
         add(cardsPanel, 0);
-        repaint();
         revalidate();
+        repaint();
     }
 
     public void removeCardsPanel() {
         this.remove(cardsPanel);
         cardsPanel = null;
         repaint();
-        revalidate();
     }
 
     private void useKnight() {
@@ -386,14 +388,14 @@ public class ActionPlayerPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 self.remove(cardPanel);
                 cardPanel = null;
-                repaint();
                 revalidate();
+                repaint();
             }
         });
         cardPanel.setOpaque(false);
         add(cardPanel, 0);
-        repaint();
         revalidate();
+        repaint();
     }
 
     private void createNamePlayer() throws IOException {
@@ -458,6 +460,7 @@ public class ActionPlayerPanel extends JPanel {
             Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
             String textUnderligne = player ? "<html><u>" + text + "</u></html>" : " " + text;
             ((JLabel) playersPanel.getComponents()[i]).setText(textUnderligne);
+            playersPanel.repaint();
         }
         try {
             String src = "src/main/resources/pion/pion";
@@ -468,7 +471,6 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        revalidate();
         repaint();
     }
 
