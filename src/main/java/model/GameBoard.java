@@ -57,6 +57,8 @@ public class GameBoard {
     private Tile highlightedTile;
     private Map<String, BufferedImage> loadedImages;
 
+    private Map<Integer, BufferedImage> diceValueImages = new HashMap<>();
+
     private BufferedImage boardImage = new BufferedImage(Constants.Game.WIDTH,
             Constants.Game.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 
@@ -64,6 +66,8 @@ public class GameBoard {
             (int) (30 / Constants.Game.DIVIDER));
     private static Font highlightedFont = new Font("SansSerif",
             Font.BOLD, (int) (35 / Constants.Game.DIVIDER));
+
+    private Map<Building, Image> scaledBuildingImages = new HashMap<>();
 
     public GameBoard(Layout layout, Thief thief, Game game) {
         loadImages();
@@ -329,6 +333,7 @@ public class GameBoard {
         initialiseVertices();
         initialiseEdges();
         initialiseBoardImage();
+        initDiceValueImages();
     }
 
     public void initialiseBoardImage() {
@@ -365,6 +370,40 @@ public class GameBoard {
         }
 
         g2dBoard.dispose();
+    }
+
+    private void initDiceValueImages() {
+        int[] diceValues = {2, 3, 4, 5, 6, 8, 9, 10, 11, 12}; // Les valeurs possibles des dés
+        int circleDiameter = (int) (60 / Constants.Game.DIVIDER); // Diamètre de base pour les cercles
+
+        for (int value : diceValues) {
+            BufferedImage image = new BufferedImage(circleDiameter, circleDiameter,
+                    BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = image.createGraphics();
+
+            // Appliquer l'antialiasing pour un rendu plus lisse
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // Dessiner le cercle
+            g2d.fillOval(0, 0, circleDiameter, circleDiameter);
+
+            // Choix de la couleur et de la police en fonction de la valeur
+            if (value == 6 || value == 8) {
+                g2d.setColor(Color.RED);
+            } else {
+                g2d.setColor(Color.BLACK);
+            }
+
+            // Dessiner la valeur du dé
+            String diceValueStr = String.valueOf(value);
+            FontMetrics metrics = g2d.getFontMetrics();
+            int xText = (circleDiameter - metrics.stringWidth(diceValueStr)) / 2;
+            int yText = ((circleDiameter - metrics.getHeight()) / 2) + metrics.getAscent();
+            g2d.drawString(diceValueStr, xText, yText);
+
+            g2d.dispose(); // Libérer les ressources du Graphics2D
+            diceValueImages.put(value, image);
+        }
     }
 
     private TileType getTileType(int resourceType) {
@@ -459,21 +498,19 @@ public class GameBoard {
         return false;
     }
     private void drawBuildingImage(Graphics2D g2d, Building building, Point vertex) {
-        BufferedImage img = getImageForBuilding(building);
         boolean isCity = buildingIsCity(building);
-        int size = (isCity ? 90 : 60);
+        if (scaledBuildingImages.get(building) == null) {
+            BufferedImage img = getImageForBuilding(building);
+            int size = (isCity ? 90 : 60);
+            scaledBuildingImages.put(building, img.getScaledInstance((int) (size / Resolution.divider()),
+                (int) (size / Resolution.divider()), Image.SCALE_SMOOTH));
+        }
         int placement = (isCity ? 40 : 30);
-        Image scaledImage = img.getScaledInstance((int) (size / Resolution.divider()),
-                (int) (size / Resolution.divider()), Image.SCALE_SMOOTH);
-        g2d.drawImage(scaledImage, (int) vertex.getX() - (int) (placement / Resolution.divider()),
+
+        g2d.drawImage(scaledBuildingImages.get(building),
+                (int) vertex.getX() - (int) (placement / Resolution.divider()),
                 (int) vertex.getY() - (int) (placement / Resolution.divider()), null);
     }
-
-    private void drawVertexCircle(Graphics2D g2d, Point vertex) {
-        g2d.setColor(Color.BLACK);
-        g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
-    }
-
 
     private void drawVertices(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -541,36 +578,18 @@ public class GameBoard {
         drawEdges(g);
         drawVertices(g);
 
-        int circleDiameter = 30; // Diamètre de base pour les cercles
-
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
             if (!thief.getTile().equals(entry.getValue())) {
                 Point pixel = layout.cubeToPixel(layout, cubeCoord);
                 int diceValue = entry.getValue().getDiceValue();
-                int circleRadius = circleDiameter / 2;
 
-                // Dessiner un cercle blanc
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setColor(Color.WHITE);
-                g2d.fillOval((int) (pixel.getX() - circleRadius), (int) (pixel.getY() - circleRadius),
-                        circleDiameter, circleDiameter);
-
-                // Ajustez la taille du cercle et de la police en fonction de la valeur du dé
-                if (diceValue == 6 || diceValue == 8) {
-                    g2d.setColor(Color.RED);
-                } else {
-                    g2d.setColor(Color.BLACK);
+                BufferedImage image = diceValueImages.get(diceValue);
+                if (image != null) {
+                    int x = (int) pixel.getX() - (image.getWidth() / 2);
+                    int y = (int) pixel.getY() - (image.getHeight() / 2);
+                    g.drawImage(image, x, y, null);
                 }
-
-                // Dessiner le numéro sur le cercle
-                String diceValueStr = String.valueOf(diceValue);
-                FontMetrics metrics = g.getFontMetrics(baseFont);
-                int xText = (int) (pixel.getX() - metrics.stringWidth(diceValueStr) / 2);
-                int yText = (int) (pixel.getY() - metrics.getHeight() / 2 + metrics.getAscent());
-
-                g2d.setFont(baseFont);
-                g2d.drawString(diceValueStr, xText, yText);
             }
         }
     }
