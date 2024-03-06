@@ -178,11 +178,6 @@ public class GameBoard {
                 }
             }
         }
-        for (TileVertex v : neighbours) {
-            if (v != null) {
-                System.out.println("Neighbour: " + v.getCoordinates());
-            }
-        }
         return neighbours;
     }
 
@@ -225,22 +220,28 @@ public class GameBoard {
     }
 
     public TileEdge[] getNeighbourTileEdgesToEdge(TileEdge edge) {
+        
         TileEdge[] neighbours = new TileEdge[4];
+
+
         int i = 0;
         for (TileEdge e : edgesMap.values()) {
             if (checkIfNeighbourInArray(neighbours, e)) {
                 continue;
             }
-            if (e.getStart().equals(edge.getStart()) && !e.getEnd().equals(edge.getEnd())) {
+            if ((e.getStart().equals(edge.getStart()) && !e.getEnd().equals(edge.getEnd())) ||
+                (e.getEnd().equals(edge.getStart()) && !e.getStart().equals(edge.getEnd()))) {
                 neighbours[i] = e;
                 i++;
             }
-            if (e.getEnd().equals(edge.getEnd()) && !e.getStart().equals(edge.getStart())) {
+            if ((e.getStart().equals(edge.getEnd()) && !e.getEnd().equals(edge.getStart())) ||
+                (e.getEnd().equals(edge.getEnd()) && !e.getStart().equals(edge.getStart()))) {
                 neighbours[i] = e;
                 i++;
             }
         }
         return neighbours;
+
     }
 
     public boolean isVertexTwoRoadsAwayFromCities(TileVertex vertex) {
@@ -259,7 +260,6 @@ public class GameBoard {
         for (TileVertex v : neighbours) {
             if(v != null){
                 if (v.getBuilding() != null) {
-                    System.out.println("Neighbour building owner: " + v.getBuilding().getOwner().getName() + " Player: " + player.getName());
                     if (v.getBuilding().getOwner() == player) {
                         return true;
                     }
@@ -304,7 +304,6 @@ public class GameBoard {
         if (isRoadNextToRoad(edge,player)) {
             return true;
         }
-        System.out.println("Road not next to road");
         return false;
     }
 
@@ -423,9 +422,23 @@ public class GameBoard {
                 TileEdge edge = new TileEdge(start, end);
                 Point edgeMidPoint = new Point((int) ((start.getX() + end.getX()) / 2),
                         (int) ((start.getY() + end.getY()) / 2));
+                if (edgesMapContainsEdge(edge)) {
+                    continue;
+                }
                 edgesMap.put(edgeMidPoint, edge);
             }
         }
+    }
+
+    public boolean edgesMapContainsEdge(TileEdge edge) {
+        for (TileEdge e : edgesMap.values()) {
+            if (e.getStart().equals(edge.getStart()) && e.getEnd().equals(edge.getEnd())) {
+                return true;
+            }else if(e.getStart().equals(edge.getEnd()) && e.getEnd().equals(edge.getStart())){
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean arePointsEqual(Point p1, Point p2) {

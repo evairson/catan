@@ -61,7 +61,6 @@ public class Game implements StateMethods {
 
     public void endTurn() {
         players.next();
-        System.out.println("It's " + getCurrentPlayer() .getName() + "'s turn");
         resourcesGiven = false;
     }
 
@@ -107,11 +106,9 @@ public class Game implements StateMethods {
                                 if (colony.getIsCity()) {
                                     Integer number = player.getResources().get(tile.getResourceType());
                                     player.getResources().replace(tile.getResourceType(), number + 2);
-                                    System.out.println("2 " + tile.getResourceType() + player.getName());
                                 } else {
                                     Integer number = player.getResources().get(tile.getResourceType());
                                     player.getResources().replace(tile.getResourceType(), number + 1);
-                                    System.out.println("1 " + tile.getResourceType() + player.getName());
                                 }
                             }
                         }
@@ -137,8 +134,6 @@ public class Game implements StateMethods {
         } else if (board.getThiefMode()) {
             board.changeThief(e);
         }
-
-        getCurrentPlayer().printResources();
     }
 
     @Override
