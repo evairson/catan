@@ -235,7 +235,7 @@ public class Game implements StateMethods {
             TileVertex cVertex = board.getClosestTileVertex();
             if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                 getCurrentPlayer().buildColony(cVertex);
-            }   
+            }
         }
         // rajouter un if ça a marché (transformer Player.buildColony en boolean)
         board.setLookingForVertex(false);
@@ -245,7 +245,7 @@ public class Game implements StateMethods {
     public void buildRoad() {
         if (board.isLookingForEdge()) {
             TileEdge cEdge = board.getClosestTileEdge();
-            if(board.canPlaceRoad(cEdge, getCurrentPlayer())) {
+            if (board.canPlaceRoad(cEdge, getCurrentPlayer())) {
                 getCurrentPlayer().buildRoad(cEdge);
             }
         }
