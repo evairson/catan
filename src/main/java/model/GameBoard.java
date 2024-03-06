@@ -282,6 +282,20 @@ public class GameBoard {
         }
         return false;
     }
+
+    public boolean isVertexNextToRoad(TileVertex vertex, Player player) {
+        TileEdge[] neighbours = getNeighbourTileEdgesToVertex(vertex);
+        for (TileEdge e : neighbours) {
+            if(e != null){
+                if (e.getBuilding() != null) {
+                    if (e.getBuilding().getOwner() == player) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     
 
     public boolean canPlaceColony(TileVertex vertex, Player player) {
@@ -291,6 +305,9 @@ public class GameBoard {
         if(!isVertexTwoRoadsAwayFromCities(vertex)){
             return false;
         }
+        // if(!isVertexNextToRoad(vertex, player)){
+        //     return false;
+        // }
         return true;
     }
 
