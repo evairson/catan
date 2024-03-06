@@ -211,7 +211,6 @@ public class Player {
                 if (c.buyAndPlace(this, true, vertex)) {
                     points++;
                 }
-                
             }
         }
     }
