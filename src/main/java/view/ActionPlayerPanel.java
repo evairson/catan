@@ -38,7 +38,7 @@ public class ActionPlayerPanel extends JPanel {
     private Animation animate = new Animation();
     private JPanel cardsPanel;
     private JPanel cardPanel;
-    private JPanel playersPanel;
+    private PlayersPanel playersPanel;
     private RollingDice dice;
     private boolean cardPlayed = false;
 
@@ -190,7 +190,6 @@ public class ActionPlayerPanel extends JPanel {
         int xCoord = Resolution.calculateResolution(180, 620)[0];
         int yCoord = Resolution.calculateResolution(180, 620)[1];
         resourcesPanel = new ResourcesPanel(game);
-        createPlayerPanel();
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
 
@@ -245,10 +244,6 @@ public class ActionPlayerPanel extends JPanel {
         game.endTurn();
         cardPlayed = false;
         update();
-    }
-
-    private void trade() {
-
     }
 
     private void addCardsPanel() {
@@ -417,35 +412,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void createPlayerPanel() {
-        playersPanel = new JPanel();
-        playersPanel.setLayout(null);
-        int x = Resolution.calculateResolution(30, 10)[0];
-        int y = Resolution.calculateResolution(30, 10)[1];
-        playersPanel.setBounds(x, y, (int) (2000 / Resolution.divider()), (int) (100 / Resolution.divider()));
-        for (int i = 0; i < game.getPlayers().size(); i++) {
-            JLabel panel = new JLabel();
-            try {
-                String src = "src/main/resources/pion/pion";
-                String imagePath = src + game.getPlayers().get(i).getColorString() + ".png";
-                Image origiImg = ImageIO.read(new File(imagePath));
-                int scale = (int) (40 / Resolution.divider());
-                Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
-                String text = game.getPlayers().get(i).getName().toUpperCase();
-                Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
-                String textUnderligne = player ? "<html><u> " + text + "</u></html>" : " " + text;
-                panel = new JLabel(textUnderligne, new ImageIcon(buttonImage), JLabel.CENTER);
-                panel.setVerticalTextPosition(JLabel.CENTER);
-                panel.setHorizontalTextPosition(JLabel.RIGHT);
-                panel.setFont(new Font("SansSerif", Font.BOLD, scale));
-                double x1 = Resolution.calculateResolution(i * 200, 20)[0];
-                double y1 = Resolution.calculateResolution(i * 200, 20)[1];
-                panel.setBounds((int) x1, (int) y1, (int) (scale * 10), (int) (scale * 1.2));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            playersPanel.add(panel);
-        }
-        playersPanel.setOpaque(false);
+        playersPanel = new PlayersPanel(game);
         add(playersPanel);
     }
 
@@ -454,14 +421,8 @@ public class ActionPlayerPanel extends JPanel {
         //dice.newPlayer(currentPlayer);
         resourcesPanel.updateResourceLabels(currentPlayer);
 
+
         namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
-        for (int i = 0; i < game.getPlayers().size(); i++) {
-            String text = game.getPlayers().get(i).getName().toUpperCase();
-            Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
-            String textUnderligne = player ? "<html><u>" + text + "</u></html>" : " " + text;
-            ((JLabel) playersPanel.getComponents()[i]).setText(textUnderligne);
-            playersPanel.repaint();
-        }
         try {
             String src = "src/main/resources/pion/pion";
             String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
@@ -471,6 +432,9 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        playersPanel.update(game);
+
         repaint();
     }
 
