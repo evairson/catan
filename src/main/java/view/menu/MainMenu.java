@@ -52,11 +52,15 @@ public class MainMenu extends JPanel {
 
     public void startapp() {
         System.out.println("Lancement du jeu...");
-        app.createNewGame();
         Container parent = getParent();
+        app.createNewGame();
         CardLayout parentLayout = (CardLayout) parent.getLayout();
         app.addPanels();
+        app.setPlaying(true);
         parentLayout.show(parent, "actionPlayerPanel");
+        app.getActionPlayerPanel().revalidate();
+        app.getActionPlayerPanel().repaint();
+        app.update();
     }
 
     public void startOptions() {

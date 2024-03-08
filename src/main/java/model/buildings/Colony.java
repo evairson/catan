@@ -58,14 +58,21 @@ public class Colony extends Building {
     }
 
     public boolean buyAndPlace(Player player, boolean isCity, TileVertex vertex) {
-        if (super.buy(player, getCost(isCity))) {
-            Colony colony = new Colony(player, isCity, false, vertex);
-            player.getBuildings().remove(vertex.getBuilding());
-            vertex.setBuilding(colony);
-            // faudrait check si c'est un port aussi là
-            player.getBuildings().add(colony);
+        if (buy(player, isCity)) {
+            place(player, isCity, vertex);
             return true;
         }
         return false;
+    }
+
+    public boolean buy(Player player, boolean isCity) {
+        return super.buy(player, getCost(isCity));
+    }
+
+    public void place(Player player, boolean isCity, TileVertex vertex) {
+        Colony colony = new Colony(player, isCity, false, vertex);
+        player.getBuildings().remove(vertex.getBuilding());
+        vertex.setBuilding(colony);
+        player.getBuildings().add(colony);
     }
 }
