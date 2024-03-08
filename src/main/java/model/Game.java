@@ -35,10 +35,10 @@ public class Game implements StateMethods {
     public Game(App app) {
         this.app = app;
         resourcesGiven = false;
-        Player player1 = new Player(Player.Color.RED, "Player1");
-        Player player2 = new Player(Player.Color.YELLOW, "Player2");
-        Player player3 = new Player(Player.Color.BLUE, "Player3");
-        Player player4 = new Player(Player.Color.GREEN, "Player4");
+        Player player1 = new Player(Player.Color.RED, "Player1", app);
+        Player player2 = new Player(Player.Color.YELLOW, "Player2", app);
+        Player player3 = new Player(Player.Color.BLUE, "Player3", app);
+        Player player4 = new Player(Player.Color.GREEN, "Player4", app);
         players = new ListPlayers(0, player1, player2, player3, player4);
         player1.setFreeColony(true);
         double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
@@ -57,8 +57,12 @@ public class Game implements StateMethods {
         Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
         thief = new Thief();
         board = new GameBoard(layout, thief, this);
-
+        app.setBoard(board);
         stack = new CardStack();
+    }
+
+    public App getApp() {
+        return app;
     }
 
     public CardStack getStack() {
@@ -238,6 +242,7 @@ public class Game implements StateMethods {
             }
             resourcesGiven = true;
         }
+        app.getActionPlayerPanel().update();
     }
 
     @Override
@@ -254,6 +259,7 @@ public class Game implements StateMethods {
             buildRoad();
         } else if (board.getThiefMode()) {
             board.changeThief();
+            board.setThiefModeEnd(true);
         }
 
         getCurrentPlayer().printResources();

@@ -9,7 +9,6 @@ import model.tiles.*;
 import others.Constants;
 import view.TileImageLoader;
 import view.TileType;
-import model.geometry.CubeCoordinates;
 import view.utilities.Resolution;
 //import view.utilities.Resolution;
 
@@ -50,12 +49,27 @@ public class GameBoard {
     private boolean placingCity = false;
     private boolean waitingChoice = false;
     private Game game;
+    private App app;
+
+    private boolean thiefModeEnd;
 
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
 
     private Tile highlightedTile;
     private Map<String, BufferedImage> loadedImages;
+
+    private Map<Integer, BufferedImage> diceValueImages = new HashMap<>();
+
+    private BufferedImage boardImage = new BufferedImage(Constants.Game.WIDTH,
+            Constants.Game.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+
+    private static Font baseFont = new Font("SansSerif", Font.BOLD,
+            (int) (30 / Constants.Game.DIVIDER));
+    private static Font highlightedFont = new Font("SansSerif",
+            Font.BOLD, (int) (35 / Constants.Game.DIVIDER));
+
+    private Map<Building, Image> scaledBuildingImages = new HashMap<>();
 
     public GameBoard(Layout layout, Thief thief, Game game) {
         loadImages();
@@ -65,6 +79,11 @@ public class GameBoard {
         this.layout = layout;
         this.initialiseBoard();
     }
+
+    public void setThiefModeEnd(boolean b) {
+        thiefModeEnd = b;
+    }
+
     private void loadImages() {
         loadedImages = new HashMap<>();
 
@@ -99,6 +118,9 @@ public class GameBoard {
         return loadedImages.get(color + "_" + type);
     }
 
+    public void setApp(App app) {
+        this.app = app;
+    }
 
     public void setThiefMode(boolean b) {
         thiefMode = b;
@@ -317,6 +339,77 @@ public class GameBoard {
         }
         initialiseVertices();
         initialiseEdges();
+        initialiseBoardImage();
+        initDiceValueImages();
+    }
+
+    public void initialiseBoardImage() {
+        Graphics2D g2dBoard = boardImage.createGraphics();
+        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
+        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
+
+        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
+            Tile tile = entry.getValue();
+            Polygon hexagon = new Polygon();
+            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
+
+            for (Point vertex : hexagonVertices) {
+                hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
+            }
+            Rectangle bounds = hexagon.getBounds();
+            BufferedImage img;
+            if (thiefMode && highlightedTile == tile) {
+                img = tileImagesS.get(tile.getResourceType());
+            } else {
+                img = tileImages.get(tile.getResourceType());
+            }
+
+            Image scaledImg = img.getScaledInstance(
+                    (int) (img.getWidth() * scaleFactorX / 1.5),
+                    (int) (img.getHeight() * scaleFactorY / 1.5),
+                    Image.SCALE_SMOOTH
+            );
+
+            int imgX = bounds.x + (bounds.width - scaledImg.getWidth(null)) / 2;
+            int imgY = bounds.y + (bounds.height - scaledImg.getHeight(null)) / 2;
+
+            g2dBoard.drawImage(scaledImg, imgX, imgY, null);
+        }
+
+        g2dBoard.dispose();
+    }
+
+    private void initDiceValueImages() {
+        int[] diceValues = {2, 3, 4, 5, 6, 8, 9, 10, 11, 12}; // Les valeurs possibles des dés
+        int circleDiameter = (int) (60 / Constants.Game.DIVIDER); // Diamètre de base pour les cercles
+
+        for (int value : diceValues) {
+            BufferedImage image = new BufferedImage(circleDiameter, circleDiameter,
+                    BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = image.createGraphics();
+
+            // Dessiner le cercle
+            g2d.fillOval(0, 0, circleDiameter, circleDiameter);
+
+            // Choix de la couleur et de la police en fonction de la valeur
+            if (value == 6 || value == 8) {
+                g2d.setColor(Color.RED);
+            } else {
+                g2d.setColor(Color.BLACK);
+            }
+
+            g2d.setFont(baseFont);
+
+            // Dessiner la valeur du dé
+            String diceValueStr = String.valueOf(value);
+            FontMetrics metrics = g2d.getFontMetrics(baseFont);
+            int xText = (circleDiameter - metrics.stringWidth(diceValueStr)) / 2;
+            int yText = ((circleDiameter - metrics.getHeight()) / 2) + metrics.getAscent();
+            g2d.drawString(diceValueStr, xText, yText);
+
+            g2d.dispose(); // Libérer les ressources du Graphics2D
+            diceValueImages.put(value, image);
+        }
     }
 
     private TileType getTileType(int resourceType) {
@@ -411,21 +504,19 @@ public class GameBoard {
         return false;
     }
     private void drawBuildingImage(Graphics2D g2d, Building building, Point vertex) {
-        BufferedImage img = getImageForBuilding(building);
         boolean isCity = buildingIsCity(building);
-        int size = (isCity ? 90 : 60);
+        if (scaledBuildingImages.get(building) == null) {
+            BufferedImage img = getImageForBuilding(building);
+            int size = (isCity ? 90 : 60);
+            scaledBuildingImages.put(building, img.getScaledInstance((int) (size / Resolution.divider()),
+                (int) (size / Resolution.divider()), Image.SCALE_SMOOTH));
+        }
         int placement = (isCity ? 40 : 30);
-        Image scaledImage = img.getScaledInstance((int) (size / Resolution.divider()),
-                (int) (size / Resolution.divider()), Image.SCALE_SMOOTH);
-        g2d.drawImage(scaledImage, (int) vertex.getX() - (int) (placement / Resolution.divider()),
+
+        g2d.drawImage(scaledBuildingImages.get(building),
+                (int) vertex.getX() - (int) (placement / Resolution.divider()),
                 (int) vertex.getY() - (int) (placement / Resolution.divider()), null);
     }
-
-    private void drawVertexCircle(Graphics2D g2d, Point vertex) {
-        g2d.setColor(Color.BLACK);
-        g2d.fillOval((int) vertex.getX() - 2, (int) vertex.getY() - 2, 4, 4);
-    }
-
 
     private void drawVertices(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -440,36 +531,19 @@ public class GameBoard {
     }
 
     public void drawImagesInHexes(Graphics g) {
+
         Graphics2D g2d = (Graphics2D) g;
-        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
-        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
 
-        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
-            Tile tile = entry.getValue();
-            Polygon hexagon = new Polygon();
-            ArrayList<Point> hexagonVertices = layout.polygonCorners(layout, tile.getCoordinates());
-
-            for (Point vertex : hexagonVertices) {
-                hexagon.addPoint((int) vertex.getX(), (int) vertex.getY());
+        if (boardImage != null) {
+            if (thiefMode || thiefModeEnd) {
+                initialiseBoardImage();
+                if (thiefModeEnd) {
+                    thiefModeEnd = false;
+                }
             }
-            Rectangle bounds = hexagon.getBounds();
-            BufferedImage img;
-            if (thiefMode && highlightedTile == tile) {
-                img = tileImagesS.get(tile.getResourceType());
-            } else {
-                img = tileImages.get(tile.getResourceType());
-            }
-
-            Image scaledImg = img.getScaledInstance(
-                    (int) (img.getWidth() * scaleFactorX / 1.5),
-                    (int) (img.getHeight() * scaleFactorY / 1.5),
-                    Image.SCALE_SMOOTH
-            );
-
-            int imgX = bounds.x + (bounds.width - scaledImg.getWidth(null)) / 2;
-            int imgY = bounds.y + (bounds.height - scaledImg.getHeight(null)) / 2;
-            g2d.drawImage(scaledImg, imgX, imgY, null);
+            g2d.drawImage(boardImage, 0, 0, null);
         }
+
     }
 
     private void drawEdgeWithImage(Graphics2D g2d, Point start, Point end, BufferedImage edgeImage) {
@@ -482,12 +556,12 @@ public class GameBoard {
         double angle = Math.atan2(end.getY() - start.getY(), end.getX() - start.getX()) + Math.PI / 2;
 
         // Mise à l'échelle de l'image
-        int scaledWidth = (int) (edgeImage.getWidth(null) * 0.38 / Resolution.divider());
-        int scaledHeight = (int) (edgeImage.getHeight(null) * 0.38 / Resolution.divider());
+        int scaledWidth = (int) (edgeImage.getWidth(null) * 0.38 / Constants.Game.DIVIDER);
+        int scaledHeight = (int) (edgeImage.getHeight(null) * 0.38 / Constants.Game.DIVIDER);
         Image scaledImage = edgeImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
 
         // Appliquer la transformation
-        AffineTransform transform = new AffineTransform();
+        AffineTransform transform = new AffineTransform(oldTransform);
         transform.translate(midX, midY);
         transform.rotate(angle);
         g2d.setTransform(transform);
@@ -516,39 +590,18 @@ public class GameBoard {
         drawEdges(g);
         drawVertices(g);
 
-        int circleDiameter = 30; // Diamètre de base pour les cercles
-        Font baseFont = new Font("SansSerif", Font.BOLD, 14); // Police de base
-
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
             if (!thief.getTile().equals(entry.getValue())) {
                 Point pixel = layout.cubeToPixel(layout, cubeCoord);
                 int diceValue = entry.getValue().getDiceValue();
-                int circleRadius = circleDiameter / 2;
 
-                // Dessiner un cercle blanc
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setColor(Color.WHITE);
-                g2d.fillOval((int) (pixel.getX() - circleRadius), (int) (pixel.getY() - circleRadius),
-                        circleDiameter, circleDiameter);
-
-                // Ajustez la taille du cercle et de la police en fonction de la valeur du dé
-                if (diceValue == 6 || diceValue == 8) {
-                    g2d.setColor(Color.red);
-                    baseFont = baseFont.deriveFont(Font.BOLD, 18f); // Augmentez la taille de la police
-                } else {
-                    g2d.setColor(Color.BLACK);
-                    baseFont = baseFont.deriveFont(Font.BOLD, 14f); // Taille de police de base
+                BufferedImage image = diceValueImages.get(diceValue);
+                if (image != null) {
+                    int x = (int) pixel.getX() - (image.getWidth() / 2);
+                    int y = (int) pixel.getY() - (image.getHeight() / 2);
+                    g.drawImage(image, x, y, null);
                 }
-
-                // Dessiner le numéro sur le cercle
-                String diceValueStr = String.valueOf(diceValue);
-                FontMetrics metrics = g.getFontMetrics(baseFont);
-                int xText = (int) (pixel.getX() - metrics.stringWidth(diceValueStr) / 2);
-                int yText = (int) (pixel.getY() - metrics.getHeight() / 2 + metrics.getAscent());
-
-                g2d.setFont(baseFont);
-                g2d.drawString(diceValueStr, xText, yText);
             }
         }
     }
@@ -601,7 +654,7 @@ public class GameBoard {
                 }
             }
         }
-
+        app.getGamePanel().repaint();
     }
 
     public void changeThief() {
@@ -636,26 +689,4 @@ public class GameBoard {
         return this.verticesMap.get(this.closestVertex);
     }
 
-    private void drawText(Graphics g, String text, Point center) {
-        if (text.equals("0")) {
-            return;
-        }
-
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLUE); // Set the color of the text
-
-        // Set the font and size of the text
-        Font font = new Font("Arial", Font.PLAIN, 12);
-        g2d.setFont(font);
-
-        // Draw the text
-        FontMetrics fontMetrics = g2d.getFontMetrics(font);
-        int textWidth = fontMetrics.stringWidth(text);
-        int textHeight = fontMetrics.getHeight();
-
-        int startX = (int) center.getX() - textWidth / 2;
-        int startY = (int) center.getY() + textHeight / 2;
-
-        g2d.drawString(text, startX, startY);
-    }
 }

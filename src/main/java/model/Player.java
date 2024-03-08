@@ -39,8 +39,11 @@ public class Player {
     private boolean hasBiggestArmy;
     private boolean hasLongestRoute;
     private int resourceCap;
-    public Player(Color c, String name) {
+    private App app;
+
+    public Player(Color c, String name, App app) {
         color = c;
+        this.app = app;
         this.name = name;
         resources = new HashMap<>();
         resources.put(TileType.CLAY, 0);
@@ -270,6 +273,7 @@ public class Player {
             }
             if (c.buyAndPlace(this, false, vertex)) {
                 points++;
+                app.checkWin();
             }
         }
     }
@@ -280,6 +284,7 @@ public class Player {
                 Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
                     points++;
+                    app.checkWin();
                 }
             }
         }
@@ -298,8 +303,10 @@ public class Player {
             DevelopmentCard card = stack.getCardStack().pop();
             if (card instanceof VictoryPointCard) {
                 points++;
+                app.checkWin();
             }
             cardsDev.add(card);
+
         } else {
             System.out.println("0 cartes dans le deck");
         }
