@@ -1,11 +1,13 @@
 package model;
 
 import others.Constants;
+import others.Music;
 import view.ActionPlayerPanel;
 import view.GamePanel;
 import view.GameWindow;
+import view.gamepanels.TradePanel;
+import view.*;
 import view.menu.MainMenu;
-import view.TradePanel;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -13,18 +15,22 @@ import java.util.HashSet;
 import network.NetworkObject;
 import network.PlayerClient;
 import network.NetworkObject.TypeObject;
+import javax.swing.*;
 
-public class App implements Runnable {
+public class App {
     private GamePanel gamePanel;
     private static ActionPlayerPanel actionPlayer;
+    private EndPanel endPanel;
     private GameWindow gameWindow;
     private Thread gameThread;
-    private static GameBoard board;
+    private GameBoard board;
     private Game game;
     private MainMenu mainMenu;
     private PlayerClient player;
+    private boolean playing;
+    private BackgroundPanel background;
 
-    public static GameBoard getBoard() {
+    public GameBoard getBoard() {
         return board;
     }
 
@@ -36,34 +42,44 @@ public class App implements Runnable {
         return mainMenu;
     }
 
-    public static void setBoard(GameBoard board) {
-        App.board = board;
+    public void setBoard(GameBoard board) {
+        this.board = board;
+        board.setApp(this);
     }
 
     public App(PlayerClient playerClient) {
         player = playerClient;
         player.setApp(this);
         mainMenu = new MainMenu(this);
-        gameWindow = new GameWindow(null, null, mainMenu);
-
+        this.gameWindow = new GameWindow(mainMenu);
         mainMenu.requestFocus();
+    }
 
-        startGameLoop();
+    public void createNewGame(Game game) {
+        this.game = game;
+        game.setPlayerClient(player);
+        this.background = new BackgroundPanel();
+        actionPlayer = new ActionPlayerPanel(this);
+        this.gamePanel = new GamePanel(this);
+        this.gameWindow.addPanels(actionPlayer, this.gamePanel, background);
+        actionPlayer.update();
     }
 
     public Game getGame() {
         return game;
     }
+
     public GameWindow getGameWindow() {
         return gameWindow;
     }
     public final GamePanel getGamePanel() {
         return gamePanel;
     }
-
-    private void startGameLoop() {
-        gameThread = new Thread(this);
-        gameThread.start();
+    public boolean isPlaying() {
+        return playing;
+    }
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
     }
 
     public void tryStartGame() {
@@ -90,80 +106,39 @@ public class App implements Runnable {
         }
     }
 
-    public void addPanels(Game game) {
-        this.game = game;
-        game.setPlayerClient(player);
-        game.initialiseGameAfterTransfer();
-        gamePanel = new GamePanel(this);
-        actionPlayer = new ActionPlayerPanel(this);
-        actionPlayer.add(gamePanel);
-        gameWindow.getContentPane().add(actionPlayer, "actionPlayerPanel");
-    }
-    public void createTradePanel() {
-        TradePanel tradePanel = new TradePanel(this.game, this.gameWindow);
-
-        //Ajoute la fenetre de trade
-        gameWindow.getContentPane().add(tradePanel, "tradePanel");
+    public void addPanels() {
+        game.initialiseGameAfterTransfer(this);
+        JPanel panelGame = new JPanel();
+        panelGame.setLayout(null);
+        panelGame.setBounds(0, 0, Constants.Game.BASE_WIDTH, Constants.Game.BASE_HEIGHT);
+        panelGame.add(actionPlayer, 0);
+        panelGame.add(gamePanel, 1);
+        panelGame.add(background, 2);
+        gameWindow.getContentPane().add(mainMenu, "mainMenu");
+        gameWindow.getContentPane().add(panelGame, "actionPlayerPanel");
     }
 
     public void update() {
-        game.update();
+        if (playing) {
+            game.update();
+            checkWin();
+            Music.update();
+        }
+    }
+    public void checkWin() {
+        if (game.getCurrentPlayer().hasWon()) {
+            endPanel = new EndPanel(this, true, game.getCurrentPlayer());
+            gameWindow.getContentPane().add(endPanel, "endPanel");
+            endPanel.updatePanel();
+            Container contentPane = getGameWindow().getContentPane();
+            CardLayout layout = getGameWindow().getLayout();
+            playing = false;
+            layout.show(contentPane, "endPanel");
+        }
     }
 
     public void render(Graphics g) {
         game.draw(g);
     }
-
-    @Override
-    public final void run() {
-
-        long previousTime = System.nanoTime();
-
-        int frames = 0;
-        int updates = 0;
-        long lastCheck = System.currentTimeMillis();
-
-        double deltaU = 0;
-        double deltaF = 0;
-
-        while (true) {
-            double timePerFrame = Constants.Number.DOUBLE_BILLION / Constants.Game.FPS_SET;
-            double timePerUpdate = Constants.Number.DOUBLE_BILLION / Constants.Game.UPS_SET;
-            long currentTime = System.nanoTime();
-
-            deltaU += (currentTime - previousTime) / timePerUpdate;
-            deltaF += (currentTime - previousTime) / timePerFrame;
-            previousTime = currentTime;
-
-            if (deltaU >= 1) {
-                if (game != null) {
-                    update();
-                    updates++;
-                    deltaU--;
-                }
-            }
-
-            if (deltaF >= 1) {
-                mainMenu.repaint();
-                if (actionPlayer != null) {
-                    actionPlayer.repaint();
-                    gamePanel.repaint();
-                }
-                gameWindow.repaint();
-                gameWindow.revalidate();
-                deltaF--;
-                frames++;
-            }
-
-            if (System.currentTimeMillis() - lastCheck >= Constants.Number.SECOND) {
-                lastCheck = System.currentTimeMillis();
-                // System.out.println("FPS :" + frames + " | Ups " + updates);
-                updates = 0;
-                frames = 0;
-            }
-
-        }
-    }
-
 
 }

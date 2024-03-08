@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class CardStack implements Serializable {
+
     public static final int NB_KNIGHTS = 14;
+    public static final int NB_MONOPOLY = 2;
+    public static final int NB_YEAR_OF_PLENTY = 2;
+    public static final int NB_ROAD_BUILDING = 2;
     public static final int NB_PROGRESS = 6;
     public static final int NB_POINT = 5;
 
@@ -18,8 +22,14 @@ public class CardStack implements Serializable {
         for (int i = 0; i < NB_KNIGHTS; i++) {
             cardToMix.add(new KnightCard());
         }
-        for (int i = 0; i < NB_POINT; i++) {
-            cardToMix.add(new ProgessCard());
+        for (int i = 0; i < NB_MONOPOLY; i++) {
+            cardToMix.add(new Monopoly());
+        }
+        for (int i = 0; i < NB_ROAD_BUILDING; i++) {
+            cardToMix.add(new RoadBuilding());
+        }
+        for (int i = 0; i < NB_YEAR_OF_PLENTY; i++) {
+            cardToMix.add(new YearOfPlenty());
         }
         for (int i = 0; i < NB_PROGRESS; i++) {
             cardToMix.add(new VictoryPointCard());
@@ -45,6 +55,7 @@ public class CardStack implements Serializable {
             }
             cardStack.add(cardToMix.get(nbCard));
         }
+        System.out.println(cardStack.size());
     }
 
 }

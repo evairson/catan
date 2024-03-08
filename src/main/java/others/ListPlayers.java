@@ -48,4 +48,14 @@ public class ListPlayers extends ArrayList<Player> {
             }
         }
     }
+
+    public Player prev() {
+        if (currentPlayerIndex - 1 < 0) {
+            currentPlayerIndex = this.size();
+        } else {
+            currentPlayerIndex--;
+        }
+        currentPlayer = this.get(currentPlayerIndex);
+        return currentPlayer;
+    }
 }

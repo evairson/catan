@@ -11,6 +11,7 @@ import java.io.IOException;
 public class ButtonImage extends JButton {
     private Image buttonImage;
     private Image buttonHover;
+    private Runnable action;
 
     public ButtonImage(String imagePath, String hoverImagePath, int xCoordBaseWidth,
                        int yCoordBaseHeight, double scale, Runnable action, MouseAdapter hoverEvent) {
@@ -19,28 +20,24 @@ public class ButtonImage extends JButton {
                 action, hoverEvent);
     }
 
+    public void setAction(Runnable action) {
+        this.addActionListener(e -> action.run());
+    }
+
     private void initializeButton(String imagePath, String hoverImagePath, int xCoordBaseWidth,
                                   int yCoordBaseHeight, double scale, Runnable action,
                                   MouseAdapter hoverEvent) {
         try {
             // Coordonnées pour la résolution cible
-            int xCoord = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight)[0];
-            int yCoord = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight)[1];
+            int[] coords = Resolution.calculateResolution(xCoordBaseWidth, yCoordBaseHeight);
+            int xCoord = coords[0];
+            int yCoord = coords[1];
 
-            // Nouveau diviseur pour la résolution cible
-            double divider = scale * Resolution.divider();
 
-            // Charger l'image originale pour obtenir ses dimensions
-            Image originalImage = ImageIO.read(new File(imagePath));
-            int originalWidth = originalImage.getWidth(null);
-            int originalHeight = originalImage.getHeight(null);
-
-            // Calculer les dimensions de l'image après division
-            int scaledWidth = (int) (originalWidth / divider);
-            int scaledHeight = (int) (originalHeight / divider);
-
-            buttonImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+            buttonImage = ImgService.loadImage(imagePath, scale);
             Image hoverOriginalImage = ImageIO.read(new File(hoverImagePath));
+            int scaledWidth = buttonImage.getWidth(null);
+            int scaledHeight = buttonImage.getHeight(null);
             buttonHover = hoverOriginalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
 
             setIcon(new ImageIcon(buttonImage));
@@ -58,7 +55,11 @@ public class ButtonImage extends JButton {
             });
             addMouseListener(hoverEvent);
 
-            addActionListener(e -> action.run());
+            addActionListener(e -> {
+                if (action != null) {
+                    action.run();
+                }
+            });
 
             setPreferredSize(new Dimension(scaledWidth, scaledHeight));
             setBorderPainted(false);

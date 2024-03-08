@@ -6,71 +6,70 @@ import java.io.File;
 import java.awt.*;
 import javax.swing.*;
 import javax.imageio.ImageIO;
-import java.lang.*;
-
+import java.util.ArrayList;
 import java.io.IOException;
 
 import model.App;
 import model.Game;
 import model.Player;
-import view.gamepanels.DeckPanel;
-import view.gamepanels.ResourcesPanel;
-import view.gamepanels.ShopPanel;
-import view.gamepanels.TradePanel;
+import others.ListPlayers;
+import view.gamepanels.*;
 import model.cards.DevelopmentCard;
 import model.cards.KnightCard;
-import model.cards.ProgessCard;
+import model.cards.Monopoly;
+import model.cards.RoadBuilding;
+import model.cards.YearOfPlenty;
 import others.Constants;
 import start.Main;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
+import java.util.concurrent.*;
 
 public class ActionPlayerPanel extends JPanel {
     private ButtonImage endTurn;
-    private ButtonImage tradeButton;
-
-    private ButtonImage city;
-    private ButtonImage colony;
-    private ButtonImage road;
-
-    private ButtonImage plus;
-
-    private ButtonImage card;
-
     private JLabel namePlayer;
     private App app;
     private Game game;
     private ResourcesPanel resourcesPanel;
     private ShopPanel shopPanel;
+    private TradeButtonPanel tradeButtonPanel;
     private TradePanel tradePanel;
     private DeckPanel deckPanel;
     private Animation animate = new Animation();
-
     private JPanel cardsPanel;
     private JPanel cardPanel;
-    private JPanel playersPanel;
+    private PlayersPanel playersPanel;
     private RollingDice dice;
+    private boolean cardPlayed = false;
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         this.app = app;
         game = app.getGame();
-
         setLayout(null);
-        setOpaque(true);
         try {
             createNamePlayer();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        setOpaque(false);
         initializeRollingDicePanel();
-        initializeTradePanel();
+        initializeTradeButtonPanel();
         initializeResourcesPanel();
         initializeShopPanel(game);
         initializeDeckPanel();
+        createPlayerPanel();
         createButton();
-        update();
+        setVisible(true);
+    }
+
+    public RollingDice getRollingDice() {
+        return dice;
+    }
+
+    public boolean getCardPlayed() {
+        return cardPlayed;
     }
 
     private void initializeRollingDicePanel() {
@@ -156,11 +155,42 @@ public class ActionPlayerPanel extends JPanel {
         add(shopPanel);
     }
 
+    private void initializeTradePanel() {
+        showTradePanel();
+    }
+
+    private JFrame getMainFrame() {
+        Container current = this;
+        while (current.getParent() != null) {
+            current = current.getParent();
+            if (current instanceof JFrame) {
+                return (JFrame) current;
+            }
+        }
+        return null; // Si le JFrame n'est pas trouvé (ce qui ne devrait pas arriver)
+    }
+
+    private void showTradePanel() {
+        JFrame mainFrame = getMainFrame();
+        JLayeredPane layeredPane = mainFrame.getLayeredPane();
+        ListPlayers listPlayers = game.getPlayers();
+        TradePanel tradePanel = new TradePanel(listPlayers, resourcesPanel);
+        layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
+        tradePanel.setVisible(true);
+        setComponentsEnabled(false);
+        repaint();
+    }
+
+    public void setComponentsEnabled(boolean enabled) {
+        for (Component comp : this.getComponents()) {
+            comp.setEnabled(enabled);
+        }
+    }
+
     private void initializeResourcesPanel() {
         int xCoord = Resolution.calculateResolution(180, 620)[0];
         int yCoord = Resolution.calculateResolution(180, 620)[1];
-        resourcesPanel = new ResourcesPanel();
-        createPlayerPanel();
+        resourcesPanel = new ResourcesPanel(game);
         MouseAdapter animMouse = new MouseAdapter() {
             private final int length = (int) (200 / Resolution.divider());
 
@@ -193,56 +223,22 @@ public class ActionPlayerPanel extends JPanel {
         add(resourcesPanel);
     }
 
-    private void initializeTradePanel() {
+    private void initializeTradeButtonPanel() {
         int xCoord = Resolution.calculateResolution(50, 560)[0];
         int yCoord = Resolution.calculateResolution(50, 560)[1];
-        tradePanel = new TradePanel(this::trade);
-        tradePanel.setVisible(true);
-        tradePanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
+        tradeButtonPanel = new TradeButtonPanel(this::initializeTradePanel);
+        tradeButtonPanel.setVisible(true);
+        tradeButtonPanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
                 (int) (185 / Resolution.divider()));
-        add(tradePanel);
-        tradePanel.setOpaque(false);
+        add(tradeButtonPanel);
+        tradeButtonPanel.setOpaque(false);
     }
 
     private void createButton() {
         String basePath = "src/main/resources/";
         endTurn = new ButtonImage(basePath + "endTurn.png", basePath + "endTurn.png",
                 960, 600, 1.5, this::changeTurn, null);
-        tradeButton = new ButtonImage(basePath + "tradeButton.png", basePath + "tradeButton.png",
-                50, 560, 5, this::trade, null);
-
-        card = new ButtonImage(basePath + "card.png", basePath + "card.png",
-                770, 560, 3, null, null);
-
-        //
-        // city = new ButtonImage(basePath + "building/city.png", basePath +
-        // "building/city.png",
-        // 1150, 20, 2, cityRunnable, null);
-        //
-        //
-        // colony = new ButtonImage(basePath + "building/colony.png", basePath +
-        // "building/colony.png",
-        // 1150, 130, 2, colonyRunnable, null);
-        //
-        //
-        // road = new ButtonImage(basePath + "building/road.png", basePath +
-        // "building/road.png",
-        // 1150, 220, 2, roadRunnable, null);
-
-        /*
-         * plus = new ButtonImage(basePath + "plus.png", basePath + "plus.png",
-         * 1160, 310, 8, null, null);
-         */
-
-        // add(city);
-        // add(colony);
-        // add(road);
-
-        // add(plus);
-
-        add(tradeButton);
         add(endTurn);
-        // add(card);
     }
 
     private void changeTurn() {
@@ -250,14 +246,10 @@ public class ActionPlayerPanel extends JPanel {
         update();
     }
 
-    private void trade() {
-        Container contentPane = this.app.getGameWindow().getContentPane();
-        CardLayout layout = this.app.getGameWindow().getLayout();
-        app.createTradePanel();
-        layout.show(contentPane, "tradePanel");
-    }
-
     private void addCardsPanel() {
+        if (game.getBlankTurn()) {
+            return;
+        }
         if (cardsPanel != null) {
             remove(cardsPanel);
         }
@@ -272,43 +264,111 @@ public class ActionPlayerPanel extends JPanel {
         cardsPanel.setLayout(null);
         cardsPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         String basePath = "src/main/resources/";
-        for (int i = 0; i < player.getCardsDev().size(); i++) {
-            String card = cardImageUrl(player.getCardsDev().get(i));
-            ButtonImage b = new ButtonImage(basePath + card, basePath + card,
-                    300 + i * 100, 250, 1.5, this::useCard, null);
+        for (int i = 0; i < game.getCurrentPlayer().getCardsDev().size(); i++) {
+            DevelopmentCard card = game.getCurrentPlayer().getCardsDev().get(i);
+            String stringCard = cardImageUrl(card);
+            System.out.println(card.getClass().getSimpleName());
+            ButtonImage b = new ButtonImage(basePath + stringCard, basePath + stringCard,
+                    300 + i * 100, 250, 1.5, () -> useCard(card.getClass().getSimpleName()), null);
             cardsPanel.add(b);
         }
-        JPanel self = this;
         cardsPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                self.remove(cardsPanel);
-                cardsPanel = null;
-                repaint();
-                revalidate();
+                removeCardsPanel();
             }
         });
         cardsPanel.setOpaque(false);
         add(cardsPanel, 0);
-        repaint();
         revalidate();
+        repaint();
     }
 
-    private void useCard() {
-        // TODO :
+    public void removeCardsPanel() {
+        this.remove(cardsPanel);
+        cardsPanel = null;
+        repaint();
+    }
+
+    private void useKnight() {
+        removeCardsPanel();
+        cardPlayed = true;
+        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i) instanceof KnightCard) {
+                cards.remove(i);
+                break;
+            }
+        }
+        game.setThiefMode(true);
+    }
+
+    private void useMonopoly() {
+        removeCardsPanel();
+        cardPlayed = true;
+        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i) instanceof Monopoly) {
+                cards.remove(i);
+                break;
+            }
+        }
+        game.setMonoWaiting(true);
+    }
+
+    private void useRoadBuilding() {
+        removeCardsPanel();
+        cardPlayed = true;
+        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i) instanceof RoadBuilding) {
+                cards.remove(i);
+                break;
+            }
+        }
+        game.getCurrentPlayer().setFreeRoad(true);
+    }
+
+    private void useYearOfPlenty() {
+        removeCardsPanel();
+        cardPlayed = true;
+        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i) instanceof YearOfPlenty) {
+                cards.remove(i);
+                break;
+            }
+        }
+    }
+
+    private void useCard(String s) {
+        switch (s) {
+            case "KnightCard": useKnight(); break;
+            case "Monopoly": useMonopoly(); break;
+            case "YearOfPlenty": useYearOfPlenty(); break;
+            case "RoadBuilding": useRoadBuilding();
+            default:
+        }
     }
 
     private String cardImageUrl(DevelopmentCard card) {
         if (card instanceof KnightCard) {
             return "cards/knight.png";
-        } else if (card instanceof ProgessCard) {
-            return "cards/progress.png";
+        } else if (card instanceof Monopoly) {
+            return "cards/monopoly.png";
+        } else if (card instanceof RoadBuilding) {
+            return "cards/roadbuilding.png";
+        } else if (card instanceof YearOfPlenty) {
+            return "cards/yearofplenty.png";
         } else {
             return "cards/point.png";
         }
     }
 
     private void drawCard() {
+        if (!game.canDraw()) {
+            return;
+        }
         game.getCurrentPlayer().drawCard(game.getStack());
         if (cardPanel != null) {
             remove(cardPanel);
@@ -317,10 +377,11 @@ public class ActionPlayerPanel extends JPanel {
         cardPanel.setLayout(null);
         cardPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         String basePath = "src/main/resources/";
-        int last = game.getCurrentPlayer().getCardsDev().size();
-        String card = cardImageUrl(game.getCurrentPlayer().getCardsDev().get(last - 1));
+        ArrayList<DevelopmentCard> devCards = game.getCurrentPlayer().getCardsDev();
+        int last = devCards.size();
+        String card = cardImageUrl(devCards.get(last - 1));
         ButtonImage b = new ButtonImage(basePath + card, basePath + card,
-                600, 250, 1.5, this::useCard, null);
+                600, 250, 1.5, () -> { }, null);
         cardPanel.add(b);
         JPanel self = this;
         cardPanel.addMouseListener(new MouseAdapter() {
@@ -329,14 +390,14 @@ public class ActionPlayerPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 self.remove(cardPanel);
                 cardPanel = null;
-                repaint();
                 revalidate();
+                repaint();
             }
         });
         cardPanel.setOpaque(false);
         add(cardPanel, 0);
-        repaint();
         revalidate();
+        repaint();
     }
 
     private void createNamePlayer() throws IOException {
@@ -364,34 +425,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void createPlayerPanel() {
-        playersPanel = new JPanel();
-        playersPanel.setLayout(null);
-        int x = Resolution.calculateResolution(30, 10)[0];
-        int y = Resolution.calculateResolution(30, 10)[1];
-        playersPanel.setBounds(x, y, (int) (2000 / Resolution.divider()), (int) (100 / Resolution.divider()));
-        for (int i = 0; i < game.getPlayers().size(); i++) {
-            JLabel panel = new JLabel();
-            try {
-                String src = "src/main/resources/pion/pion";
-                String imagePath = src + game.getPlayers().get(i).getColorString() + ".png";
-                Image origiImg = ImageIO.read(new File(imagePath));
-                int scale = (int) (40 / Resolution.divider());
-                Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
-                String text = game.getPlayers().get(i).getName().toUpperCase();
-                Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
-                String textUnderligne = player ? "<html><u> " + text + "</u></html>" : " " + text;
-                panel = new JLabel(textUnderligne, new ImageIcon(buttonImage), JLabel.CENTER);
-                panel.setVerticalTextPosition(JLabel.CENTER);
-                panel.setHorizontalTextPosition(JLabel.RIGHT);
-                panel.setFont(new Font("SansSerif", Font.BOLD, scale));
-                double x1 = Resolution.calculateResolution(i * 200, 20)[0];
-                double y1 = Resolution.calculateResolution(i * 200, 20)[1];
-                panel.setBounds((int) x1, (int) y1, (int) (scale * 10), (int) (scale * 1.2));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            playersPanel.add(panel);
-        }
+        playersPanel = new PlayersPanel(game);
         add(playersPanel);
     }
 
@@ -405,12 +439,7 @@ public class ActionPlayerPanel extends JPanel {
         } else {
             resourcesPanel.updateResourceLabels(game.getPlayerClient());
         }
-        for (int i = 0; i < game.getPlayers().size(); i++) {
-            String text = game.getPlayers().get(i).getName().toUpperCase();
-            Boolean player = game.getPlayers().get(i) == game.getCurrentPlayer();
-            String textUnderligne = player ? "<html><u>" + text + "</u></html>" : " " + text;
-            ((JLabel) playersPanel.getComponents()[i]).setText(textUnderligne);
-        }
+
         try {
             String src = "src/main/resources/pion/pion";
             String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
@@ -421,6 +450,9 @@ public class ActionPlayerPanel extends JPanel {
             e.printStackTrace();
         }
         updateTurn();
+
+
+        playersPanel.update(game);
         revalidate();
         repaint();
     }
@@ -430,12 +462,10 @@ public class ActionPlayerPanel extends JPanel {
             if (game.isMyTurn()) {
                 shopPanel.setEnabledPanel(true);
                 endTurn.setEnabled(true);
-                tradeButton.setEnabled(true);
                 dice.setEnabledPanel(true);
             } else {
                 shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);
-                tradeButton.setEnabled(false);
                 dice.setEnabledPanel(false);
             }
         }

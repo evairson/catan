@@ -31,12 +31,20 @@ public class Road extends Building {
         return Constants.BuildingCosts.ROAD;
     }
     public boolean buyAndPlace(Player player, TileEdge edge) {
-        if (super.buy(player, getCost())) {
-            Road road = new Road(player, edge, player.getColor());
-            player.getBuildings().add(road);
-            edge.setBuilding(road);
+        if (buy(player)) {
+            place(player, edge);
             return true;
         }
         return false;
+    }
+
+    public boolean buy(Player player) {
+        return super.buy(player, getCost());
+    }
+
+    public void place(Player player, TileEdge edge) {
+        Road road = new Road(player, edge, player.getColor());
+        player.getBuildings().add(road);
+        edge.setBuilding(road);
     }
 }

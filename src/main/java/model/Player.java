@@ -3,8 +3,10 @@ package model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import model.buildings.*;
+import model.cards.VictoryPointCard;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
 import view.TileType;
@@ -33,19 +35,32 @@ public class Player implements Serializable {
     protected ArrayList<DevelopmentCard> cardsDev;
     protected ArrayList<Building> buildings;
 
+    protected Boolean freeRoad = false;
+    protected Boolean freeColony = true;
+
+    protected int points;
+    protected boolean hasBiggestArmy;
+    protected boolean hasLongestRoute;
+    protected int resourceCap;
+    protected App app;
+
     public Player(Color c, String name, int id) {
         this.id = id;
         color = c;
         this.name = name;
         resources = new HashMap<>();
-        resources.put(TileType.CLAY, 1);
-        resources.put(TileType.ORE, 8);
-        resources.put(TileType.WHEAT, 8);
-        resources.put(TileType.WOOD, 3);
-        resources.put(TileType.WOOL, 3);
+        resources.put(TileType.CLAY, 0);
+        resources.put(TileType.ORE, 0);
+        resources.put(TileType.WHEAT, 0);
+        resources.put(TileType.WOOD, 0);
+        resources.put(TileType.WOOL, 0);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;
+        points = 0;
+        hasBiggestArmy = false;
+        hasLongestRoute = false;
+        resourceCap = 7;
     }
 
     public Player(Color c, String name) {
@@ -60,12 +75,32 @@ public class Player implements Serializable {
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;
+        points = 0;
+        hasBiggestArmy = false;
+        hasLongestRoute = false;
+        resourceCap = 7;
     }
 
     public void printBuildings() {
         for (Building b : buildings) {
             System.out.println(b);
         }
+    }
+
+    public boolean getFreeRoad() {
+        return freeRoad;
+    }
+
+    public void setFreeRoad(boolean b) {
+        freeRoad = b;
+    }
+
+    public boolean getFreeColony() {
+        return freeColony;
+    }
+
+    public void setFreeColony(boolean b) {
+        freeColony = b;
     }
 
     public boolean hasColony() {
@@ -88,6 +123,10 @@ public class Player implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public int getResourceCap() {
+        return resourceCap;
     }
 
     public void setName(String name) {
@@ -145,15 +184,58 @@ public class Player implements Serializable {
         return dice2;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
     public ArrayList<Building> getBuildings() {
         return buildings;
+    }
+
+    public ArrayList<Colony> getColony() {
+        ArrayList<Colony> array = new ArrayList<>();
+        for (Building b : getBuildings()) {
+            if (b instanceof Colony) {
+                array.add((Colony) b);
+            }
+        }
+        return array;
+    }
+
+    public ArrayList<Road> getRoads() {
+        ArrayList<Road> array = new ArrayList<>();
+        for (Building b : getBuildings()) {
+            if (b instanceof Road) {
+                array.add((Road) b);
+            }
+        }
+        return array;
     }
 
     public HashMap<TileType, Integer> getResources() {
         return resources;
     }
+    public int getResource(TileType t) {
+        return resources.get(t);
+    }
+    public int getResourcesSum() {
+        int acc = 0;
+        for (Integer i : resources.values()) {
+            acc += i;
+        }
+        return acc;
+    }
     public ArrayList<DevelopmentCard> getCardsDev() {
         return cardsDev;
+    }
+    public boolean hasWon() {
+        return points >= 10;
+    }
+    public boolean hasBiggestArmy() {
+        return hasBiggestArmy;
+    }
+    public boolean hasLongestRoute() {
+        return hasLongestRoute;
     }
 
     public void setCardsDev(ArrayList<DevelopmentCard> cardsDev) {
@@ -197,21 +279,27 @@ public class Player implements Serializable {
     public void buildRoad(TileEdge edge) {
         if (edge.getBuilding() == null) {
             Road r = new Road(this);
+            if (freeRoad) {
+                r.place(this, edge);
+                setFreeRoad(false);
+                return;
+            }
             r.buyAndPlace(this, edge);
-            System.out.println("Road built");
-        } else {
-            System.out.println("Road not built");
         }
     }
 
     public void buildColony(TileVertex vertex) {
         if (vertex.getBuilding() == null) {
             Colony c = new Colony(this);
-            if (c.buyAndPlace(this, false, vertex)) {
-                System.out.println("Colony built");
+            if (freeColony) {
+                setFreeColony(false);
+                setFreeRoad(true);
+                c.place(this, false, vertex);
             }
-        } else {
-            System.out.println("Colony not built");
+            if (c.buyAndPlace(this, false, vertex)) {
+                points++;
+                app.checkWin();
+            }
         }
     }
 
@@ -220,11 +308,10 @@ public class Player implements Serializable {
             if (vertex.getBuilding().getOwner().equals(this)) {
                 Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
-                    System.out.println("City built");
+                    points++;
+                    app.checkWin();
                 }
             }
-        } else {
-            System.out.println("City not built");
         }
     }
 
@@ -238,7 +325,13 @@ public class Player implements Serializable {
 
     public void drawCard(CardStack stack) {
         if (!stack.getCardStack().isEmpty()) {
-            cardsDev.add(stack.getCardStack().pop());
+            DevelopmentCard card = stack.getCardStack().pop();
+            if (card instanceof VictoryPointCard) {
+                points++;
+                app.checkWin();
+            }
+            cardsDev.add(card);
+
         } else {
             System.out.println("0 cartes dans le deck");
         }
@@ -262,28 +355,17 @@ public class Player implements Serializable {
         }
         return true;
     }
-
-    /**
-     * This method adds the amounts of resources contained in the resourcesAmountsToAdd array.
-     * @param resourceAmountsToAdd The amounts of resources we add
-     */
-    public void addResourceAmount(int[] resourceAmountsToAdd) {
-        addResource(TileType.CLAY, resourceAmountsToAdd[0]);
-        addResource(TileType.ORE, resourceAmountsToAdd[1]);
-        addResource(TileType.WHEAT, resourceAmountsToAdd[2]);
-        addResource(TileType.WOOD, resourceAmountsToAdd[3]);
-        addResource(TileType.WOOL, resourceAmountsToAdd[4]);
-    }
-
-    /**
-     * This method removes the amount of resources contained in the resourcesAmountsToRemove array.
-     * @param resourceAmountsToRemove The amounts of resources we remove
-     */
-    public void removeResourceAmount(int[] resourceAmountsToRemove) {
-        addResource(TileType.CLAY, -resourceAmountsToRemove[0]);
-        addResource(TileType.ORE, -resourceAmountsToRemove[1]);
-        addResource(TileType.WHEAT, -resourceAmountsToRemove[2]);
-        addResource(TileType.WOOD, -resourceAmountsToRemove[3]);
-        addResource(TileType.WOOL, -resourceAmountsToRemove[4]);
+    public void removeOneRandom() {
+        if (getResourcesSum() > 0) {
+            Random rd = new Random();
+            TileType[] resTList = {TileType.CLAY, TileType.ORE, TileType.WHEAT, TileType.WOOD, TileType.WOOL};
+            while (true) {
+                int k = rd.nextInt(0, 5);
+                if (resources.get(resTList[k]) > 0) {
+                    addResource(resTList[k], -1);
+                    break;
+                }
+            }
+        }
     }
 }
