@@ -5,7 +5,6 @@ import others.Music;
 import view.ActionPlayerPanel;
 import view.GamePanel;
 import view.GameWindow;
-import view.gamepanels.TradePanel;
 import view.*;
 import view.menu.MainMenu;
 
