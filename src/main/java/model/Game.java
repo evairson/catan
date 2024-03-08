@@ -374,6 +374,7 @@ public class Game implements StateMethods {
         if (board.isLookingForVertex()) {
             TileVertex cVertex = board.getClosestTileVertex();
             if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+                System.out.println("Derchos99 : " + cVertex.getCoordinates());
                 getCurrentPlayer().buildColony(cVertex);
             }
         }

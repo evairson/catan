@@ -1,6 +1,10 @@
 package view.gamepanels;
 
 import model.Player;
+import model.buildings.Colony;
+import model.buildings.Harbor;
+import model.buildings.SpecializedHarbor;
+import model.tiles.TileVertex;
 import others.Constants;
 import others.ListPlayers;
 import view.GameWindow;
@@ -14,8 +18,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 public class TradePanel extends JPanel {
     private Image backgroundImage;
@@ -133,7 +137,6 @@ public class TradePanel extends JPanel {
             }
         });
     }
-
     private void gatherResourcesOffered() {
         resourcesOffered.clear();
         for (int i = 0; i < playerOneLabels.length; i++) {
@@ -144,7 +147,6 @@ public class TradePanel extends JPanel {
             }
         }
     }
-
     private void gatherResourcesRequested() {
         resourcesRequested.clear();
         for (int i = 0; i < playerTwoLabels.length; i++) {
@@ -181,7 +183,6 @@ public class TradePanel extends JPanel {
     }
 
     // -------- Fonctions traitant les mécanismes des boutons d'échange -------- //
-
     private boolean canSelectedPlayerFulfillRequest() {
         if (selectedPlayer == null) {
             return false;
@@ -198,7 +199,6 @@ public class TradePanel extends JPanel {
 
         return true;
     }
-
     private void proposeAction() {
         gatherResourcesRequested();
         displayResources(resourcesRequested);
@@ -328,24 +328,64 @@ public class TradePanel extends JPanel {
         }
     }
 
-    private boolean isValidBankTrade() {
-        gatherResourcesOffered();
-        gatherResourcesRequested();
-        int totalMultiplesOfFour = 0;
-        for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
-            if (entry.getValue() % 4 != 0) {
-                // Si l'une des ressources offertes n'est pas un multiple de 4, l'échange n'est pas valide.
-                return false;
+    private List<Harbor> getCurrentPlayerHarbors() {
+        List<Harbor> accessiblesHarbors = new ArrayList<>();
+        Player currentPlayer = listPlayers.getCurrentPlayer();
+        ArrayList<Colony> colonies = currentPlayer.getColony();
+
+        for (Colony colony : colonies) {
+            TileVertex colonyVertex = colony.getVertex();
+            Harbor connectedHarbor = colonyVertex.getHarbor();
+            if (connectedHarbor != null) {
+                accessiblesHarbors.add(connectedHarbor);
             }
-            totalMultiplesOfFour += entry.getValue() / 4;
+        }
+        return accessiblesHarbors;
+    }
+    private int getBestTradeRatio(TileType resourceType) {
+        int bestRatio = 4;
+
+        for (Harbor harbor : getCurrentPlayerHarbors()) {
+            if (harbor instanceof SpecializedHarbor
+                    && ((SpecializedHarbor) harbor).getResourceType() == resourceType) {
+                return 2;
+            } else if (!(harbor instanceof SpecializedHarbor) && bestRatio > 3) {
+                bestRatio = 3;
+            }
+        }
+        return bestRatio;
+    }
+    private boolean isValidBankTrade() {
+        List<Harbor> currentPlayerPorts = getCurrentPlayerHarbors();
+        int generalTradeRate = currentPlayerPorts.stream().anyMatch(Objects::nonNull) ? 3 : 4;
+
+        for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
+            TileType offeredResource = entry.getKey();
+            Integer offeredAmount = entry.getValue();
+            int requiredTradeRate = generalTradeRate; // Taux général par défaut.
+
+            // Vérifier si un port spécialisé ajuste le taux pour cette ressource.
+            for (Harbor harbor : currentPlayerPorts) {
+                if (harbor instanceof SpecializedHarbor
+                        && ((SpecializedHarbor) harbor).getResourceType() == offeredResource) {
+                    requiredTradeRate = 2; // Taux spécialisé.
+                    break;
+                }
+            }
+
+            if (offeredAmount % requiredTradeRate != 0) {
+                return false; // Si les ressources offertes ne correspondent pas au taux d'échange requis.
+            }
         }
 
-        // Calcul du nombre total de ressources demandées.
+        // Vérifier que le nombre total de ressources demandées correspond au nombre d'échanges effectués.
+        int totalExchanges = resourcesOffered.values().stream()
+                .mapToInt(integer -> integer / generalTradeRate)
+                .sum();
         int totalRequestedResources = getTotalSelectedResources(playerTwoLabels);
-
-        // Et il doit y avoir exactement k types de ressources demandées pour k multiples de 4 offerts.
-        return totalMultiplesOfFour == totalRequestedResources;
+        return totalExchanges == totalRequestedResources;
     }
+
     // -------- Fonctions affichant et traitant les boutons
     // et leur mécanisme pour la séléction des joueurs -------- //
 
