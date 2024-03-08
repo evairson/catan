@@ -51,6 +51,8 @@ public class GameBoard {
     private Game game;
     private App app;
 
+    private boolean thiefModeEnd;
+
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
 
@@ -77,6 +79,11 @@ public class GameBoard {
         this.layout = layout;
         this.initialiseBoard();
     }
+
+    public void setThiefModeEnd(boolean b) {
+        thiefModeEnd = b;
+    }
+
     private void loadImages() {
         loadedImages = new HashMap<>();
 
@@ -381,9 +388,6 @@ public class GameBoard {
                     BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = image.createGraphics();
 
-            // Appliquer l'antialiasing pour un rendu plus lisse
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
             // Dessiner le cercle
             g2d.fillOval(0, 0, circleDiameter, circleDiameter);
 
@@ -394,9 +398,11 @@ public class GameBoard {
                 g2d.setColor(Color.BLACK);
             }
 
+            g2d.setFont(baseFont);
+
             // Dessiner la valeur du dé
             String diceValueStr = String.valueOf(value);
-            FontMetrics metrics = g2d.getFontMetrics();
+            FontMetrics metrics = g2d.getFontMetrics(baseFont);
             int xText = (circleDiameter - metrics.stringWidth(diceValueStr)) / 2;
             int yText = ((circleDiameter - metrics.getHeight()) / 2) + metrics.getAscent();
             g2d.drawString(diceValueStr, xText, yText);
@@ -529,6 +535,12 @@ public class GameBoard {
         Graphics2D g2d = (Graphics2D) g;
 
         if (boardImage != null) {
+            if (thiefMode || thiefModeEnd) {
+                initialiseBoardImage();
+                if (thiefModeEnd) {
+                    thiefModeEnd = false;
+                }
+            }
             g2d.drawImage(boardImage, 0, 0, null);
         }
 
@@ -544,12 +556,12 @@ public class GameBoard {
         double angle = Math.atan2(end.getY() - start.getY(), end.getX() - start.getX()) + Math.PI / 2;
 
         // Mise à l'échelle de l'image
-        int scaledWidth = (int) (edgeImage.getWidth(null) * 0.38 / Resolution.divider());
-        int scaledHeight = (int) (edgeImage.getHeight(null) * 0.38 / Resolution.divider());
+        int scaledWidth = (int) (edgeImage.getWidth(null) * 0.38 / Constants.Game.DIVIDER);
+        int scaledHeight = (int) (edgeImage.getHeight(null) * 0.38 / Constants.Game.DIVIDER);
         Image scaledImage = edgeImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
 
         // Appliquer la transformation
-        AffineTransform transform = new AffineTransform();
+        AffineTransform transform = new AffineTransform(oldTransform);
         transform.translate(midX, midY);
         transform.rotate(angle);
         g2d.setTransform(transform);
@@ -677,26 +689,4 @@ public class GameBoard {
         return this.verticesMap.get(this.closestVertex);
     }
 
-    private void drawText(Graphics g, String text, Point center) {
-        if (text.equals("0")) {
-            return;
-        }
-
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLUE); // Set the color of the text
-
-        // Set the font and size of the text
-        Font font = new Font("Arial", Font.PLAIN, 12);
-        g2d.setFont(font);
-
-        // Draw the text
-        FontMetrics fontMetrics = g2d.getFontMetrics(font);
-        int textWidth = fontMetrics.stringWidth(text);
-        int textHeight = fontMetrics.getHeight();
-
-        int startX = (int) center.getX() - textWidth / 2;
-        int startY = (int) center.getY() + textHeight / 2;
-
-        g2d.drawString(text, startX, startY);
-    }
 }

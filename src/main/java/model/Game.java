@@ -61,6 +61,10 @@ public class Game implements StateMethods {
         stack = new CardStack();
     }
 
+    public App getApp() {
+        return app;
+    }
+
     public CardStack getStack() {
         return stack;
     }
@@ -255,6 +259,7 @@ public class Game implements StateMethods {
             buildRoad();
         } else if (board.getThiefMode()) {
             board.changeThief();
+            board.setThiefModeEnd(true);
         }
 
         getCurrentPlayer().printResources();
