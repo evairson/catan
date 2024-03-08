@@ -9,7 +9,7 @@ public class NetworkObject implements Serializable {
     private TypeObject type;
 
     public enum TypeObject {
-        Message, Game, Board,
+        Message, Game, Board, ChatMessage,
     }
 
     public TypeObject getType() {
@@ -21,6 +21,12 @@ public class NetworkObject implements Serializable {
         this.message = message;
         this.id = id;
         this.object = object;
+    }
+    public NetworkObject(TypeObject type, String message, int id) {
+        this.type = type;
+        this.message = message;
+        this.id = id;
+        this.object = null;
     }
 
     public String getMessage() {

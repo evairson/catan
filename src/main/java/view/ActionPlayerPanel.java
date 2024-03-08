@@ -39,6 +39,7 @@ public class ActionPlayerPanel extends JPanel {
     private Animation animate = new Animation();
     private JPanel cardsPanel;
     private JPanel cardPanel;
+    private JPanel chat;
     private PlayersPanel playersPanel;
     private RollingDice dice;
     private boolean cardPlayed = false;
@@ -59,6 +60,7 @@ public class ActionPlayerPanel extends JPanel {
         initializeResourcesPanel();
         initializeShopPanel(game);
         initializeDeckPanel();
+        initializeChat();
         createPlayerPanel();
         createButton();
         setVisible(true);
@@ -70,6 +72,10 @@ public class ActionPlayerPanel extends JPanel {
 
     public boolean getCardPlayed() {
         return cardPlayed;
+    }
+
+    public JPanel getChat() {
+        return chat;
     }
 
     private void initializeRollingDicePanel() {
@@ -157,6 +163,17 @@ public class ActionPlayerPanel extends JPanel {
 
     private void initializeTradePanel() {
         showTradePanel();
+    }
+
+    private void initializeChat() {
+        int xCoord = Resolution.calculateResolution(750, 200)[0];
+        int yCoord = Resolution.calculateResolution(750, 200)[1];
+
+        chat = new ChatPanel(this);
+        chat.setVisible(true);
+        chat.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
+                (int) (400 / Resolution.divider()));
+        add(chat);
     }
 
     private JFrame getMainFrame() {
@@ -471,4 +488,7 @@ public class ActionPlayerPanel extends JPanel {
         }
     }
 
+    public App getApp() {
+        return app;
+    }
 }

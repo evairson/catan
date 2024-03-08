@@ -73,6 +73,8 @@ public class PlayerClient extends Player {
                                 TileEdge cEdge = (TileEdge) networkObjet.getObject();
                                 app.getGame().buildRoad(cEdge);
                             }
+                        case ChatMessage:
+                            app.addMessage(networkObjet.getMessage());
                         default:
                             break;
                     }
