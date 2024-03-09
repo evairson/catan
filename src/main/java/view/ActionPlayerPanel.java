@@ -332,6 +332,7 @@ public class ActionPlayerPanel extends JPanel {
                 break;
             }
         }
+        game.setYearOfPlenty(2);
     }
 
     private void useCard(String s) {

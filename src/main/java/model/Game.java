@@ -81,6 +81,10 @@ public class Game implements StateMethods {
         monoWaiting = b;
     }
 
+    public void setYearOfPlenty(int i) {
+        yearOfPlentyWaiting = i;
+    }
+
     public void resourceClicked(TileType t) {
         if (monoWaiting) {
             monopolyPlay(t);
