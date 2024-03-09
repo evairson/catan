@@ -176,8 +176,8 @@ public class Game implements StateMethods, Serializable {
         if (start || backwards) {
             getCurrentPlayer().setFreeColony(true);
         }
-        update();
-        App.getActionPlayerPanel().repaint();
+        //update();
+        App.getActionPlayerPanel().update();
         App.getGamePanel().repaint();
     }
 
