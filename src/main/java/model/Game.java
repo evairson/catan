@@ -48,22 +48,9 @@ public class Game implements StateMethods, Serializable {
         }
         players = new ListPlayers(0, playersSet);
         players.getCurrentPlayer().setFreeColony(true);
-        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
-        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
-        System.out.println(scaleFactorX + " et " + scaleFactorY);
-        Point point1 = new Point(
-                (int) (267 * scaleFactorX),
-                (int) (267 * scaleFactorY)
-        );
-        System.out.println((int) (267 * scaleFactorX) + " et  ; " + (int) (47 * scaleFactorX));
-        Point point2 = new Point(
-                (int) (47 * scaleFactorX),
-                (int) (47 * scaleFactorY)
-        );
-//        Point point2 = new Point((int) (93 / Resolution.divider()), (int) (93 / Resolution.divider()));
-        Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
+
         thief = new Thief();
-        board = new GameBoard(layout, thief, this);
+        board = new GameBoard(thief, this);
         stack = new CardStack();
     }
 
@@ -158,7 +145,7 @@ public class Game implements StateMethods, Serializable {
         if (start && getCurrentPlayer().last(this)) {
             start = false;
             backwards = true;
-        } else if (backwards && getCurrentPlayer().first()) {
+        } else if (backwards && getCurrentPlayer().first(this)) {
             backwards = false;
         } else if (backwards) {
             players.prev();

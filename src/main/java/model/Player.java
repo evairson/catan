@@ -390,13 +390,10 @@ public class Player implements Serializable {
     }
 
     public boolean last(Game game) {
-        if (game.getPlayers().size() - 1 == id) {
-            return true;
-        }
-        return false;
+        return (game.getPlayers().get(game.getPlayers().size() - 1) == this);
     }
 
-    public boolean first() {
-        return id == 0;
+    public boolean first(Game game) {
+        return game.getPlayers().get(0) == this;
     }
 }
