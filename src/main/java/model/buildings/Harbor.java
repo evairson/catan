@@ -4,11 +4,9 @@ import model.tiles.TileVertex;
 
 public class Harbor {
     private TileVertex location;
-    private int tradeRatio;
 
-    public Harbor(TileVertex location, int tradeRatio) {
+    public Harbor(TileVertex location) {
         this.location = location;
-        this.tradeRatio = tradeRatio;
     }
 
     public TileVertex getLocation() {

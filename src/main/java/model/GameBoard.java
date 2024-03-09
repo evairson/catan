@@ -2,6 +2,7 @@ package model;
 
 import model.buildings.Building;
 import model.buildings.Colony;
+import model.buildings.Harbor;
 import model.buildings.Road;
 import model.geometry.*;
 import model.geometry.Point;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameBoard {
+    private final Map<TileVertex, Harbor> harborMap = new HashMap<>();
     private HashMap<CubeCoordinates, Tile> board;
     private Layout layout;
     private int gridSize = 2;
@@ -78,6 +80,30 @@ public class GameBoard {
         board = new HashMap<CubeCoordinates, Tile>();
         this.layout = layout;
         this.initialiseBoard();
+        this.initialisePorts();
+
+    }
+
+    public void initialisePorts() {
+        // Exemple de création d'un port pour un TileVertex spécifique
+        Point harborPoint = new Point(642, 330); // Les coordonnées du TileVertex pour le port
+        TileVertex harborVertex = findTileVertexByPoint(harborPoint);
+
+        if (harborVertex != null) {
+            // Créez votre port ici. Cela pourrait être un port général ou spécialisé
+            // en fonction de votre conception. Pour le test, créons un port général.
+            Harbor testPort = new Harbor(harborVertex); // Supposons que vous avez une classe GeneralPort
+            harborMap.put(harborVertex, testPort);
+        }
+    }
+
+    private TileVertex findTileVertexByPoint(Point point) {
+        for (TileVertex vertex : verticesMap.values()) {
+            if (arePointsEqual(vertex.getCoordinates(), point)) {
+                return vertex;
+            }
+        }
+        return null;
     }
 
     public void setThiefModeEnd(boolean b) {
