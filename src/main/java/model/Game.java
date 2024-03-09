@@ -26,7 +26,6 @@ public class Game implements StateMethods {
     private boolean resourcesGiven;
     private boolean start = true;
     private boolean backwards = false;
-    private boolean playingVoleur = false;
     private App app;
     private boolean blankTurn = false;
     private boolean monoWaiting = false;
@@ -92,6 +91,7 @@ public class Game implements StateMethods {
         }
         if (yearOfPlentyWaiting > 0) {
             getCurrentPlayer().addResource(t, 1);
+            System.out.println("gave " + t);
             yearOfPlentyWaiting--;
         }
     }
@@ -123,7 +123,7 @@ public class Game implements StateMethods {
         if (!p.hasThrowDices() && !start && !backwards) {
             return false;
         }
-        if (playingVoleur) {
+        if (board.getThiefMode()) {
             return false;
         }
         return true;
@@ -193,7 +193,6 @@ public class Game implements StateMethods {
     }
 
     public void setThiefMode(boolean b) {
-        playingVoleur = b;
         board.setThiefMode(b);
         divideRessourcesByTwo();
     }
@@ -357,7 +356,7 @@ public class Game implements StateMethods {
             return;
         }
         if (((!Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
-            || getCurrentPlayer().getFreeRoad()) {
+            || getCurrentPlayer().getFreeRoad() > 0) {
             if (board.isLookingForEdge()) {
                 board.setLookingForEdge(!board.isLookingForEdge());
                 board.setPlacingCity(false);
