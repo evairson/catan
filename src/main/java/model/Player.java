@@ -32,7 +32,7 @@ public class Player {
     private HashMap<TileType, Integer> resources;
     private ArrayList<DevelopmentCard> cardsDev;
     private ArrayList<Building> buildings;
-    private Boolean freeRoad = false;
+    private int freeRoad = 0;
     private Boolean freeColony = true;
 
     private int points;
@@ -66,12 +66,12 @@ public class Player {
         }
     }
 
-    public boolean getFreeRoad() {
+    public int getFreeRoad() {
         return freeRoad;
     }
 
-    public void setFreeRoad(boolean b) {
-        freeRoad = b;
+    public void setFreeRoad(int i) {
+        freeRoad = i;
     }
 
     public boolean getFreeColony() {
@@ -254,9 +254,9 @@ public class Player {
     public void buildRoad(TileEdge edge) {
         if (edge.getBuilding() == null) {
             Road r = new Road(this);
-            if (freeRoad) {
+            if (freeRoad > 0) {
                 r.place(this, edge);
-                setFreeRoad(false);
+                freeRoad--;
                 return;
             }
             r.buyAndPlace(this, edge);
@@ -268,7 +268,7 @@ public class Player {
             Colony c = new Colony(this);
             if (freeColony) {
                 setFreeColony(false);
-                setFreeRoad(true);
+                freeRoad++;
                 c.place(this, false, vertex);
                 return;
             }

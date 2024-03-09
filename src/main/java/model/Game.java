@@ -110,17 +110,20 @@ public class Game implements StateMethods {
     }
 
     public boolean canPass() {
-        if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
+        Player p = getCurrentPlayer();
+        if (p.getFreeRoad() > 0) {
             return false;
         }
-        if ((start || backwards)
-            && (getCurrentPlayer().getFreeRoad() || getCurrentPlayer().getFreeColony())) {
+        if (monoWaiting || yearOfPlentyWaiting > 0) {
+            return false;
+        }
+        if (p.getFreeColony()) {
+            return false;
+        }
+        if (!p.hasThrowDices() && !start && !backwards) {
             return false;
         }
         if (playingVoleur) {
-            return false;
-        }
-        if (app.getActionPlayerPanel().getCardPlayed()) {
             return false;
         }
         return true;
