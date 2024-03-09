@@ -5,8 +5,6 @@ import java.net.Socket;
 import model.App;
 import model.Game;
 import model.Player;
-import model.tiles.TileEdge;
-import model.tiles.TileVertex;
 import network.NetworkObject.TypeObject;
 
 import java.net.InetAddress;
@@ -16,6 +14,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import exceptionclass.ConstructBuildingException;
+import exceptionclass.NetworkObjectException;
 
 public class PlayerClient extends Player {
     private static App app;
@@ -45,45 +46,23 @@ public class PlayerClient extends Player {
                             }
                             break;
                         case Message:
-                            if (networkObjet.getMessage().equals("ID")) {
-                                id = networkObjet.getId();
-                                System.out.println("Je suis le joueur numéro : " + id);
-                            }
-                            if (networkObjet.getMessage().equals("NamePlayers")) {
-                                HashSet<Player> hashSet = (HashSet<Player>) networkObjet.getObject();
-                                app.startGame(hashSet);
-                            }
-                            if (networkObjet.getMessage().equals("changeTurn")) {
-                                app.getGame().endTurn();
-                            }
+                            message(networkObjet);
                             break;
                         case Board:
-                            if (networkObjet.getMessage().equals("buildCity")) {
-                                System.out.println("derchos");
-                                TileVertex cVertex = (TileVertex) networkObjet.getObject();
-                                app.getGame().buildCity(cVertex);
-                            }
-                            if (networkObjet.getMessage().equals("buildColony")) {
-                                System.out.println("derchos");
-                                TileVertex cVertex = (TileVertex) networkObjet.getObject();
-                                app.getGame().buildColony(cVertex);
-                            }
-                            if (networkObjet.getMessage().equals("buildRoad")) {
-                                System.out.println("derchos");
-                                TileEdge cEdge = (TileEdge) networkObjet.getObject();
-                                app.getGame().buildRoad(cEdge);
-                            }
+                            board(networkObjet);
                         default:
                             break;
                     }
                 }
+            } catch (NetworkObjectException e) {
+                NetworkObjectException.messageError();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    // N'oubliez pas de fermer proprement vos ressources
+    // Fermer proprement les ressources
     public void close() throws IOException {
         in.close();
         socket.close();
@@ -95,7 +74,7 @@ public class PlayerClient extends Player {
     }
 
     public void setApp(App app) {
-        this.app = app;
+        PlayerClient.app = app;
     }
 
     public int getId() {
@@ -108,5 +87,50 @@ public class PlayerClient extends Player {
 
     public boolean isMyTurn(Game game) {
         return id == game.getCurrentPlayer().getId();
+    }
+
+    public void message(NetworkObject networkObjet) throws NetworkObjectException {
+        switch (networkObjet.getMessage()) {
+            case "ID":
+                id = networkObjet.getId();
+                System.out.println("Je suis le joueur numéro : " + id);
+                break;
+            case "NamePlayers":
+                HashSet<Player> hashSet = (HashSet<Player>) networkObjet.getObject();
+                app.startGame(hashSet);
+                break;
+            case "changeTurn":
+                app.getGame().endTurn();
+                break;
+            default:
+                throw new NetworkObjectException();
+        }
+    }
+
+    public void board(NetworkObject networkObject) throws NetworkObjectException {
+        try {
+            switch (networkObject.getMessage()) {
+                case "buildCity":
+                    System.out.println("try to construct a city Network");
+                    int idCity = (int) networkObject.getObject();
+                    app.getGame().buildCity(idCity);
+                    break;
+                case "buildColony":
+                    System.out.println("try to construct a colony Network");
+                    int idColony = (int) networkObject.getObject();
+                    app.getGame().buildColony(idColony);
+                    break;
+                case "buildRoad":
+                    System.out.println("try to construct a road Network");
+                    int idRoad = (int) networkObject.getObject();
+                    app.getGame().buildRoad(idRoad);
+                    break;
+                default:
+                    break;
+            }
+        } catch (ConstructBuildingException e) {
+            ConstructBuildingException.messageError();
+        }
+
     }
 }

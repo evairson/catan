@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class EndPanel extends JPanel {
-    private App app;
     private Image backgroundImage;
     private boolean playerWon;
     private JButton returnBt;
@@ -18,9 +17,8 @@ public class EndPanel extends JPanel {
     private final Font bigFont = new Font("Serif", Font.PLAIN, (int) (96 / Resolution.divider()));
     private final Font smallFont = new Font("Serif", Font.PLAIN, (int) (72 / Resolution.divider()));
     private Player player;
-    public EndPanel(App app, boolean playerWon, Player player) {
+    public EndPanel(boolean playerWon, Player player) {
         this.playerWon = true;
-        this.app = app;
         this.player = player;
         setLayout(null);
         updatePanel();
@@ -80,8 +78,8 @@ public class EndPanel extends JPanel {
         }
     }
     private void returnToMainMenu() {
-        Container contentPane = this.app.getGameWindow().getContentPane();
-        CardLayout layout = this.app.getGameWindow().getLayout();
+        Container contentPane = App.getGameWindow().getContentPane();
+        CardLayout layout = App.getGameWindow().getLayout();
         layout.show(contentPane, "mainMenu");
     }
     private void quitapp() {

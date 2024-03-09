@@ -21,7 +21,22 @@ public class Player implements Serializable {
         RED,
         YELLOW,
         BLUE,
-        GREEN
+        GREEN,
+    }
+
+    public static Color getColorId(int i) {
+        switch (i) {
+            case 0:
+                return Color.RED;
+            case 1:
+                return Color.YELLOW;
+            case 2:
+                return Color.BLUE;
+            case 3:
+                return Color.GREEN;
+            default:
+                return Color.RED;
+        }
     }
 
     protected int id;
@@ -286,6 +301,8 @@ public class Player implements Serializable {
             }
             r.buyAndPlace(this, edge);
         }
+        System.out.println("okR");
+        App.getGamePanel().repaint();
     }
 
     public void buildColony(TileVertex vertex) {
@@ -298,9 +315,11 @@ public class Player implements Serializable {
             }
             if (c.buyAndPlace(this, false, vertex)) {
                 points++;
-                app.checkWin();
+                App.checkWin();
             }
         }
+        System.out.println("ok");
+        App.getGamePanel().repaint();
     }
 
     public void buildCity(TileVertex vertex) {
@@ -309,10 +328,11 @@ public class Player implements Serializable {
                 Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
                     points++;
-                    app.checkWin();
+                    App.checkWin();
                 }
             }
         }
+        App.getGamePanel().repaint();
     }
 
     public void createOrBuy() {

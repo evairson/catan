@@ -625,21 +625,24 @@ public class GameBoard implements Serializable {
 
     public void draw(Graphics g) {
         drawBoard(g);
-        if (minDistanceToVertex < 20) {
+        if (minDistanceToVertex < 20 && lookingForVertex) {
             g.setColor(Color.RED);
             g.fillOval((int) closestVertex.getX() - 10,
                     (int) closestVertex.getY() - 10, 20, 20);
         }
-        try {
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setColor(Color.RED);
-            TileEdge edge = this.edgesMap.get(this.closestEdge);
-            g2d.setStroke(new BasicStroke(6));
-            g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
-                    (int) edge.getEnd().getX(),
-                    (int) edge.getEnd().getY());
-        } catch (Exception e) { // null seulement la première fois qu'on survole un hexagone
+        if (lookingForEdge) {
+            try {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(Color.RED);
+                TileEdge edge = this.edgesMap.get(this.closestEdge);
+                g2d.setStroke(new BasicStroke(6));
+                g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
+                        (int) edge.getEnd().getX(),
+                        (int) edge.getEnd().getY());
+            } catch (Exception e) { // null seulement la première fois qu'on survole un hexagone
+            }
         }
+
         drawThief(g);
     }
 
@@ -671,7 +674,6 @@ public class GameBoard implements Serializable {
                 }
             }
         }
-        app.getGamePanel().repaint();
     }
 
     public void changeThief() {
@@ -681,26 +683,26 @@ public class GameBoard implements Serializable {
     }
 
     public TileEdge findClosestEdge() {
-        TileEdge closestTileEdge = new TileEdge();
         for (Point edge : this.edgesMap.keySet()) {
             double distance = edge.distance(mousePosition);
             if (distance < minDistanceToEdge) {
                 minDistanceToEdge = distance;
                 closestEdge = edge;
                 closestTileEdge = this.edgesMap.get(edge);
+                App.getGamePanel().repaint();
             }
         }
         return closestTileEdge;
     }
 
     public TileVertex findClosestVertex() {
-        TileVertex closestTileVertex = new TileVertex();
         for (Point vertex : this.verticesMap.keySet()) {
             double distance = vertex.distance(mousePosition);
             if (distance < minDistanceToVertex) {
                 minDistanceToVertex = distance;
                 closestVertex = vertex;
                 closestTileVertex = this.verticesMap.get(vertex);
+                App.getGamePanel().repaint();
             }
         }
         return this.verticesMap.get(this.closestVertex);

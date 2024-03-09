@@ -59,7 +59,6 @@ public class ActionPlayerPanel extends JPanel {
         initializeResourcesPanel();
         initializeShopPanel(game);
         initializeDeckPanel();
-        createPlayerPanel();
         createButton();
         setVisible(true);
     }
@@ -424,7 +423,7 @@ public class ActionPlayerPanel extends JPanel {
         add(namePlayer);
     }
 
-    private void createPlayerPanel() {
+    public void createPlayerPanel() {
         playersPanel = new PlayersPanel(game);
         add(playersPanel);
     }
@@ -451,8 +450,9 @@ public class ActionPlayerPanel extends JPanel {
         }
         updateTurn();
 
-
-        playersPanel.update(game);
+        if (playersPanel != null) {
+            playersPanel.update(game);
+        }
         revalidate();
         repaint();
     }
@@ -462,11 +462,9 @@ public class ActionPlayerPanel extends JPanel {
             if (game.isMyTurn()) {
                 shopPanel.setEnabledPanel(true);
                 endTurn.setEnabled(true);
-                dice.setEnabledPanel(true);
             } else {
                 shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);
-                dice.setEnabledPanel(false);
             }
         }
     }

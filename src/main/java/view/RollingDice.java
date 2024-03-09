@@ -126,9 +126,4 @@ public class RollingDice extends JPanel {
         player.setHasTrowDices(false);
         this.player = player;
     }
-
-    public void setEnabledPanel(boolean b) {
-        rollButton.setEnabled(b);
-        repaint();
-    }
 }
