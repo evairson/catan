@@ -38,18 +38,22 @@ public class PlayerClient extends Player {
                 out.flush();
                 Object object;
                 while ((object = in.readObject()) != null) {
-                    NetworkObject networkObjet = ((NetworkObject) object);
-                    switch (networkObjet.getType()) {
+                    NetworkObject networkObject = ((NetworkObject) object);
+                    switch (networkObject.getType()) {
                         case Game:
-                            if (networkObjet.getMessage().equals("startGame")) {
-                                app.getMainMenu().startapp((Game) (networkObjet.getObject()));
+                            if (networkObject.getMessage().equals("startGame")) {
+                                app.getMainMenu().startapp((Game) (networkObject.getObject()));
+                            }
+                            if (networkObject.getMessage().equals("dices")) {
+                                int[] tab = (int[]) networkObject.getObject();
+                                App.getActionPlayerPanel().getRollingDice().networkThrowDices(tab);
                             }
                             break;
                         case Message:
-                            message(networkObjet);
+                            message(networkObject);
                             break;
                         case Board:
-                            board(networkObjet);
+                            board(networkObject);
                         default:
                             break;
                     }

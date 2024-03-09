@@ -30,7 +30,7 @@ public class ListPlayers extends ArrayList<Player> {
      *
      */
     public Player next() {
-        if (currentPlayerIndex + 1 > this.size()) {
+        if (currentPlayerIndex + 1 >= this.size()) {
             currentPlayerIndex = 0;
         } else {
             currentPlayerIndex++;

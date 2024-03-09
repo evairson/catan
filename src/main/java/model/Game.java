@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import model.buildings.Building;
 import model.buildings.Colony;
 import model.cards.CardStack;
-import model.geometry.Layout;
-import model.geometry.Point;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
@@ -114,7 +112,11 @@ public class Game implements StateMethods, Serializable {
     }
 
     public boolean canPass() {
+        System.out.println("j'entre");
         if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
+            System.out.println("dice" + getCurrentPlayer().hasThrowDices());
+            System.out.println("start" + start);
+            System.out.println("backwards" + backwards);
             return false;
         }
         if ((start || backwards)
@@ -127,6 +129,7 @@ public class Game implements StateMethods, Serializable {
         if (App.getActionPlayerPanel().getCardPlayed()) {
             return false;
         }
+        System.out.println("a si c'est bon");
         return true;
     }
 
@@ -163,7 +166,6 @@ public class Game implements StateMethods, Serializable {
         if (start || backwards) {
             getCurrentPlayer().setFreeColony(true);
         }
-        //update();
         App.getActionPlayerPanel().update();
         App.getGamePanel().repaint();
     }

@@ -430,7 +430,6 @@ public class ActionPlayerPanel extends JPanel {
 
     public void update() {
         Player currentPlayer = game.getCurrentPlayer();
-        dice.newPlayer(currentPlayer);
 
         if (!Main.hasServer()) {
             resourcesPanel.updateResourceLabels(currentPlayer);

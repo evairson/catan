@@ -59,8 +59,8 @@ public class App {
         game.setPlayerClient(player);
         App.background = new BackgroundPanel();
         actionPlayer = new ActionPlayerPanel(this);
-        this.gamePanel = new GamePanel(this);
-        App.gameWindow.addPanels(actionPlayer, this.gamePanel, background);
+        gamePanel = new GamePanel(this);
+        App.gameWindow.addPanels(actionPlayer, gamePanel, background);
     }
 
     public Game getGame() {
