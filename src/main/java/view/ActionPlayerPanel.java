@@ -461,7 +461,11 @@ public class ActionPlayerPanel extends JPanel {
         if (Main.hasServer()) {
             if (game.isMyTurn()) {
                 shopPanel.setEnabledPanel(true);
-                endTurn.setEnabled(true);
+                if (game.canPass()) {
+                    endTurn.setEnabled(true);
+                } else {
+                    endTurn.setEnabled(false);
+                }
             } else {
                 shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);

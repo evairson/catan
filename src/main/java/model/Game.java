@@ -178,6 +178,7 @@ public class Game implements StateMethods, Serializable {
         }
         update();
         App.getActionPlayerPanel().repaint();
+        App.getGamePanel().repaint();
     }
 
     public boolean canDraw() {
@@ -478,6 +479,7 @@ public class Game implements StateMethods, Serializable {
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
                 getCurrentPlayer().buildRoad(edge);
+                App.getActionPlayerPanel().update();
                 App.getGamePanel().repaint();
                 return;
             }
