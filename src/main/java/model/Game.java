@@ -30,6 +30,7 @@ public class Game implements StateMethods {
     private boolean blankTurn = false;
     private boolean monoWaiting = false;
     private int yearOfPlentyWaiting = 0;
+    private Player first;
 
     public Game(App app) {
         this.app = app;
@@ -134,6 +135,10 @@ public class Game implements StateMethods {
             return;
         }
 
+        if (first == null) {
+            first = getCurrentPlayer();
+        }
+
         if (start || backwards) {
             ArrayList<Colony> colony = getCurrentPlayer().getColony();
             if (colony.size() >= 2) {
@@ -145,10 +150,10 @@ public class Game implements StateMethods {
             }
         }
 
-        if (start && getCurrentPlayer().getName().equals("Player4")) {
+        if (start && players.peekNext() == first) {
             start = false;
             backwards = true;
-        } else if (backwards && getCurrentPlayer().getName().equals("Player1")) {
+        } else if (backwards && getCurrentPlayer() == first) {
             backwards = false;
         } else if (backwards) {
             players.prev();
