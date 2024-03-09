@@ -270,6 +270,7 @@ public class Player {
                 setFreeColony(false);
                 setFreeRoad(true);
                 c.place(this, false, vertex);
+                return;
             }
             if (c.buyAndPlace(this, false, vertex)) {
                 points++;
