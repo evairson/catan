@@ -41,12 +41,20 @@ public class PlayerClient extends Player {
                     NetworkObject networkObject = ((NetworkObject) object);
                     switch (networkObject.getType()) {
                         case Game:
-                            if (networkObject.getMessage().equals("startGame")) {
-                                app.getMainMenu().startapp((Game) (networkObject.getObject()));
-                            }
-                            if (networkObject.getMessage().equals("dices")) {
-                                int[] tab = (int[]) networkObject.getObject();
-                                App.getActionPlayerPanel().getRollingDice().networkThrowDices(tab);
+                            switch (networkObject.getMessage()) {
+                                case "startGame" :
+                                    app.getMainMenu().startapp((Game) (networkObject.getObject()));
+                                    break;
+                                case "dices" :
+                                    int[] tab = (int[]) networkObject.getObject();
+                                    App.getActionPlayerPanel().getRollingDice().networkThrowDices(tab);
+                                    break;
+                                case "trade" :
+                                    TradeObject tradeObject = (TradeObject) networkObject.getObject();
+                                    App.getActionPlayerPanel().showTradePanel(tradeObject);
+                                default:
+                                    System.out.println("Pas de message correspondant");
+                                    break;
                             }
                             break;
                         case Message:

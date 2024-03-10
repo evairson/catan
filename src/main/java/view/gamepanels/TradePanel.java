@@ -1,8 +1,13 @@
 package view.gamepanels;
 
 import model.Player;
+import network.NetworkObject;
+import network.NetworkObject.TypeObject;
+import network.PlayerClient;
+import network.TradeObject;
 import others.Constants;
 import others.ListPlayers;
+import start.Main;
 import view.GameWindow;
 import view.TileType;
 import view.utilities.ButtonImage;
@@ -53,6 +58,21 @@ public class TradePanel extends JPanel {
         createTradeButtons();
         createPlayersButtons();
         initializeSelectedPlayerImage();
+        updateProposeButtonState();
+    }
+
+    public TradePanel(TradeObject tradeObject) {
+        this.resourcesOffered = tradeObject.getResourcesOffered();
+        this.resourcesRequested = tradeObject.getResourcesRequested();
+        //initializeSelectedPlayerLabel();
+        initializeResourceNameMap();
+        setLayout(null);
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+        loadBackgroundImage("src/main/resources/tradePanel.png");
+        createResourceButtons(false);
+        createTradeButtons();
+        //createPlayersButtons();
+        //initializeSelectedPlayerImage();
         updateProposeButtonState();
     }
 
@@ -207,11 +227,18 @@ public class TradePanel extends JPanel {
         displayResources(resourcesOffered);
 
         boolean canFulfillRequest = canSelectedPlayerFulfillRequest();
-        acceptButton.setEnabled(canFulfillRequest);
 
         toggleTradeInterface(false);
         notifyOfferToPlayer(selectedPlayer);
-        declineButton.setEnabled(true);
+        if (Main.hasServer()) {
+            declineButton.setEnabled(false);
+            proposeButton.setEnabled(false);
+            acceptButton.setEnabled(false);
+            bankTradeButton.setEnabled(false);
+        } else {
+            acceptButton.setEnabled(canFulfillRequest);
+            declineButton.setEnabled(true);
+        }
     }
     private void bankTradeAction() {
         isBank = true;
@@ -224,6 +251,22 @@ public class TradePanel extends JPanel {
     private void notifyOfferToPlayer(Player player) {
         // TODO : Implémentez la notification pour le joueur sélectionné.
         // Cela peut être un changement de couleur, un message pop-up, etc.
+
+        if (listPlayers.getCurrentPlayer() instanceof PlayerClient) {
+            try {
+                PlayerClient playerClient = (PlayerClient) player;
+                int id = playerClient.getId();
+                TradeObject tradeObject = new TradeObject(id, player.getId(), resourcesOffered,
+                    resourcesRequested);
+                NetworkObject object = new NetworkObject(TypeObject.Game, "trade", id, tradeObject);
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
+        } else {
+            System.out.println("Problème de downCast");
+        }
     }
     private void acceptAction(boolean isBank) {
         performTrade(isBank);

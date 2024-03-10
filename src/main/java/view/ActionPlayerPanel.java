@@ -19,6 +19,7 @@ import model.cards.KnightCard;
 import model.cards.Monopoly;
 import model.cards.RoadBuilding;
 import model.cards.YearOfPlenty;
+import network.TradeObject;
 import others.Constants;
 import start.Main;
 import view.utilities.Animation;
@@ -61,6 +62,10 @@ public class ActionPlayerPanel extends JPanel {
         initializeDeckPanel();
         createButton();
         setVisible(true);
+    }
+
+    public TradePanel getTradePanel() {
+        return tradePanel;
     }
 
     public RollingDice getRollingDice() {
@@ -155,7 +160,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeTradePanel() {
-        showTradePanel();
+        showTradePanel(null);
     }
 
     private JFrame getMainFrame() {
@@ -169,11 +174,15 @@ public class ActionPlayerPanel extends JPanel {
         return null; // Si le JFrame n'est pas trouvé (ce qui ne devrait pas arriver)
     }
 
-    private void showTradePanel() {
+    public void showTradePanel(TradeObject tradeObject) {
         JFrame mainFrame = getMainFrame();
         JLayeredPane layeredPane = mainFrame.getLayeredPane();
         ListPlayers listPlayers = game.getPlayers();
-        TradePanel tradePanel = new TradePanel(listPlayers, resourcesPanel);
+        if (tradeObject == null) {
+            TradePanel tradePanel = new TradePanel(listPlayers, resourcesPanel);
+        } else {
+            TradePanel tradePanel = new TradePanel(tradeObject);
+        }
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);
         setComponentsEnabled(false);
@@ -466,6 +475,7 @@ public class ActionPlayerPanel extends JPanel {
                     endTurn.setEnabled(false);
                 }
             } else {
+                dice.setButtonIsOn(false);
                 shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);
             }
