@@ -160,6 +160,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeTradePanel() {
+        System.out.println("ok");
         showTradePanel(null);
     }
 
@@ -179,9 +180,9 @@ public class ActionPlayerPanel extends JPanel {
         JLayeredPane layeredPane = mainFrame.getLayeredPane();
         ListPlayers listPlayers = game.getPlayers();
         if (tradeObject == null) {
-            TradePanel tradePanel = new TradePanel(listPlayers, resourcesPanel);
+            tradePanel = new TradePanel(listPlayers, resourcesPanel);
         } else {
-            TradePanel tradePanel = new TradePanel(tradeObject);
+            tradePanel = new TradePanel(tradeObject, listPlayers, resourcesPanel, game.getPlayerClient());
         }
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);

@@ -51,7 +51,19 @@ public class PlayerClient extends Player {
                                     break;
                                 case "trade" :
                                     TradeObject tradeObject = (TradeObject) networkObject.getObject();
-                                    App.getActionPlayerPanel().showTradePanel(tradeObject);
+                                    if (tradeObject.getIdPlayer() == id) {
+                                        System.out.println("c'est moi");
+                                        App.getActionPlayerPanel().showTradePanel(tradeObject);
+                                    }
+                                    break;
+                                case "tradeAccept" :
+                                    int idTrader = (int) networkObject.getObject();
+                                    if (idTrader == id) {
+                                        System.out.println("c'est moi");
+                                        App.getActionPlayerPanel().getTradePanel().acceptAction(false);
+                                        App.getActionPlayerPanel().update();
+                                    }
+                                    break;
                                 default:
                                     System.out.println("Pas de message correspondant");
                                     break;
@@ -62,7 +74,9 @@ public class PlayerClient extends Player {
                             break;
                         case Board:
                             board(networkObject);
+                            break;
                         default:
+                            System.out.println("Pas de message correspondant");
                             break;
                     }
                 }

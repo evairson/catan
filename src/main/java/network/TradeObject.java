@@ -8,12 +8,12 @@ import view.TileType;
 public class TradeObject implements Serializable {
     private int idTrader;
     private int idPlayer;
-    private HashMap<TileType, Integer> resourcesRequested;
-    private HashMap<TileType, Integer> resourcesOffered;
+    private HashMap<String, Integer> resourcesRequested;
+    private HashMap<String, Integer> resourcesOffered;
 
 
-    public TradeObject(int idTrader, int idPlayer, HashMap<TileType, Integer> resourcesRequested,
-        HashMap<TileType, Integer> resourcesOffered) {
+    public TradeObject(int idTrader, int idPlayer, HashMap<String, Integer> resourcesRequested,
+        HashMap<String, Integer> resourcesOffered) {
         this.idTrader = idTrader;
         this.idPlayer = idPlayer;
         this.resourcesOffered = resourcesOffered;
@@ -26,17 +26,35 @@ public class TradeObject implements Serializable {
     public void setIdPlayer(int idPlayer) {
         this.idPlayer = idPlayer;
     }
-    public HashMap<TileType, Integer> getResourcesRequested() {
+    public HashMap<String, Integer> getResourcesRequested() {
         return resourcesRequested;
     }
-    public void setResourcesRequested(HashMap<TileType, Integer> resourcesRequested) {
+    public void setResourcesRequested(HashMap<String, Integer> resourcesRequested) {
         this.resourcesRequested = resourcesRequested;
     }
-    public HashMap<TileType, Integer> getResourcesOffered() {
+    public HashMap<String, Integer> getResourcesOffered() {
         return resourcesOffered;
     }
-    public void setResourcesOffered(HashMap<TileType, Integer> resourcesOffered) {
+    public void setResourcesOffered(HashMap<String, Integer> resourcesOffered) {
         this.resourcesOffered = resourcesOffered;
+    }
+
+    public static HashMap<String, Integer> toString(HashMap<TileType, Integer> typeMap) {
+        HashMap<String, Integer> stringKeyMap = new HashMap<>();
+
+        for (HashMap.Entry<TileType, Integer> entry : typeMap.entrySet()) {
+            stringKeyMap.put(entry.getKey().name(), entry.getValue());
+        }
+        return stringKeyMap;
+    }
+
+    public static HashMap<TileType, Integer> toTileType(HashMap<String, Integer> stringKeyMap) {
+        HashMap<TileType, Integer> typeMap = new HashMap<>();
+
+        for (HashMap.Entry<String, Integer> entry : stringKeyMap.entrySet()) {
+            typeMap.put(TileType.valueOf(entry.getKey()), entry.getValue());
+        }
+        return typeMap;
     }
 
 }
