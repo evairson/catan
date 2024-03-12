@@ -12,4 +12,10 @@ public class SpecializedHarbor extends Harbor {
     public TileType getResourceType() {
         return resourceType;
     }
+
+    @Override
+    public String toString() {
+        return "SpecializedHarbor{" + "location="
+                + getLocation().getCoordinates() + ", resourceType=" + resourceType + '}';
+    }
 }

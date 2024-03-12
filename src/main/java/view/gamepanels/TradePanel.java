@@ -335,7 +335,9 @@ public class TradePanel extends JPanel {
 
         for (Colony colony : colonies) {
             TileVertex colonyVertex = colony.getVertex();
+            System.out.println("derchos098 : " + colonyVertex);
             Harbor connectedHarbor = colonyVertex.getHarbor();
+            System.out.println("derchos1256798 : " + connectedHarbor);
             if (connectedHarbor != null) {
                 accessiblesHarbors.add(connectedHarbor);
             }
@@ -357,11 +359,16 @@ public class TradePanel extends JPanel {
     }
     private boolean isValidBankTrade() {
         List<Harbor> currentPlayerPorts = getCurrentPlayerHarbors();
+        System.out.println(currentPlayerPorts);
         int generalTradeRate = currentPlayerPorts.stream().anyMatch(Objects::nonNull) ? 3 : 4;
+
+        gatherResourcesOffered();
+        gatherResourcesRequested();
 
         for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
             TileType offeredResource = entry.getKey();
             Integer offeredAmount = entry.getValue();
+            System.out.println(offeredAmount);
             int requiredTradeRate = generalTradeRate; // Taux général par défaut.
 
             // Vérifier si un port spécialisé ajuste le taux pour cette ressource.

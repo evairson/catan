@@ -12,4 +12,9 @@ public class Harbor {
     public TileVertex getLocation() {
         return location;
     }
+
+    @Override
+    public String toString() {
+        return "Harbor{" + "location=" + location.getCoordinates() + '}';
+    }
 }

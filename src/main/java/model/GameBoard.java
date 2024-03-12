@@ -27,6 +27,16 @@ import java.util.Map;
 
 public class GameBoard {
     private final Map<TileVertex, Harbor> harborMap = new HashMap<>();
+
+    public void displayHarborMap() {
+        for (Map.Entry<TileVertex, Harbor> entry : harborMap.entrySet()) {
+            TileVertex vertex = entry.getKey();
+            Harbor harbor = entry.getValue();
+            System.out.println("Vertex: " + vertex.getCoordinates() + ", Harbor: "
+                    + harbor + ", Vertex: " + vertex);
+        }
+    }
+
     private HashMap<CubeCoordinates, Tile> board;
     private Layout layout;
     private int gridSize = 2;
@@ -49,7 +59,6 @@ public class GameBoard {
     private boolean placingRoad = false;
     private boolean placingColony = false;
     private boolean placingCity = false;
-    private boolean waitingChoice = false;
     private Game game;
     private App app;
 
@@ -81,14 +90,14 @@ public class GameBoard {
         this.layout = layout;
         this.initialiseBoard();
         this.initialisePorts();
-
+        displayHarborMap();
     }
 
     public void initialisePorts() {
         // Exemple de création d'un port pour un TileVertex spécifique
         Point harborPoint = new Point(642, 330); // Les coordonnées du TileVertex pour le port
         TileVertex harborVertex = findTileVertexByPoint(harborPoint);
-
+        System.out.println("derchos1890" + harborVertex);
         if (harborVertex != null) {
             // Créez votre port ici. Cela pourrait être un port général ou spécialisé
             // en fonction de votre conception. Pour le test, créons un port général.
@@ -99,7 +108,7 @@ public class GameBoard {
 
     private TileVertex findTileVertexByPoint(Point point) {
         for (TileVertex vertex : verticesMap.values()) {
-            if (arePointsEqual(vertex.getCoordinates(), point)) {
+            if (vertex.getCoordinates().equals(point)) {
                 return vertex;
             }
         }
