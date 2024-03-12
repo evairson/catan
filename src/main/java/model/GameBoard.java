@@ -24,16 +24,6 @@ import java.util.Map;
 
 public class GameBoard {
     private final Map<TileVertex, Harbor> harborMap = new HashMap<>();
-
-    public void displayHarborMap() {
-        for (Map.Entry<TileVertex, Harbor> entry : harborMap.entrySet()) {
-            TileVertex vertex = entry.getKey();
-            Harbor harbor = entry.getValue();
-            System.out.println("Vertex: " + vertex.getCoordinates() + ", Harbor: "
-                    + harbor + ", Vertex: " + vertex);
-        }
-    }
-
     private HashMap<CubeCoordinates, Tile> board;
     private Layout layout;
     private int gridSize = 2;
@@ -78,6 +68,7 @@ public class GameBoard {
             Font.BOLD, (int) (35 / Constants.Game.DIVIDER));
 
     private Map<Building, Image> scaledBuildingImages = new HashMap<>();
+    private BufferedImage harborImage;
 
     public GameBoard(Layout layout, Thief thief, Game game) {
         loadImages();
@@ -87,7 +78,32 @@ public class GameBoard {
         this.layout = layout;
         this.initialiseBoard();
         this.initialisePorts();
-        displayHarborMap();
+        loadHarborImage();
+    }
+
+    private void loadHarborImage() {
+        try {
+            BufferedImage originalImage = ImageIO.read(new File("src/main/resources/harbor.png"));
+            // Ajustez la taille comme nécessaire
+            int width = originalImage.getWidth() / 5; // Exemple de réduction de la taille
+            int height = originalImage.getHeight() / 5;
+            harborImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = harborImage.createGraphics();
+            g2d.drawImage(originalImage, 0, 0, width, height, null);
+            g2d.dispose();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void drawPorts(Graphics g) {
+        for (Map.Entry<TileVertex, Harbor> entry : harborMap.entrySet()) {
+            TileVertex vertex = entry.getKey();
+            Point location = vertex.getCoordinates();
+            // Dessinez l'image du port à l'emplacement du vertex
+            g.drawImage(harborImage, (int) location.getX() - harborImage.getWidth() / 2,
+                    (int) location.getY() - harborImage.getHeight() / 2, null);
+        }
     }
 
     public void initialisePorts() {
@@ -772,6 +788,7 @@ public class GameBoard {
         drawImagesInHexes(g);
         drawEdges(g);
         drawVertices(g);
+        drawPorts(g);
 
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
