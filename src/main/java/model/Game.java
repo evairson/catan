@@ -383,7 +383,6 @@ public class Game implements StateMethods {
             TileVertex cVertex = board.getClosestTileVertex();
             if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                 getCurrentPlayer().buildColony(cVertex);
-                System.out.println("derchos99 : " + cVertex.getCoordinates());
             }
         }
         // rajouter un if ça a marché (transformer Player.buildColony en boolean)
