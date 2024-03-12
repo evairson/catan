@@ -3,6 +3,7 @@ package others;
 import model.geometry.Orientation;
 import model.geometry.CubeCoordinates;
 import view.TileType;
+import view.utilities.Resolution;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -73,6 +74,9 @@ public class Constants {
         public static final double BASE_DIAGONAL = Math.sqrt(Math.pow(BASE_WIDTH, 2)
                 + Math.pow(BASE_HEIGHT, 2));
         public static final int BASE_DIVIDER_IMAGE = 2;
+
+
+
         private static final Dimension[] TEST_SCREEN_SIZES = {
             new Dimension(1024, 768),    // 4:3         0
             new Dimension(1280, 800),    // 16:10       1
@@ -82,9 +86,24 @@ public class Constants {
             new Dimension(1920, 1080),   // 16:9        5
         };
         private static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-        public static final Dimension ADJUSTED_SIZE = adjustToAspectRatio(SCREEN_SIZE);
+        public static final Dimension ADJUSTED_SIZE = adjustToAspectRatio(checkIfWindows(SCREEN_SIZE));
         public static final int WIDTH = ADJUSTED_SIZE.width;
         public static final int HEIGHT = ADJUSTED_SIZE.height;
+
+        public static final double DIVIDER = Resolution.divider();
+
+        private static Dimension checkIfWindows(Dimension screenSize) {
+            String osName = System.getProperty("os.name").toLowerCase();
+            double width = screenSize.getWidth();
+            double height = screenSize.getHeight();
+
+            if (osName.contains("win")) {
+                Rectangle winSize = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                        .getMaximumWindowBounds();
+                height = winSize.getHeight();
+            }
+            return new Dimension((int) width, (int) height);
+        }
 
         private static Dimension adjustToAspectRatio(Dimension screenSize) {
             // Ratio cible 16:9
@@ -166,6 +185,6 @@ public class Constants {
     }
 
     public static class Others {
-        public static final String MUSIC_DIRECTORY = "";
+        public static final String MUSIC_DIRECTORY = "src/main/resources/music";
     }
 }

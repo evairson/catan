@@ -21,6 +21,7 @@ public class GameWindow extends JFrame {
 
     private MainMenu mainMenu;
     private TradePanel tradePanel;
+    private BackgroundPanel background;
     private CardLayout layout;
 
     public GameWindow(MainMenu mainMenu) {
@@ -56,9 +57,11 @@ public class GameWindow extends JFrame {
         setResizable(false);
     }
 
-    public void addPanels(ActionPlayerPanel actionPlayer, GamePanel gamePanel) {
+    public void addPanels(ActionPlayerPanel actionPlayer, GamePanel gamePanel, BackgroundPanel background) {
         this.actionPlayer = actionPlayer;
         this.gamePanel = gamePanel;
+        this.background = background;
+
     }
     public void close(int i) {
         System.exit(i);
