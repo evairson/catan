@@ -91,21 +91,51 @@ public class GameBoard {
     }
 
     public void initialisePorts() {
-        // Exemple de création d'un port pour un TileVertex spécifique
-        Point harborPoint = new Point(642, 330); // Les coordonnées du TileVertex pour le port
-        Point harborPointSp = new Point(582, 225); // Les coordonnées du TileVertex pour le port Sp
-        TileVertex harborVertex = findTileVertexByPoint(harborPoint);
-        TileVertex harborSpVertex = findTileVertexByPoint(harborPointSp);
-        if (harborVertex != null) {
-            // Créez votre port ici. Cela pourrait être un port général ou spécialisé
-            // en fonction de votre conception. Pour le test, créons un port général.
-            Harbor testPort = new Harbor(harborVertex); // Supposons que vous avez une classe GeneralPort
-            SpecializedHarbor test = new SpecializedHarbor(harborSpVertex, TileType.WHEAT);
-            harborVertex.setHarbor(testPort);
-            harborSpVertex.setHarbor(test);
-            harborMap.put(harborVertex, testPort);
-            harborMap.put(harborSpVertex, test);
+        // Définir les coordonnées des ports classiques
+        Point[] classicPortsPoints = {
+            new Point(218, 155),
+            new Point(279, 120),
+            new Point(582, 225),
+            new Point(642, 260),
+            new Point(703, 365),
+            new Point(703, 435),
+            new Point(279, 680),
+            new Point(218, 645)
+        };
+
+        // Définir les coordonnées des ports spécialisés et leur type de ressource associé
+        Map<Point, TileType> specializedPortsPoints = Map.of(
+            new Point(400, 120), TileType.WOOL,
+            new Point(461, 155), TileType.WOOL,
+            new Point(642, 540), TileType.CLAY,
+            new Point(582, 575), TileType.CLAY,
+            new Point(461, 645), TileType.WOOD,
+            new Point(400, 680), TileType.WOOD,
+            new Point(158, 540), TileType.WHEAT,
+            new Point(158, 470), TileType.WHEAT,
+            new Point(158, 330), TileType.ORE,
+            new Point(158, 260), TileType.ORE
+        );
+
+        // Initialiser les ports classiques
+        for (Point point : classicPortsPoints) {
+            TileVertex harborVertex = findTileVertexByPoint(point);
+            if (harborVertex != null) {
+                Harbor port = new Harbor(harborVertex);
+                harborVertex.setHarbor(port);
+                harborMap.put(harborVertex, port);
+            }
         }
+
+        // Initialiser les ports spécialisés
+        specializedPortsPoints.forEach((point, type) -> {
+            TileVertex harborVertex = findTileVertexByPoint(point);
+            if (harborVertex != null) {
+                SpecializedHarbor specializedPort = new SpecializedHarbor(harborVertex, type);
+                harborVertex.setHarbor(specializedPort);
+                harborMap.put(harborVertex, specializedPort);
+            }
+        });
     }
 
     private TileVertex findTileVertexByPoint(Point point) {
