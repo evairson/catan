@@ -107,7 +107,7 @@ public class Game implements StateMethods {
             }
         }
         getCurrentPlayer().addResource(t, amount);
-        // TODO : Update les ressources du joueur en direct ^^
+        app.getActionPlayerPanel().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
         System.out.println("monopoly de " + amount + " " + t);
     }
 

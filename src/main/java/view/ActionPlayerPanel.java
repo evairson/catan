@@ -66,6 +66,10 @@ public class ActionPlayerPanel extends JPanel {
         return dice;
     }
 
+    public ResourcesPanel getResourcesPanel() {
+        return resourcesPanel;
+    }
+
 
     private void initializeRollingDicePanel() {
         int xCoord = Resolution.calculateResolution(1108, 440)[0];
