@@ -15,11 +15,8 @@ public class GamePanel extends JPanel {
 
     private MouseInputs mouseInputs;
 
-
-
     public GamePanel(App game) {
         this.game = game;
-
         mouseInputs = new MouseInputs(game);
         addMouseListener(mouseInputs);
         addMouseMotionListener(mouseInputs);

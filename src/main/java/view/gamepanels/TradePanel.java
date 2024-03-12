@@ -335,9 +335,7 @@ public class TradePanel extends JPanel {
 
         for (Colony colony : colonies) {
             TileVertex colonyVertex = colony.getVertex();
-            System.out.println("derchos098 : " + colonyVertex);
             Harbor connectedHarbor = colonyVertex.getHarbor();
-            System.out.println("derchos1256798 : " + connectedHarbor);
             if (connectedHarbor != null) {
                 accessiblesHarbors.add(connectedHarbor);
             }
@@ -508,7 +506,6 @@ public class TradePanel extends JPanel {
         ImageIcon icon = new ImageIcon(path);
         backgroundImage = icon.getImage().getScaledInstance(this.getWidth(),
                 this.getHeight(), Image.SCALE_SMOOTH);
-        System.out.println("derchos" + Constants.Game.WIDTH + " ; " + Constants.Game.HEIGHT);
     }
     @Override
     protected void paintComponent(Graphics g) {

@@ -96,7 +96,6 @@ public class GameBoard {
         Point harborPointSp = new Point(582, 225); // Les coordonnées du TileVertex pour le port Sp
         TileVertex harborVertex = findTileVertexByPoint(harborPoint);
         TileVertex harborSpVertex = findTileVertexByPoint(harborPointSp);
-        System.out.println("derchos1890" + harborVertex);
         if (harborVertex != null) {
             // Créez votre port ici. Cela pourrait être un port général ou spécialisé
             // en fonction de votre conception. Pour le test, créons un port général.
