@@ -359,16 +359,23 @@ public class TradePanel extends JPanel {
     }
     private boolean isValidBankTrade() {
         List<Harbor> currentPlayerPorts = getCurrentPlayerHarbors();
-        System.out.println(currentPlayerPorts);
-        int generalTradeRate = currentPlayerPorts.stream().anyMatch(Objects::nonNull) ? 3 : 4;
+        // Définir le taux général à 4 par défaut
+        int generalTradeRate = 4;
+
+        // Vérifier la présence d'un port classique
+        boolean hasGeneralPort = currentPlayerPorts.stream().anyMatch(port ->
+                !(port instanceof SpecializedHarbor));
+        if (hasGeneralPort) {
+            generalTradeRate = 3;
+        }
 
         gatherResourcesOffered();
         gatherResourcesRequested();
+        int totalExchanges = 0;
 
         for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
             TileType offeredResource = entry.getKey();
             Integer offeredAmount = entry.getValue();
-            System.out.println(offeredAmount);
             int requiredTradeRate = generalTradeRate; // Taux général par défaut.
 
             // Vérifier si un port spécialisé ajuste le taux pour cette ressource.
@@ -383,12 +390,9 @@ public class TradePanel extends JPanel {
             if (offeredAmount % requiredTradeRate != 0) {
                 return false; // Si les ressources offertes ne correspondent pas au taux d'échange requis.
             }
+            totalExchanges += offeredAmount / requiredTradeRate;
         }
 
-        // Vérifier que le nombre total de ressources demandées correspond au nombre d'échanges effectués.
-        int totalExchanges = resourcesOffered.values().stream()
-                .mapToInt(integer -> integer / generalTradeRate)
-                .sum();
         int totalRequestedResources = getTotalSelectedResources(playerTwoLabels);
         return totalExchanges == totalRequestedResources;
     }

@@ -1,9 +1,6 @@
 package model;
 
-import model.buildings.Building;
-import model.buildings.Colony;
-import model.buildings.Harbor;
-import model.buildings.Road;
+import model.buildings.*;
 import model.geometry.*;
 import model.geometry.Point;
 import model.tiles.*;
@@ -96,13 +93,19 @@ public class GameBoard {
     public void initialisePorts() {
         // Exemple de création d'un port pour un TileVertex spécifique
         Point harborPoint = new Point(642, 330); // Les coordonnées du TileVertex pour le port
+        Point harborPointSp = new Point(582, 225); // Les coordonnées du TileVertex pour le port Sp
         TileVertex harborVertex = findTileVertexByPoint(harborPoint);
+        TileVertex harborSpVertex = findTileVertexByPoint(harborPointSp);
         System.out.println("derchos1890" + harborVertex);
         if (harborVertex != null) {
             // Créez votre port ici. Cela pourrait être un port général ou spécialisé
             // en fonction de votre conception. Pour le test, créons un port général.
             Harbor testPort = new Harbor(harborVertex); // Supposons que vous avez une classe GeneralPort
+            SpecializedHarbor test = new SpecializedHarbor(harborSpVertex, TileType.WHEAT);
+            harborVertex.setHarbor(testPort);
+            harborSpVertex.setHarbor(test);
             harborMap.put(harborVertex, testPort);
+            harborMap.put(harborSpVertex, test);
         }
     }
 
