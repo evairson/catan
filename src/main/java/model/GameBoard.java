@@ -673,6 +673,7 @@ public class GameBoard implements Serializable {
                 if (distance < minDistanceToCenterTile) {
                     minDistanceToCenterTile = distance;
                     highlightedTile = board.get(coordinatesTile);
+                    App.getGamePanel().repaint();
                 }
             }
         }

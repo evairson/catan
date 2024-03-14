@@ -94,11 +94,9 @@ public class App {
     public void startGame(HashSet<Player> hashSet) {
         try {
             game = new Game(hashSet);
-            System.out.println(game.getBoard() == null);
             NetworkObject gameObject = new NetworkObject(TypeObject.Game, "startGame", player.getId(), game);
             player.getOut().writeUnshared(gameObject);
             player.getOut().flush();
-            System.out.println("ok");
         } catch (Exception e) {
             e.getStackTrace();
         }

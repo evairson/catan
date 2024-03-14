@@ -27,7 +27,7 @@ public class Road extends Building {
         return this.edge;
     }
 
-    public int[] getCost() {
+    public static int[] getCost() {
         return Constants.BuildingCosts.ROAD;
     }
     public boolean buyAndPlace(Player player, TileEdge edge) {

@@ -19,6 +19,9 @@ import model.cards.KnightCard;
 import model.cards.Monopoly;
 import model.cards.RoadBuilding;
 import model.cards.YearOfPlenty;
+import network.NetworkObject;
+import network.PlayerClient;
+import network.NetworkObject.TypeObject;
 import network.TradeObject;
 import others.Constants;
 import start.Main;
@@ -160,7 +163,6 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeTradePanel() {
-        System.out.println("ok");
         showTradePanel(null);
     }
 
@@ -265,7 +267,6 @@ public class ActionPlayerPanel extends JPanel {
         Player player;
         if (Main.hasServer()) {
             player = game.getPlayerClient();
-            System.out.println(game.getPlayerClient() == game.getCurrentPlayer());
         } else {
             player = game.getCurrentPlayer();
         }
@@ -374,11 +375,26 @@ public class ActionPlayerPanel extends JPanel {
         }
     }
 
+    public void drawCardServer() {
+        game.getCurrentPlayer().drawCard(game.getStack());
+    }
+
     private void drawCard() {
         if (!game.canDraw()) {
             return;
         }
         game.getCurrentPlayer().drawCard(game.getStack());
+        if (Main.hasServer() && game.getCurrentPlayer() instanceof PlayerClient) {
+            try {
+                PlayerClient player = game.getPlayerClient();
+                NetworkObject gameObject;
+                gameObject = new NetworkObject(TypeObject.Message, "DrawCard", player.getId(), null);
+                player.getOut().writeUnshared(gameObject);
+                player.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         if (cardPanel != null) {
             remove(cardPanel);
         }
@@ -405,6 +421,7 @@ public class ActionPlayerPanel extends JPanel {
         });
         cardPanel.setOpaque(false);
         add(cardPanel, 0);
+        updateShopPanel();
         revalidate();
         repaint();
     }
@@ -466,10 +483,14 @@ public class ActionPlayerPanel extends JPanel {
         repaint();
     }
 
+    public void updateShopPanel() {
+        shopPanel.updateEnablePanel(game);
+    }
+
     public void updateTurn() {
         if (Main.hasServer()) {
             if (game.isMyTurn()) {
-                shopPanel.setEnabledPanel(true);
+                updateShopPanel();
                 if (game.canPass()) {
                     endTurn.setEnabled(true);
                 } else {

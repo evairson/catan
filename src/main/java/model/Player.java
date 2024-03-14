@@ -131,7 +131,6 @@ public class Player implements Serializable {
         for (TileType r : resources.keySet()) {
             System.out.print(r + " ");
         }
-        System.out.println();
     }
 
     // Getter / Setter : ---------------
@@ -306,7 +305,6 @@ public class Player implements Serializable {
             }
             r.buyAndPlace(this, edge);
         }
-        System.out.println("okR");
         App.getGamePanel().repaint();
     }
 
@@ -323,7 +321,6 @@ public class Player implements Serializable {
                 App.checkWin();
             }
         }
-        System.out.println("ok");
         App.getGamePanel().repaint();
     }
 
@@ -353,7 +350,7 @@ public class Player implements Serializable {
             DevelopmentCard card = stack.getCardStack().pop();
             if (card instanceof VictoryPointCard) {
                 points++;
-                app.checkWin();
+                App.checkWin();
             }
             cardsDev.add(card);
 

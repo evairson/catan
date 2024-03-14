@@ -112,7 +112,6 @@ public class Game implements StateMethods, Serializable {
     }
 
     public boolean canPass() {
-        System.out.println("j'entre");
         if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
             System.out.println("dice" + getCurrentPlayer().hasThrowDices());
             System.out.println("start" + start);
@@ -129,7 +128,6 @@ public class Game implements StateMethods, Serializable {
         if (App.getActionPlayerPanel().getCardPlayed()) {
             return false;
         }
-        System.out.println("a si c'est bon");
         return true;
     }
 
@@ -307,11 +305,22 @@ public class Game implements StateMethods, Serializable {
     }
 
     // Build methods ---------------
+
+    public boolean canBuildCity() {
+        if (blankTurn) {
+            return false;
+        }
+        if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
+            return true;
+        }
+        return false;
+    }
+
     public void buildCityButtonAction() {
         if (blankTurn) {
             return;
         }
-        if ((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven) {
+        if (((!Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
             if (getCurrentPlayer().hasColony()) {
                 if (board.isLookingForVertex()) {
                     board.setLookingForVertex(!board.isLookingForVertex());
@@ -333,11 +342,23 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    public boolean canBuildColony() {
+        if (blankTurn) {
+            return false;
+        }
+        if (((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
+            || getCurrentPlayer().getFreeColony()) {
+            return true;
+        }
+        return false;
+    }
+
+
     public void buildColonyButtonAction() {
         if (blankTurn) {
             return;
         }
-        if (((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
+        if (((!Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
             || getCurrentPlayer().getFreeColony()) {
             if (board.isLookingForVertex()) {
                 board.setLookingForVertex(!board.isLookingForVertex());
@@ -356,6 +377,17 @@ public class Game implements StateMethods, Serializable {
                 board.setPlacingCity(false);
             }
         }
+    }
+
+    public boolean canBuildRoad() {
+        if (blankTurn) {
+            return false;
+        }
+        if (((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
+            || getCurrentPlayer().getFreeRoad()) {
+            return true;
+        }
+        return false;
     }
 
     public void buildRoadButtonAction() {

@@ -48,18 +48,19 @@ public class PlayerClient extends Player {
                                 case "dices" :
                                     int[] tab = (int[]) networkObject.getObject();
                                     App.getActionPlayerPanel().getRollingDice().networkThrowDices(tab);
+                                    if (networkObject.getId() == id) {
+                                        App.getActionPlayerPanel().updateShopPanel();
+                                    }
                                     break;
                                 case "trade" :
                                     TradeObject tradeObject = (TradeObject) networkObject.getObject();
                                     if (tradeObject.getIdPlayer() == id) {
-                                        System.out.println("c'est moi");
                                         App.getActionPlayerPanel().showTradePanel(tradeObject);
                                     }
                                     break;
                                 case "tradeAccept" :
                                     int idTrader = (int) networkObject.getObject();
                                     if (idTrader == id) {
-                                        System.out.println("c'est moi");
                                         App.getActionPlayerPanel().getTradePanel().acceptAction(false);
                                         App.getActionPlayerPanel().update();
                                     }
@@ -128,6 +129,11 @@ public class PlayerClient extends Player {
             case "changeTurn":
                 app.getGame().endTurn();
                 break;
+            case "DrawCard":
+                if (id != networkObjet.getId()) {
+                    App.getActionPlayerPanel().drawCardServer();
+                }
+                break;
             default:
                 throw new NetworkObjectException();
         }
@@ -137,19 +143,25 @@ public class PlayerClient extends Player {
         try {
             switch (networkObject.getMessage()) {
                 case "buildCity":
-                    System.out.println("try to construct a city Network");
                     int idCity = (int) networkObject.getObject();
                     app.getGame().buildCity(idCity);
+                    if (networkObject.getId() == id) {
+                        App.getActionPlayerPanel().updateShopPanel();
+                    }
                     break;
                 case "buildColony":
-                    System.out.println("try to construct a colony Network");
                     int idColony = (int) networkObject.getObject();
                     app.getGame().buildColony(idColony);
+                    if (networkObject.getId() == id) {
+                        App.getActionPlayerPanel().updateShopPanel();
+                    }
                     break;
                 case "buildRoad":
-                    System.out.println("try to construct a road Network");
                     int idRoad = (int) networkObject.getObject();
                     app.getGame().buildRoad(idRoad);
+                    if (networkObject.getId() == id) {
+                        App.getActionPlayerPanel().updateShopPanel();
+                    }
                     break;
                 default:
                     break;
