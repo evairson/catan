@@ -5,8 +5,6 @@ import java.net.Socket;
 import model.App;
 import model.Game;
 import model.Player;
-import model.tiles.TileEdge;
-import model.tiles.TileVertex;
 import network.NetworkObject.TypeObject;
 
 import java.net.InetAddress;
@@ -16,6 +14,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import exceptionclass.ConstructBuildingException;
+import exceptionclass.NetworkObjectException;
 
 public class PlayerClient extends Player {
     private static App app;
@@ -37,55 +38,60 @@ public class PlayerClient extends Player {
                 out.flush();
                 Object object;
                 while ((object = in.readObject()) != null) {
-                    NetworkObject networkObjet = ((NetworkObject) object);
-                    switch (networkObjet.getType()) {
+                    NetworkObject networkObject = ((NetworkObject) object);
+                    switch (networkObject.getType()) {
                         case Game:
-                            if (networkObjet.getMessage().equals("startGame")) {
-                                app.getMainMenu().startapp((Game) (networkObjet.getObject()));
+                            switch (networkObject.getMessage()) {
+                                case "startGame" :
+                                    app.getMainMenu().startapp((Game) (networkObject.getObject()));
+                                    break;
+                                case "dices" :
+                                    int[] tab = (int[]) networkObject.getObject();
+                                    App.getActionPlayerPanel().getRollingDice().networkThrowDices(tab);
+                                    if (networkObject.getId() == id) {
+                                        App.getActionPlayerPanel().updateShopPanel();
+                                    }
+                                    break;
+                                case "trade" :
+                                    TradeObject tradeObject = (TradeObject) networkObject.getObject();
+                                    if (tradeObject.getIdPlayer() == id) {
+                                        App.getActionPlayerPanel().showTradePanel(tradeObject);
+                                    }
+                                    break;
+                                case "tradeAccept" :
+                                    int idTrader = (int) networkObject.getObject();
+                                    if (idTrader == id) {
+                                        App.getActionPlayerPanel().getTradePanel().acceptAction(false);
+                                        App.getActionPlayerPanel().update();
+                                    }
+                                    break;
+                                default:
+                                    System.out.println("Pas de message correspondant");
+                                    break;
                             }
                             break;
                         case Message:
-                            if (networkObjet.getMessage().equals("ID")) {
-                                id = networkObjet.getId();
-                                System.out.println("Je suis le joueur numéro : " + id);
-                            }
-                            if (networkObjet.getMessage().equals("NamePlayers")) {
-                                HashSet<Player> hashSet = (HashSet<Player>) networkObjet.getObject();
-                                app.startGame(hashSet);
-                            }
-                            if (networkObjet.getMessage().equals("changeTurn")) {
-                                app.getGame().endTurn();
-                            }
+                            message(networkObject);
                             break;
                         case Board:
-                            if (networkObjet.getMessage().equals("buildCity")) {
-                                System.out.println("derchos");
-                                TileVertex cVertex = (TileVertex) networkObjet.getObject();
-                                app.getGame().buildCity(cVertex);
-                            }
-                            if (networkObjet.getMessage().equals("buildColony")) {
-                                System.out.println("derchos");
-                                TileVertex cVertex = (TileVertex) networkObjet.getObject();
-                                app.getGame().buildColony(cVertex);
-                            }
-                            if (networkObjet.getMessage().equals("buildRoad")) {
-                                System.out.println("derchos");
-                                TileEdge cEdge = (TileEdge) networkObjet.getObject();
-                                app.getGame().buildRoad(cEdge);
-                            }
+                            board(networkObject);
+                            break;
                         case ChatMessage:
-                            app.addMessage(networkObjet.getMessage());
+                            app.addMessage(networkObject.getMessage());
                         default:
+                            System.out.println("Pas de message correspondant");
                             break;
                     }
                 }
+            } catch (NetworkObjectException e) {
+                NetworkObjectException.messageError();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    // N'oubliez pas de fermer proprement vos ressources
+    // Fermer proprement les ressources
     public void close() throws IOException {
         in.close();
         socket.close();
@@ -97,7 +103,7 @@ public class PlayerClient extends Player {
     }
 
     public void setApp(App app) {
-        this.app = app;
+        PlayerClient.app = app;
     }
 
     public int getId() {
@@ -110,5 +116,61 @@ public class PlayerClient extends Player {
 
     public boolean isMyTurn(Game game) {
         return id == game.getCurrentPlayer().getId();
+    }
+
+    public void message(NetworkObject networkObjet) throws NetworkObjectException {
+        switch (networkObjet.getMessage()) {
+            case "ID":
+                id = networkObjet.getId();
+                System.out.println("Je suis le joueur numéro : " + id);
+                break;
+            case "NamePlayers":
+                HashSet<Player> hashSet = (HashSet<Player>) networkObjet.getObject();
+                app.startGame(hashSet);
+                break;
+            case "changeTurn":
+                app.getGame().endTurn();
+                break;
+            case "DrawCard":
+                if (id != networkObjet.getId()) {
+                    App.getActionPlayerPanel().drawCardServer();
+                }
+                break;
+            default:
+                throw new NetworkObjectException();
+        }
+    }
+
+    public void board(NetworkObject networkObject) throws NetworkObjectException {
+        try {
+            switch (networkObject.getMessage()) {
+                case "buildCity":
+                    int idCity = (int) networkObject.getObject();
+                    app.getGame().buildCity(idCity);
+                    if (networkObject.getId() == id) {
+                        App.getActionPlayerPanel().updateShopPanel();
+                    }
+                    break;
+                case "buildColony":
+                    int idColony = (int) networkObject.getObject();
+                    app.getGame().buildColony(idColony);
+                    if (networkObject.getId() == id) {
+                        App.getActionPlayerPanel().updateShopPanel();
+                    }
+                    break;
+                case "buildRoad":
+                    int idRoad = (int) networkObject.getObject();
+                    app.getGame().buildRoad(idRoad);
+                    if (networkObject.getId() == id) {
+                        App.getActionPlayerPanel().updateShopPanel();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        } catch (ConstructBuildingException e) {
+            ConstructBuildingException.messageError();
+        }
+
     }
 }

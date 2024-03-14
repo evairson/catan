@@ -18,7 +18,7 @@ public abstract class Building implements Serializable {
         return owner;
     }
 
-    public boolean buyable(Player player, int[] cost) {
+    public static boolean buyable(Player player, int[] cost) {
         for (int i = 0; i < cost.length; i++) {
             if (player.getResources().get(TileType.CLAY) < cost[0]) {
                 return false;

@@ -21,7 +21,22 @@ public class Player implements Serializable {
         RED,
         YELLOW,
         BLUE,
-        GREEN
+        GREEN,
+    }
+
+    public static Color getColorId(int i) {
+        switch (i) {
+            case 0:
+                return Color.RED;
+            case 1:
+                return Color.YELLOW;
+            case 2:
+                return Color.BLUE;
+            case 3:
+                return Color.GREEN;
+            default:
+                return Color.RED;
+        }
     }
 
     protected int id;
@@ -67,11 +82,11 @@ public class Player implements Serializable {
         color = c;
         this.name = name;
         resources = new HashMap<>();
-        resources.put(TileType.CLAY, 1);
-        resources.put(TileType.ORE, 8);
-        resources.put(TileType.WHEAT, 8);
-        resources.put(TileType.WOOD, 3);
-        resources.put(TileType.WOOL, 3);
+        resources.put(TileType.CLAY, 0);
+        resources.put(TileType.ORE, 0);
+        resources.put(TileType.WHEAT, 0);
+        resources.put(TileType.WOOD, 0);
+        resources.put(TileType.WOOL, 0);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;
@@ -116,7 +131,6 @@ public class Player implements Serializable {
         for (TileType r : resources.keySet()) {
             System.out.print(r + " ");
         }
-        System.out.println();
     }
 
     // Getter / Setter : ---------------
@@ -272,6 +286,11 @@ public class Player implements Serializable {
         throwDice2();
     }
 
+    public void setDices(int dice1, int dice2) {
+        this.dice1 = dice1;
+        this.dice2 = dice2;
+    }
+
     public void placeBuilding(TileVertex vertex) {
         // TODO :
     }
@@ -286,6 +305,7 @@ public class Player implements Serializable {
             }
             r.buyAndPlace(this, edge);
         }
+        App.getGamePanel().repaint();
     }
 
     public void buildColony(TileVertex vertex) {
@@ -298,9 +318,10 @@ public class Player implements Serializable {
             }
             if (c.buyAndPlace(this, false, vertex)) {
                 points++;
-                app.checkWin();
+                App.checkWin();
             }
         }
+        App.getGamePanel().repaint();
     }
 
     public void buildCity(TileVertex vertex) {
@@ -309,10 +330,11 @@ public class Player implements Serializable {
                 Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
                     points++;
-                    app.checkWin();
+                    App.checkWin();
                 }
             }
         }
+        App.getGamePanel().repaint();
     }
 
     public void createOrBuy() {
@@ -328,7 +350,7 @@ public class Player implements Serializable {
             DevelopmentCard card = stack.getCardStack().pop();
             if (card instanceof VictoryPointCard) {
                 points++;
-                app.checkWin();
+                App.checkWin();
             }
             cardsDev.add(card);
 
@@ -367,5 +389,13 @@ public class Player implements Serializable {
                 }
             }
         }
+    }
+
+    public boolean last(Game game) {
+        return (game.getPlayers().get(game.getPlayers().size() - 1) == this);
+    }
+
+    public boolean first(Game game) {
+        return game.getPlayers().get(0) == this;
     }
 }

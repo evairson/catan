@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import model.buildings.Building;
 import model.buildings.Colony;
 import model.cards.CardStack;
-import model.geometry.Layout;
-import model.geometry.Point;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
@@ -24,6 +22,8 @@ import view.TileType;
 
 import java.io.Serializable;
 import java.util.HashSet;
+
+import exceptionclass.ConstructBuildingException;
 
 public class Game implements StateMethods, Serializable {
     private GameBoard board;
@@ -46,22 +46,9 @@ public class Game implements StateMethods, Serializable {
         }
         players = new ListPlayers(0, playersSet);
         players.getCurrentPlayer().setFreeColony(true);
-        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
-        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
-        System.out.println(scaleFactorX + " et " + scaleFactorY);
-        Point point1 = new Point(
-                (int) (267 * scaleFactorX),
-                (int) (267 * scaleFactorY)
-        );
-        System.out.println((int) (267 * scaleFactorX) + " et  ; " + (int) (47 * scaleFactorX));
-        Point point2 = new Point(
-                (int) (47 * scaleFactorX),
-                (int) (47 * scaleFactorY)
-        );
-//        Point point2 = new Point((int) (93 / Resolution.divider()), (int) (93 / Resolution.divider()));
-        Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
+
         thief = new Thief();
-        board = new GameBoard(layout, thief, this);
+        board = new GameBoard(thief, this);
         stack = new CardStack();
     }
 
@@ -126,6 +113,9 @@ public class Game implements StateMethods, Serializable {
 
     public boolean canPass() {
         if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
+            System.out.println("dice" + getCurrentPlayer().hasThrowDices());
+            System.out.println("start" + start);
+            System.out.println("backwards" + backwards);
             return false;
         }
         if ((start || backwards)
@@ -142,10 +132,6 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void endTurn() {
-        if (!canPass()) {
-            return;
-        }
-
         if (start || backwards) {
             ArrayList<Colony> colony = getCurrentPlayer().getColony();
             if (colony.size() >= 2) {
@@ -157,10 +143,10 @@ public class Game implements StateMethods, Serializable {
             }
         }
 
-        if (start && getCurrentPlayer().getName().equals("Player4")) {
+        if (start && getCurrentPlayer().last(this)) {
             start = false;
             backwards = true;
-        } else if (backwards && getCurrentPlayer().getName().equals("Player1")) {
+        } else if (backwards && getCurrentPlayer().first(this)) {
             backwards = false;
         } else if (backwards) {
             players.prev();
@@ -178,6 +164,8 @@ public class Game implements StateMethods, Serializable {
         if (start || backwards) {
             getCurrentPlayer().setFreeColony(true);
         }
+        App.getActionPlayerPanel().update();
+        App.getGamePanel().repaint();
     }
 
     public boolean canDraw() {
@@ -285,6 +273,7 @@ public class Game implements StateMethods, Serializable {
         }
 
         getCurrentPlayer().printResources();
+        App.getGamePanel().repaint();
     }
 
     @Override
@@ -316,11 +305,22 @@ public class Game implements StateMethods, Serializable {
     }
 
     // Build methods ---------------
+
+    public boolean canBuildCity() {
+        if (blankTurn) {
+            return false;
+        }
+        if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
+            return true;
+        }
+        return false;
+    }
+
     public void buildCityButtonAction() {
         if (blankTurn) {
             return;
         }
-        if ((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven) {
+        if (((!Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
             if (getCurrentPlayer().hasColony()) {
                 if (board.isLookingForVertex()) {
                     board.setLookingForVertex(!board.isLookingForVertex());
@@ -342,11 +342,23 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    public boolean canBuildColony() {
+        if (blankTurn) {
+            return false;
+        }
+        if (((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
+            || getCurrentPlayer().getFreeColony()) {
+            return true;
+        }
+        return false;
+    }
+
+
     public void buildColonyButtonAction() {
         if (blankTurn) {
             return;
         }
-        if (((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
+        if (((!Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
             || getCurrentPlayer().getFreeColony()) {
             if (board.isLookingForVertex()) {
                 board.setLookingForVertex(!board.isLookingForVertex());
@@ -365,6 +377,17 @@ public class Game implements StateMethods, Serializable {
                 board.setPlacingCity(false);
             }
         }
+    }
+
+    public boolean canBuildRoad() {
+        if (blankTurn) {
+            return false;
+        }
+        if (((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
+            || getCurrentPlayer().getFreeRoad()) {
+            return true;
+        }
+        return false;
     }
 
     public void buildRoadButtonAction() {
@@ -404,7 +427,8 @@ public class Game implements StateMethods, Serializable {
             if (cVertex != null) {
                 try {
                     int id = playerClient.getId();
-                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildColony", id, cVertex);
+                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildColony",
+                            id, cVertex.getId());
                     playerClient.getOut().writeUnshared(object);
                     playerClient.getOut().flush();
                 } catch (Exception e) {
@@ -413,24 +437,29 @@ public class Game implements StateMethods, Serializable {
             }
         } else {
             if (cVertex != null) {
-                buildColony(cVertex);
+                try {
+                    buildColony(cVertex.getId());
+                } catch (ConstructBuildingException e) {
+                    ConstructBuildingException.messageError();
+                }
             }
         }
-        // rajouter un if ça a marché (transformer Player.buildCity en boolean)
-        board.setLookingForVertex(false);
-        board.setPlacingCity(false);
+
 
     }
 
-    public void buildColony(TileVertex cVertex) {
-        TileVertex currentVertex = cVertex;
+    public void buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVerticesMap().values()) {
-            if (vertex.getId() == cVertex.getId()) {
-                System.out.println("yeah !");
-                currentVertex = vertex;
+            if (vertex.getId() == idVertex) {
+                // rajouter un if ça a marché (transformer Player.buildCity en boolean)
+                board.setLookingForVertex(false);
+                board.setPlacingCity(false);
+                getCurrentPlayer().buildColony(vertex);
+                App.getGamePanel().repaint();
+                return;
             }
         }
-        getCurrentPlayer().buildColony(currentVertex);
+        throw new ConstructBuildingException();
     }
 
     public void networkBuildRoad() {
@@ -442,7 +471,8 @@ public class Game implements StateMethods, Serializable {
             if (cEdge != null) {
                 try {
                     int id = playerClient.getId();
-                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildRoad", id, cEdge);
+                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildRoad",
+                            id, cEdge.getId());
                     playerClient.getOut().writeUnshared(object);
                     playerClient.getOut().flush();
                 } catch (Exception e) {
@@ -451,7 +481,11 @@ public class Game implements StateMethods, Serializable {
             }
         } else {
             if (cEdge != null) {
-                buildRoad(cEdge);
+                try {
+                    buildRoad(cEdge.getId());
+                } catch (ConstructBuildingException e) {
+                    ConstructBuildingException.messageError();
+                }
             }
         }
         // rajouter un if ça a marché (transformer Player.buildRoad en boolean)
@@ -459,15 +493,19 @@ public class Game implements StateMethods, Serializable {
         board.setPlacingRoad(false);
     }
 
-    public void buildRoad(TileEdge cEdge) {
-        TileEdge currentEdge = cEdge;
+    public void buildRoad(int idEdge) throws ConstructBuildingException {
         for (TileEdge edge : board.getEdgeMap().values()) {
-            if (edge.getId() == cEdge.getId()) {
+            if (edge.getId() == idEdge) {
                 System.out.println("yeah !");
-                currentEdge = edge;
+                board.setLookingForVertex(false);
+                board.setPlacingCity(false);
+                getCurrentPlayer().buildRoad(edge);
+                App.getActionPlayerPanel().update();
+                App.getGamePanel().repaint();
+                return;
             }
         }
-        getCurrentPlayer().buildRoad(currentEdge);
+        throw new ConstructBuildingException();
     }
 
     public void networkBuildCity() {
@@ -482,7 +520,8 @@ public class Game implements StateMethods, Serializable {
             if (cVertex != null) {
                 try {
                     int id = playerClient.getId();
-                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity", id, cVertex);
+                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity",
+                            id, cVertex.getId());
                     playerClient.getOut().writeUnshared(object);
                     playerClient.getOut().flush();
                 } catch (Exception e) {
@@ -491,24 +530,29 @@ public class Game implements StateMethods, Serializable {
             }
         } else {
             if (cVertex != null) {
-                buildCity(cVertex);
+                try {
+                    buildCity(cVertex.getId());
+                    App.getGamePanel().repaint();
+                } catch (ConstructBuildingException e) {
+                    ConstructBuildingException.messageError();
+                }
             }
         }
         // rajouter un if ça a marché (transformer Player.buildCity en boolean)
-        board.setLookingForVertex(false);
-        board.setPlacingCity(false);
 
     }
 
-    public void buildCity(TileVertex cVertex) {
-        TileVertex currentVertex = cVertex;
+    public void buildCity(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVerticesMap().values()) {
-            if (vertex.getId() == cVertex.getId()) {
+            if (vertex.getId() == idVertex) {
                 System.out.println("yeah !");
-                currentVertex = cVertex;
+                board.setLookingForVertex(false);
+                board.setPlacingCity(false);
+                getCurrentPlayer().buildCity(vertex);
+                return;
             }
         }
-        getCurrentPlayer().buildCity(cVertex);
+        throw new ConstructBuildingException();
     }
 
     public void initialiseGameAfterTransfer(App app) {
@@ -527,6 +571,7 @@ public class Game implements StateMethods, Serializable {
                 }
             }
         }
+        updatePlayerColor();
     }
 
     public void setPlayerClient(PlayerClient player) {
@@ -535,5 +580,11 @@ public class Game implements StateMethods, Serializable {
 
     public boolean isMyTurn() {
         return playerClient.isMyTurn(this);
+    }
+
+    public void updatePlayerColor() {
+        for (Player player : players) {
+            player.setColor(Player.getColorId(player.getId()));
+        }
     }
 }

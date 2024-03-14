@@ -51,7 +51,7 @@ public class ListPlayers extends ArrayList<Player> {
 
     public Player prev() {
         if (currentPlayerIndex - 1 < 0) {
-            currentPlayerIndex = this.size();
+            currentPlayerIndex = this.size() - 1;
         } else {
             currentPlayerIndex--;
         }

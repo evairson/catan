@@ -19,6 +19,10 @@ import model.cards.KnightCard;
 import model.cards.Monopoly;
 import model.cards.RoadBuilding;
 import model.cards.YearOfPlenty;
+import network.NetworkObject;
+import network.PlayerClient;
+import network.NetworkObject.TypeObject;
+import network.TradeObject;
 import others.Constants;
 import start.Main;
 import view.utilities.Animation;
@@ -64,6 +68,10 @@ public class ActionPlayerPanel extends JPanel {
         createPlayerPanel();
         createButton();
         setVisible(true);
+    }
+
+    public TradePanel getTradePanel() {
+        return tradePanel;
     }
 
     public RollingDice getRollingDice() {
@@ -162,7 +170,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeTradePanel() {
-        showTradePanel();
+        showTradePanel(null);
     }
 
     private void initializeChat() {
@@ -187,11 +195,15 @@ public class ActionPlayerPanel extends JPanel {
         return null; // Si le JFrame n'est pas trouvé (ce qui ne devrait pas arriver)
     }
 
-    private void showTradePanel() {
+    public void showTradePanel(TradeObject tradeObject) {
         JFrame mainFrame = getMainFrame();
         JLayeredPane layeredPane = mainFrame.getLayeredPane();
         ListPlayers listPlayers = game.getPlayers();
-        TradePanel tradePanel = new TradePanel(listPlayers, resourcesPanel);
+        if (tradeObject == null) {
+            tradePanel = new TradePanel(listPlayers, resourcesPanel);
+        } else {
+            tradePanel = new TradePanel(tradeObject, listPlayers, resourcesPanel, game.getPlayerClient());
+        }
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);
         setComponentsEnabled(false);
@@ -273,7 +285,6 @@ public class ActionPlayerPanel extends JPanel {
         Player player;
         if (Main.hasServer()) {
             player = game.getPlayerClient();
-            System.out.println(game.getPlayerClient() == game.getCurrentPlayer());
         } else {
             player = game.getCurrentPlayer();
         }
@@ -382,11 +393,26 @@ public class ActionPlayerPanel extends JPanel {
         }
     }
 
+    public void drawCardServer() {
+        game.getCurrentPlayer().drawCard(game.getStack());
+    }
+
     private void drawCard() {
         if (!game.canDraw()) {
             return;
         }
         game.getCurrentPlayer().drawCard(game.getStack());
+        if (Main.hasServer() && game.getCurrentPlayer() instanceof PlayerClient) {
+            try {
+                PlayerClient player = game.getPlayerClient();
+                NetworkObject gameObject;
+                gameObject = new NetworkObject(TypeObject.Message, "DrawCard", player.getId(), null);
+                player.getOut().writeUnshared(gameObject);
+                player.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         if (cardPanel != null) {
             remove(cardPanel);
         }
@@ -413,6 +439,7 @@ public class ActionPlayerPanel extends JPanel {
         });
         cardPanel.setOpaque(false);
         add(cardPanel, 0);
+        updateShopPanel();
         revalidate();
         repaint();
     }
@@ -441,14 +468,13 @@ public class ActionPlayerPanel extends JPanel {
         add(namePlayer);
     }
 
-    private void createPlayerPanel() {
+    public void createPlayerPanel() {
         playersPanel = new PlayersPanel(game);
         add(playersPanel);
     }
 
     public void update() {
         Player currentPlayer = game.getCurrentPlayer();
-        dice.newPlayer(currentPlayer);
 
         if (!Main.hasServer()) {
             resourcesPanel.updateResourceLabels(currentPlayer);
@@ -468,22 +494,30 @@ public class ActionPlayerPanel extends JPanel {
         }
         updateTurn();
 
-
-        playersPanel.update(game);
+        if (playersPanel != null) {
+            playersPanel.update(game);
+        }
         revalidate();
         repaint();
+    }
+
+    public void updateShopPanel() {
+        shopPanel.updateEnablePanel(game);
     }
 
     public void updateTurn() {
         if (Main.hasServer()) {
             if (game.isMyTurn()) {
-                shopPanel.setEnabledPanel(true);
-                endTurn.setEnabled(true);
-                dice.setEnabledPanel(true);
+                updateShopPanel();
+                if (game.canPass()) {
+                    endTurn.setEnabled(true);
+                } else {
+                    endTurn.setEnabled(false);
+                }
             } else {
+                dice.setButtonIsOn(false);
                 shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);
-                dice.setEnabledPanel(false);
             }
         }
     }
