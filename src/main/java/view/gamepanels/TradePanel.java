@@ -58,6 +58,7 @@ public class TradePanel extends JPanel {
         createPlayersButtons();
         initializeSelectedPlayerImage();
         updateProposeButtonState();
+        initializeReturnButton();
     }
 
     // -------- Fonctions affichant les boutons ressources et leurs labels respectifs -------- //
@@ -235,55 +236,21 @@ public class TradePanel extends JPanel {
         toggleTradeInterface(true);
     }
     private void performTrade(boolean isBank) {
-        HashMap<TileType, Integer> currentPlayerResources = listPlayers.getCurrentPlayer().getResources();
+        gatherResourcesOffered();
+        gatherResourcesRequested();
 
         if (isBank) {
-            // Transaction avec la banque
-            gatherResourcesOffered();
-            gatherResourcesRequested();
-
-            for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
-                TileType resource = entry.getKey();
-                Integer amount = entry.getValue();
-
-                // Retirer les ressources offertes du joueur courant
-                currentPlayerResources.put(resource, currentPlayerResources.getOrDefault(resource,
-                        0) - amount);
-            }
-
-            for (Map.Entry<TileType, Integer> entry : resourcesRequested.entrySet()) {
-                TileType resource = entry.getKey();
-                Integer amount = entry.getValue();
-
-                // Ajouter la ressource demandée au joueur courant
-                currentPlayerResources.put(resource, currentPlayerResources.getOrDefault(resource,
-                        0) + amount);
-            }
+            // Mise à jour des ressources pour une transaction avec la banque
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested, false);
         } else {
-            // Transaction avec un autre joueur
-            HashMap<TileType, Integer> selectedPlayerResources = selectedPlayer.getResources();
+            // Mise à jour des ressources pour une transaction entre deux joueurs
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true);
+            updateResources(selectedPlayer.getResources(), resourcesOffered, false);
 
-            for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
-                TileType resource = entry.getKey();
-                Integer amount = entry.getValue();
-
-                currentPlayerResources.put(resource, currentPlayerResources.getOrDefault(resource,
-                        0) - amount);
-                selectedPlayerResources.put(resource, selectedPlayerResources.getOrDefault(resource,
-                        0) + amount);
-            }
-
-            for (Map.Entry<TileType, Integer> entry : resourcesRequested.entrySet()) {
-                TileType resource = entry.getKey();
-                Integer amount = entry.getValue();
-
-                currentPlayerResources.put(resource, currentPlayerResources.getOrDefault(resource,
-                        0) + amount);
-                selectedPlayerResources.put(resource, selectedPlayerResources.getOrDefault(resource,
-                        0) - amount);
-            }
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested, false);
+            updateResources(selectedPlayer.getResources(), resourcesRequested, true);
         }
-
         // Effacer les ressources demandées et offertes après la transaction
         resourcesRequested.clear();
         resourcesOffered.clear();
@@ -291,6 +258,22 @@ public class TradePanel extends JPanel {
         // Mettre à jour l'affichage des ressources pour les joueurs impliqués
         resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
     }
+
+    /**
+     * Met à jour les ressources d'un joueur en fonction des ressources offertes ou demandées.
+     * @param playerResources Les ressources actuelles du joueur.
+     * @param changes Les changements à appliquer (offertes/demandées).
+     * @param subtract Si vrai, les ressources seront soustraites (offertes),
+     *                 sinon elles seront ajoutées (demandées).
+     */
+    private void updateResources(HashMap<TileType, Integer> playerResources,
+                                 HashMap<TileType, Integer> changes, boolean subtract) {
+        changes.forEach((resource, amount) -> {
+            int currentAmount = playerResources.getOrDefault(resource, 0);
+            playerResources.put(resource, subtract ? currentAmount - amount : currentAmount + amount);
+        });
+    }
+
     private void toggleTradeInterface(boolean enable) {
         for (ButtonImage button : playerOneButtons) {
             button.setEnabled(enable);
@@ -327,7 +310,6 @@ public class TradePanel extends JPanel {
             acceptButton.setEnabled(isValidBankTrade());
         }
     }
-
     private List<Harbor> getCurrentPlayerHarbors() {
         List<Harbor> accessiblesHarbors = new ArrayList<>();
         Player currentPlayer = listPlayers.getCurrentPlayer();
@@ -342,19 +324,7 @@ public class TradePanel extends JPanel {
         }
         return accessiblesHarbors;
     }
-    private int getBestTradeRatio(TileType resourceType) {
-        int bestRatio = 4;
 
-        for (Harbor harbor : getCurrentPlayerHarbors()) {
-            if (harbor instanceof SpecializedHarbor
-                    && ((SpecializedHarbor) harbor).getResourceType() == resourceType) {
-                return 2;
-            } else if (!(harbor instanceof SpecializedHarbor) && bestRatio > 3) {
-                bestRatio = 3;
-            }
-        }
-        return bestRatio;
-    }
     private boolean isValidBankTrade() {
         List<Harbor> currentPlayerPorts = getCurrentPlayerHarbors();
         // Définir le taux général à 4 par défaut
@@ -498,6 +468,12 @@ public class TradePanel extends JPanel {
             parentFrame.getActionPlayer().setComponentsEnabled(true);
             parentFrame.getActionPlayer().setVisible(true);
         }
+    }
+
+    private void initializeReturnButton() {
+        ButtonImage returnButton = new ButtonImage("src/main/resources/backGame.png",
+                "src/main/resources/backGame.png", 100, 620, 1.2, this::closeTradePanel, null);
+        add(returnButton);
     }
 
     // -------- Fonctions d'affichage du panel et de son background -------- //
