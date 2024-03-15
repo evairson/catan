@@ -1,5 +1,7 @@
 package view.utilities;
 
+import model.geometry.Point;
+
 import javax.swing.*;
 
 public class Animation {
@@ -124,6 +126,44 @@ public class Animation {
                     return;
                 }
             }
+        }).start();
+    }
+
+    /**
+     * Anime un JPanel le long d'une courbe de Bézier quadratique.
+     *
+     * @param p0         Le point de départ.
+     * @param p1         Le point de contrôle.
+     * @param p2         Le point d'arrivée.
+     * @param delay      Le délai entre chaque étape de l'animation (en millisecondes).
+     * @param steps      Le nombre d'étapes pour l'animation.
+     * @param toAnimate  Le JPanel à animer.
+     * @param onComplete Runnable à exécuter une fois l'anim completed :)
+     */
+    public void animateAlongBezierCurve(final Point p0, final Point p1, final Point p2,
+                                        final int delay, final int steps,
+                                        final JPanel toAnimate, Runnable onComplete) {
+        new Thread(() -> {
+            for (int i = 0; i <= steps; i++) {
+                final double t = i / (double) steps;
+                // Calcul de la position selon la courbe de Bézier quadratique
+                int x = (int) ((1 - t) * (1 - t) * p0.getX()
+                        + 2 * (1 - t) * t * p1.getX() + t * t * p2.getX());
+                int y = (int) ((1 - t) * (1 - t) * p0.getY()
+                        + 2 * (1 - t) * t * p1.getY() + t * t * p2.getY());
+
+                // Mise à jour de la position du JPanel
+                SwingUtilities.invokeLater(() -> toAnimate.setLocation(x, y));
+
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.out.println("Animation interrupted: " + e.getMessage());
+                    return;
+                }
+            }
+            SwingUtilities.invokeLater(onComplete);
         }).start();
     }
 

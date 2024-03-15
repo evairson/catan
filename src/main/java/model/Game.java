@@ -238,13 +238,12 @@ public class Game implements StateMethods {
                         Colony colony = (Colony) b;
                         for (Tile tile : colony.getVertex().getTiles()) {
                             if (tile.getDiceValue() == getCurrentPlayer().getDice()) {
-                                if (colony.getIsCity()) {
-                                    Integer number = player.getResources().get(tile.getResourceType());
-                                    player.getResources().replace(tile.getResourceType(), number + 2);
-                                } else {
-                                    Integer number = player.getResources().get(tile.getResourceType());
-                                    player.getResources().replace(tile.getResourceType(), number + 1);
-                                }
+                                int amount = colony.getIsCity() ? 2 : 1;
+                                Integer number = player.getResources().get(tile.getResourceType());
+                                player.getResources().replace(tile.getResourceType(), number + amount);
+                                //animation pour la resource
+                                getApp().getActionPlayerPanel().animateResourceGain(tile.getResourceType(),
+                                        colony.getVertex().getCoordinates(), player);
                             }
                         }
                     }

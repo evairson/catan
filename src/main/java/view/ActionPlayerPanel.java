@@ -2,6 +2,7 @@ package view;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.awt.*;
 import javax.swing.*;
@@ -23,9 +24,12 @@ import others.Constants;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
+
+import java.util.HashMap;
 import java.util.concurrent.*;
 
 public class ActionPlayerPanel extends JPanel {
+    private JPanel testBezier;
     private ButtonImage endTurn;
     private JLabel namePlayer;
     private App app;
@@ -40,6 +44,7 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel cardPanel;
     private PlayersPanel playersPanel;
     private RollingDice dice;
+    private HashMap<TileType, BufferedImage> resourceImages = new HashMap<>();
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -51,6 +56,7 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        preloadResourceImages();
         setOpaque(false);
         initializeRollingDicePanel();
         initializeTradeButtonPanel();
@@ -60,7 +66,35 @@ public class ActionPlayerPanel extends JPanel {
         createPlayerPanel();
         createButton();
         setVisible(true);
+//        initializeTest();
+//        initializeTestAnimation();
     }
+
+    public void preloadResourceImages() {
+        for (TileType type : TileType.values()) {
+            try {
+                BufferedImage originalImage = ImageIO.read(new File(type.getImagePath()));
+                // Calculer les nouvelles dimensions
+                int newWidth = originalImage.getWidth() / 5;
+                int newHeight = originalImage.getHeight() / 5;
+
+                // Créer une nouvelle image réduite
+                BufferedImage resizedImage = new BufferedImage(newWidth,
+                        newHeight, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2d = resizedImage.createGraphics();
+
+                // Redessiner l'image originale dans la nouvelle image avec les nouvelles dimensions
+                g2d.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
+                g2d.dispose();
+
+                // Stocker l'image redimensionnée
+                resourceImages.put(type, resizedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     public RollingDice getRollingDice() {
         return dice;
@@ -434,4 +468,52 @@ public class ActionPlayerPanel extends JPanel {
         repaint();
     }
 
+    public void initializeTest() {
+        testBezier = new JPanel();
+        testBezier.add(new ButtonImage("src/main/resources/resources/clay.png",
+                "src/main/resources/resources/clay.png",
+                0, 0, 5, null, null));
+        testBezier.setBounds(300, 500, 50, 80);
+//        testBezier.setBackground(Color.red);
+        testBezier.setVisible(true);
+//        testBezier.setOpaque(true);
+        add(testBezier);
+    }
+
+    public void initializeTestAnimation() {
+        Point p0 = new Point(300, 500);
+        Point p1 = new Point(600, 200);
+        Point p2 = new Point(650, 900);
+//        animate.animateAlongBezierCurve(p0, p1, p2, 2, 1000, tradeButtonPanel);
+    }
+
+    public void animateResourceGain(TileType resourceType,
+                                    model.geometry.Point startLocation, Player player) {
+        // Trouver l'image de la ressource
+        BufferedImage resourceImage = resourceImages.get(resourceType);
+        // Créer un JPanel temporaire pour l'animation
+        JPanel resourcePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(resourceImage, 0, 0, null);
+            }
+        };
+        resourcePanel.setSize(resourceImage.getWidth(), resourceImage.getHeight());
+        resourcePanel.setLocation((int) startLocation.getX(), (int) startLocation.getY());
+
+        add(resourcePanel);
+
+        // Définir les coordonnées finales (emplacement dans l'UI des ressources du joueur)
+        model.geometry.Point endLocation = new model.geometry.Point(600, 900);
+        model.geometry.Point controlPoint = new model.geometry.Point(700, 200);
+        // Animer le déplacement du JPanel
+        Animation animation = new Animation();
+        animation.animateAlongBezierCurve(startLocation, controlPoint, endLocation, 5,
+                1000, resourcePanel, () -> {
+                this.remove(resourcePanel);
+                this.repaint();
+            });
+
+    }
 }
