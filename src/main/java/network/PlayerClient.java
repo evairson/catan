@@ -76,6 +76,8 @@ public class PlayerClient extends Player {
                         case Board:
                             board(networkObject);
                             break;
+                        case ChatMessage:
+                            app.addMessage(networkObject.getMessage());
                         default:
                             System.out.println("Pas de message correspondant");
                             break;

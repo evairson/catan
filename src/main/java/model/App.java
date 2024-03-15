@@ -101,6 +101,9 @@ public class App {
             e.getStackTrace();
         }
     }
+    public void addMessage(String message) {
+        ((ChatPanel) actionPlayer.getChat()).addMessage(message);
+    }
 
     public void addPanels() {
         game.initialiseGameAfterTransfer(this);
@@ -140,4 +143,7 @@ public class App {
         game.draw(g);
     }
 
+    public PlayerClient getPlayer() {
+        return player;
+    }
 }
