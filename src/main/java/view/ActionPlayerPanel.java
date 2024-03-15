@@ -65,7 +65,7 @@ public class ActionPlayerPanel extends JPanel {
         initializeShopPanel(game);
         initializeDeckPanel();
         initializeChat();
-        createPlayerPanel();
+        //createPlayerPanel();
         createButton();
         setVisible(true);
     }
