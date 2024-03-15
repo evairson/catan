@@ -37,6 +37,13 @@ public class ListPlayers extends ArrayList<Player> {
         return currentPlayer;
     }
 
+    public Player peekNext() {
+        if (currentPlayerIndex + 1 >= this.size()) {
+            return this.get(0);
+        }
+        return this.get(currentPlayerIndex + 1);
+    }
+
     public Player prev() {
         if (currentPlayerIndex - 1 < 0) {
             currentPlayerIndex = this.size();

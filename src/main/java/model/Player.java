@@ -32,7 +32,7 @@ public class Player {
     private HashMap<TileType, Integer> resources;
     private ArrayList<DevelopmentCard> cardsDev;
     private ArrayList<Building> buildings;
-    private Boolean freeRoad = false;
+    private int freeRoad = 0;
     private Boolean freeColony = true;
 
     private int points;
@@ -46,11 +46,11 @@ public class Player {
         this.app = app;
         this.name = name;
         resources = new HashMap<>();
-        resources.put(TileType.CLAY, 0);
-        resources.put(TileType.ORE, 0);
-        resources.put(TileType.WHEAT, 0);
-        resources.put(TileType.WOOD, 0);
-        resources.put(TileType.WOOL, 0);
+        resources.put(TileType.CLAY, 6);
+        resources.put(TileType.ORE, 6);
+        resources.put(TileType.WHEAT, 6);
+        resources.put(TileType.WOOD, 6);
+        resources.put(TileType.WOOL, 6);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;
@@ -66,12 +66,12 @@ public class Player {
         }
     }
 
-    public boolean getFreeRoad() {
+    public int getFreeRoad() {
         return freeRoad;
     }
 
-    public void setFreeRoad(boolean b) {
-        freeRoad = b;
+    public void setFreeRoad(int i) {
+        freeRoad = i;
     }
 
     public boolean getFreeColony() {
@@ -254,9 +254,9 @@ public class Player {
     public void buildRoad(TileEdge edge) {
         if (edge.getBuilding() == null) {
             Road r = new Road(this);
-            if (freeRoad) {
+            if (freeRoad > 0) {
                 r.place(this, edge);
-                setFreeRoad(false);
+                freeRoad--;
                 return;
             }
             r.buyAndPlace(this, edge);
@@ -268,8 +268,9 @@ public class Player {
             Colony c = new Colony(this);
             if (freeColony) {
                 setFreeColony(false);
-                setFreeRoad(true);
+                freeRoad++;
                 c.place(this, false, vertex);
+                return;
             }
             if (c.buyAndPlace(this, false, vertex)) {
                 points++;

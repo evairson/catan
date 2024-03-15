@@ -1,5 +1,6 @@
 package model.tiles;
 
+import model.buildings.Harbor;
 import model.geometry.Point;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,9 +10,18 @@ public class TileVertex {
 
     private Set<Tile> tiles;
     private Building building;
+    private Harbor harbor;
     private Point coordinates;
     public TileVertex() {
         tiles = new HashSet<>();
+    }
+
+    public void setHarbor(Harbor harbor) {
+        this.harbor = harbor;
+    }
+
+    public Harbor getHarbor() {
+        return harbor;
     }
 
     public void addTile(Tile tile) {

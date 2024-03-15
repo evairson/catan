@@ -40,7 +40,6 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel cardPanel;
     private PlayersPanel playersPanel;
     private RollingDice dice;
-    private boolean cardPlayed = false;
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -67,9 +66,10 @@ public class ActionPlayerPanel extends JPanel {
         return dice;
     }
 
-    public boolean getCardPlayed() {
-        return cardPlayed;
+    public ResourcesPanel getResourcesPanel() {
+        return resourcesPanel;
     }
+
 
     private void initializeRollingDicePanel() {
         int xCoord = Resolution.calculateResolution(1108, 440)[0];
@@ -242,7 +242,6 @@ public class ActionPlayerPanel extends JPanel {
 
     private void changeTurn() {
         game.endTurn();
-        cardPlayed = false;
         update();
     }
 
@@ -285,7 +284,6 @@ public class ActionPlayerPanel extends JPanel {
 
     private void useKnight() {
         removeCardsPanel();
-        cardPlayed = true;
         ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
         for (int i = 0; i < cards.size(); i++) {
             if (cards.get(i) instanceof KnightCard) {
@@ -298,7 +296,6 @@ public class ActionPlayerPanel extends JPanel {
 
     private void useMonopoly() {
         removeCardsPanel();
-        cardPlayed = true;
         ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
         for (int i = 0; i < cards.size(); i++) {
             if (cards.get(i) instanceof Monopoly) {
@@ -311,7 +308,6 @@ public class ActionPlayerPanel extends JPanel {
 
     private void useRoadBuilding() {
         removeCardsPanel();
-        cardPlayed = true;
         ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
         for (int i = 0; i < cards.size(); i++) {
             if (cards.get(i) instanceof RoadBuilding) {
@@ -319,12 +315,11 @@ public class ActionPlayerPanel extends JPanel {
                 break;
             }
         }
-        game.getCurrentPlayer().setFreeRoad(true);
+        game.getCurrentPlayer().setFreeRoad(2);
     }
 
     private void useYearOfPlenty() {
         removeCardsPanel();
-        cardPlayed = true;
         ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
         for (int i = 0; i < cards.size(); i++) {
             if (cards.get(i) instanceof YearOfPlenty) {
@@ -332,6 +327,7 @@ public class ActionPlayerPanel extends JPanel {
                 break;
             }
         }
+        game.setYearOfPlenty(2);
     }
 
     private void useCard(String s) {

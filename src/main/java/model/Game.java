@@ -26,11 +26,11 @@ public class Game implements StateMethods {
     private boolean resourcesGiven;
     private boolean start = true;
     private boolean backwards = false;
-    private boolean playingVoleur = false;
     private App app;
     private boolean blankTurn = false;
     private boolean monoWaiting = false;
     private int yearOfPlentyWaiting = 0;
+    private Player first;
 
     public Game(App app) {
         this.app = app;
@@ -81,6 +81,10 @@ public class Game implements StateMethods {
         monoWaiting = b;
     }
 
+    public void setYearOfPlenty(int i) {
+        yearOfPlentyWaiting = i;
+    }
+
     public void resourceClicked(TileType t) {
         if (monoWaiting) {
             monopolyPlay(t);
@@ -88,6 +92,7 @@ public class Game implements StateMethods {
         }
         if (yearOfPlentyWaiting > 0) {
             getCurrentPlayer().addResource(t, 1);
+            System.out.println("gave " + t);
             yearOfPlentyWaiting--;
         }
     }
@@ -102,21 +107,25 @@ public class Game implements StateMethods {
             }
         }
         getCurrentPlayer().addResource(t, amount);
+        app.getActionPlayerPanel().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
         System.out.println("monopoly de " + amount + " " + t);
     }
 
     public boolean canPass() {
-        if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
+        Player p = getCurrentPlayer();
+        if (p.getFreeRoad() > 0) {
             return false;
         }
-        if ((start || backwards)
-            && (getCurrentPlayer().getFreeRoad() || getCurrentPlayer().getFreeColony())) {
+        if (monoWaiting || yearOfPlentyWaiting > 0) {
             return false;
         }
-        if (playingVoleur) {
+        if (p.getFreeColony()) {
             return false;
         }
-        if (app.getActionPlayerPanel().getCardPlayed()) {
+        if (!p.hasThrowDices() && !start && !backwards) {
+            return false;
+        }
+        if (board.getThiefMode()) {
             return false;
         }
         return true;
@@ -125,6 +134,10 @@ public class Game implements StateMethods {
     public void endTurn() {
         if (!canPass()) {
             return;
+        }
+
+        if (first == null) {
+            first = getCurrentPlayer();
         }
 
         if (start || backwards) {
@@ -138,10 +151,10 @@ public class Game implements StateMethods {
             }
         }
 
-        if (start && getCurrentPlayer().getName().equals("Player4")) {
+        if (start && players.peekNext() == first) {
             start = false;
             backwards = true;
-        } else if (backwards && getCurrentPlayer().getName().equals("Player1")) {
+        } else if (backwards && getCurrentPlayer() == first) {
             backwards = false;
         } else if (backwards) {
             players.prev();
@@ -186,7 +199,6 @@ public class Game implements StateMethods {
     }
 
     public void setThiefMode(boolean b) {
-        playingVoleur = b;
         board.setThiefMode(b);
         divideRessourcesByTwo();
     }
@@ -229,11 +241,9 @@ public class Game implements StateMethods {
                                 if (colony.getIsCity()) {
                                     Integer number = player.getResources().get(tile.getResourceType());
                                     player.getResources().replace(tile.getResourceType(), number + 2);
-                                    System.out.println("2 " + tile.getResourceType() + player.getName());
                                 } else {
                                     Integer number = player.getResources().get(tile.getResourceType());
                                     player.getResources().replace(tile.getResourceType(), number + 1);
-                                    System.out.println("1 " + tile.getResourceType() + player.getName());
                                 }
                             }
                         }
@@ -261,8 +271,6 @@ public class Game implements StateMethods {
             board.changeThief();
             board.setThiefModeEnd(true);
         }
-
-        getCurrentPlayer().printResources();
     }
 
     @Override
@@ -350,7 +358,7 @@ public class Game implements StateMethods {
             return;
         }
         if (((!Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
-            || getCurrentPlayer().getFreeRoad()) {
+            || getCurrentPlayer().getFreeRoad() > 0) {
             if (board.isLookingForEdge()) {
                 board.setLookingForEdge(!board.isLookingForEdge());
                 board.setPlacingCity(false);
@@ -373,7 +381,7 @@ public class Game implements StateMethods {
     public void buildColony() {
         if (board.isLookingForVertex()) {
             TileVertex cVertex = board.getClosestTileVertex();
-            if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+            if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                 getCurrentPlayer().buildColony(cVertex);
             }
         }
@@ -385,7 +393,9 @@ public class Game implements StateMethods {
     public void buildRoad() {
         if (board.isLookingForEdge()) {
             TileEdge cEdge = board.getClosestTileEdge();
-            getCurrentPlayer().buildRoad(cEdge);
+            if (board.canPlaceRoad(cEdge, getCurrentPlayer())) {
+                getCurrentPlayer().buildRoad(cEdge);
+            }
         }
         // rajouter un if ça a marché (transformer Player.buildRoad en boolean)
         board.setLookingForEdge(false);
@@ -395,7 +405,7 @@ public class Game implements StateMethods {
     public void buildCity() {
         if (board.isLookingForVertex()) {
             TileVertex cVertex = board.getClosestTileVertex();
-            if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+            if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                 getCurrentPlayer().buildCity(cVertex);
             }
         }
