@@ -325,7 +325,7 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn) {
             return;
         }
-        if (((!Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
+        if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
             if (getCurrentPlayer().hasColony()) {
                 if (board.isLookingForVertex()) {
                     board.setLookingForVertex(!board.isLookingForVertex());
@@ -363,7 +363,7 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn) {
             return;
         }
-        if (((!Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
+        if (((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
             || getCurrentPlayer().getFreeColony()) {
             if (board.isLookingForVertex()) {
                 board.setLookingForVertex(!board.isLookingForVertex());
@@ -399,7 +399,7 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn) {
             return;
         }
-        if (((!Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
+        if (((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
             || getCurrentPlayer().getFreeRoad() > 0) {
             if (board.isLookingForEdge()) {
                 board.setLookingForEdge(!board.isLookingForEdge());

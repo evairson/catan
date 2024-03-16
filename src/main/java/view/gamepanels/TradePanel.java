@@ -347,9 +347,12 @@ public class TradePanel extends JPanel {
             } else {
                 selectedPlayerResources = selectedPlayer.getResources();
             }
+            // Mise à jour des ressources pour une transaction entre deux joueurs
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true);
+            updateResources(selectedPlayerResources, resourcesOffered, false);
 
             updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested, false);
-            updateResources(selectedPlayer.getResources(), resourcesRequested, true);
+            updateResources(selectedPlayerResources, resourcesRequested, true);
         }
         // Effacer les ressources demandées et offertes après la transaction
         resourcesRequested.clear();
