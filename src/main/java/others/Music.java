@@ -57,7 +57,7 @@ public class Music {
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioInput);
                 FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(-20.0f);
+                gainControl.setValue(-80.0f);
                 clip.start();
                 return clip;
             }

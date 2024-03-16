@@ -1,9 +1,10 @@
 package model;
 
+import java.io.Serializable;
 import model.tiles.Tile;
 import view.TileType;
 
-public class Thief {
+public class Thief implements Serializable {
     private Tile tile;
     private boolean onDesert;
 

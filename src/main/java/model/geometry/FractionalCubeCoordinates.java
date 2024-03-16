@@ -1,6 +1,8 @@
 package model.geometry;
 
-public class FractionalCubeCoordinates {
+import java.io.Serializable;
+
+public class FractionalCubeCoordinates implements Serializable {
     private double q;
     private double r;
     private double s;

@@ -1,8 +1,10 @@
 package model.geometry;
 
+import java.io.Serializable;
+
 import others.Constants;
 
-public class CubeCoordinates {
+public class CubeCoordinates implements Serializable {
     private int q;
     private int r;
     private int s;
