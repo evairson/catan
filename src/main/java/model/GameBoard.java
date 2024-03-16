@@ -28,7 +28,7 @@ public class GameBoard {
     private HashMap<CubeCoordinates, Tile> board;
     private Layout layout;
     private int gridSize = 2;
-    private ArrayList<TileVertex> verticesMap;
+    private ArrayList<TileVertex> vertices;
     private HashMap<Point, TileEdge> edgesMap;
     // sert à stocker les coordonnées du sommet le plus proche de la souris
     // peut aller dans une autre classe...
@@ -216,7 +216,7 @@ public class GameBoard {
         int index = 0;
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getStart().equals(vertex.getCoordinates())) {
-                for (TileVertex neighbour : verticesMap) {
+                for (TileVertex neighbour : vertices) {
                     if (neighbour.getCoordinates().equals(edge.getEnd())) {
                         if (checkIfNeighbourInArray(neighbours, neighbour)) {
                             continue;
@@ -227,7 +227,7 @@ public class GameBoard {
                 }
             }
             if (edge.getEnd().equals(vertex.getCoordinates())) {
-                for (TileVertex neighbour : verticesMap) {
+                for (TileVertex neighbour : vertices) {
                     if (neighbour.getCoordinates().equals(edge.getStart())) {
                         if (checkIfNeighbourInArray(neighbours, neighbour)) {
                             continue;
@@ -430,7 +430,7 @@ public class GameBoard {
     }
 
     private void initialiseVertices() {
-        verticesMap = new ArrayList<>();
+        vertices = new ArrayList<>();
 
         // Parcourir toutes les tuiles du plateau
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
@@ -444,7 +444,7 @@ public class GameBoard {
                 // Vérifier si ce sommet est déjà dans la map
                 boolean found = false;
 
-                for (TileVertex v : verticesMap) {
+                for (TileVertex v : vertices) {
                     Point storedVertex = v.getCoordinates();
                     v.addTile(tile);
                     if (arePointsEqual(vertex, storedVertex)) {
@@ -465,7 +465,7 @@ public class GameBoard {
                     tileVertex.setCoordinates(vertex);
                     tileVertex.setCoordinates(vertex);
                     // Arrondir les coordonnées pour éviter les erreurs d'arrondi
-                    verticesMap.add(tileVertex);
+                    vertices.add(tileVertex);
                 }
             }
         }
@@ -526,7 +526,7 @@ public class GameBoard {
         g2d.setColor(Color.BLACK); // Color for the vertices
         // Draw the vertices
 
-        for (TileVertex v : verticesMap) {
+        for (TileVertex v : vertices) {
             Building building = v.getBuilding();
             if (building != null) {
                 drawBuildingImage(g2d, building, v.getCoordinates());
@@ -682,7 +682,7 @@ public class GameBoard {
 
     public TileVertex findClosestVertex() {
         closestTileVertex = new TileVertex();
-        for (TileVertex v : verticesMap) {
+        for (TileVertex v : vertices) {
             Point vertex = v.getCoordinates();
             double distance = vertex.distance(mousePosition);
             if  (closestTileVertex == null || distance < minDistanceToVertex) {
