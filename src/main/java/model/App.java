@@ -46,10 +46,16 @@ public class App {
         board.setApp(this);
     }
 
+    public App(Player p) {
+        mainMenu = new MainMenu(this, p);
+        App.gameWindow = new GameWindow(mainMenu);
+        mainMenu.requestFocus();
+    }
+
     public App(PlayerClient playerClient) {
         player = playerClient;
         player.setApp(this);
-        mainMenu = new MainMenu(this);
+        mainMenu = new MainMenu(this, null);
         App.gameWindow = new GameWindow(mainMenu);
         mainMenu.requestFocus();
     }

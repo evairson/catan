@@ -40,7 +40,7 @@ public class Game implements StateMethods, Serializable {
     private int yearOfPlentyWaiting = 0;
     private Player first;
 
-    Game(HashSet<Player> playersSet) {
+    public Game(HashSet<Player> playersSet) {
         for (Player player : playersSet) {
             playersSet.add(player);
         }
@@ -444,6 +444,8 @@ public class Game implements StateMethods, Serializable {
             if (cVertex != null) {
                 try {
                     buildColony(cVertex.getId());
+                    App.getActionPlayerPanel().update();
+                    App.getGamePanel().repaint();
                 } catch (ConstructBuildingException e) {
                     ConstructBuildingException.messageError();
                 }
@@ -541,6 +543,7 @@ public class Game implements StateMethods, Serializable {
                 if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                     try {
                         buildCity(cVertex.getId());
+                        App.getActionPlayerPanel().update();
                         App.getGamePanel().repaint();
                     } catch (ConstructBuildingException e) {
                         ConstructBuildingException.messageError();
@@ -569,19 +572,23 @@ public class Game implements StateMethods, Serializable {
         this.app = app;
         app.setBoard(board);
         board.initialiseBoardAfterTransfer();
-        for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).getId() == playerClient.getId()) {
-                Boolean isCurrentPlayer = false;
-                if (getCurrentPlayer() == players.get(i)) {
-                    isCurrentPlayer = true;
-                }
-                players.set(i, playerClient);
-                if (isCurrentPlayer) {
-                    players.setCurrentPlayer(playerClient);
+
+        if (Main.hasServer()) {
+            for (int i = 0; i < players.size(); i++) {
+                if (players.get(i).getId() == playerClient.getId()) {
+                    Boolean isCurrentPlayer = false;
+                    if (getCurrentPlayer() == players.get(i)) {
+                        isCurrentPlayer = true;
+                    }
+                    players.set(i, playerClient);
+                    if (isCurrentPlayer) {
+                        players.setCurrentPlayer(playerClient);
+                    }
                 }
             }
+            updatePlayerColor();
         }
-        updatePlayerColor();
+
     }
 
     public void setPlayerClient(PlayerClient player) {
