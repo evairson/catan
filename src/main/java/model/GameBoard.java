@@ -28,7 +28,7 @@ public class GameBoard {
     private HashMap<CubeCoordinates, Tile> board;
     private Layout layout;
     private int gridSize = 2;
-    private HashMap<Point, TileVertex> verticesMap;
+    private ArrayList<TileVertex> verticesMap;
     private HashMap<Point, TileEdge> edgesMap;
     // sert à stocker les coordonnées du sommet le plus proche de la souris
     // peut aller dans une autre classe...
@@ -216,7 +216,7 @@ public class GameBoard {
         int index = 0;
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getStart().equals(vertex.getCoordinates())) {
-                for (TileVertex neighbour : verticesMap.values()) {
+                for (TileVertex neighbour : verticesMap) {
                     if (neighbour.getCoordinates().equals(edge.getEnd())) {
                         if (checkIfNeighbourInArray(neighbours, neighbour)) {
                             continue;
@@ -227,7 +227,7 @@ public class GameBoard {
                 }
             }
             if (edge.getEnd().equals(vertex.getCoordinates())) {
-                for (TileVertex neighbour : verticesMap.values()) {
+                for (TileVertex neighbour : verticesMap) {
                     if (neighbour.getCoordinates().equals(edge.getStart())) {
                         if (checkIfNeighbourInArray(neighbours, neighbour)) {
                             continue;
@@ -430,7 +430,7 @@ public class GameBoard {
     }
 
     private void initialiseVertices() {
-        verticesMap = new HashMap<>();
+        verticesMap = new ArrayList<>();
 
         // Parcourir toutes les tuiles du plateau
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
@@ -443,11 +443,13 @@ public class GameBoard {
             for (Point vertex : hexagonVertices) {
                 // Vérifier si ce sommet est déjà dans la map
                 boolean found = false;
-                for (Point storedVertex : verticesMap.keySet()) {
+
+                for (TileVertex v : verticesMap) {
+                    Point storedVertex = v.getCoordinates();
+                    v.addTile(tile);
                     if (arePointsEqual(vertex, storedVertex)) {
                         // Si oui, ajouter la tuile actuelle à la liste des tuiles
                         // associées à ce sommet
-                        verticesMap.get(storedVertex).addTile(tile);
                         found = true;
                         break;
                     }
@@ -461,8 +463,9 @@ public class GameBoard {
                     // Mettre ce sommet dans la map avec comme valeur l'objet TileVertex
                     vertex = new Point((Math.round(vertex.getX())), (Math.round(vertex.getY())));
                     tileVertex.setCoordinates(vertex);
+                    tileVertex.setCoordinates(vertex);
                     // Arrondir les coordonnées pour éviter les erreurs d'arrondi
-                    verticesMap.put(vertex, tileVertex);
+                    verticesMap.add(tileVertex);
                 }
             }
         }
@@ -522,10 +525,11 @@ public class GameBoard {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK); // Color for the vertices
         // Draw the vertices
-        for (Point vertex : verticesMap.keySet()) {
-            Building building = verticesMap.get(vertex).getBuilding();
+
+        for (TileVertex v : verticesMap) {
+            Building building = v.getBuilding();
             if (building != null) {
-                drawBuildingImage(g2d, building, vertex);
+                drawBuildingImage(g2d, building, v.getCoordinates());
             }
         }
     }
@@ -677,16 +681,17 @@ public class GameBoard {
     }
 
     public TileVertex findClosestVertex() {
-        TileVertex closestTileVertex = new TileVertex();
-        for (Point vertex : this.verticesMap.keySet()) {
+        closestTileVertex = new TileVertex();
+        for (TileVertex v : verticesMap) {
+            Point vertex = v.getCoordinates();
             double distance = vertex.distance(mousePosition);
-            if (distance < minDistanceToVertex) {
+            if  (closestTileVertex == null || distance < minDistanceToVertex) {
+                closestTileVertex = v;
                 minDistanceToVertex = distance;
-                closestVertex = vertex;
-                closestTileVertex = this.verticesMap.get(vertex);
+                closestVertex = v.getCoordinates();
             }
         }
-        return this.verticesMap.get(this.closestVertex);
+        return closestTileVertex;
     }
 
 }
