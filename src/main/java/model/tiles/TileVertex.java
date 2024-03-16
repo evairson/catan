@@ -1,6 +1,7 @@
 package model.tiles;
 
 import java.io.Serializable;
+import model.buildings.Harbor;
 import model.geometry.Point;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +12,7 @@ public class TileVertex implements Serializable {
     private Building building;
     private static int idClass;
     private int id;
+    private Harbor harbor;
     private Point coordinates;
 
     public int getId() {
@@ -36,6 +38,14 @@ public class TileVertex implements Serializable {
 
     public static void resetIdClass() {
         idClass = 0;
+    }
+
+    public void setHarbor(Harbor harbor) {
+        this.harbor = harbor;
+    }
+
+    public Harbor getHarbor() {
+        return harbor;
     }
 
     public void addTile(Tile tile) {
