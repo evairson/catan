@@ -1,10 +1,11 @@
 package model.cards;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Stack;
 
+public class CardStack implements Serializable {
 
-public class CardStack {
     public static final int NB_KNIGHTS = 14;
     public static final int NB_MONOPOLY = 2;
     public static final int NB_YEAR_OF_PLENTY = 2;

@@ -2,6 +2,9 @@ package view.gamepanels;
 
 import view.utilities.ButtonImage;
 import model.Game;
+import model.Player;
+import start.Main;
+
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 
@@ -53,6 +56,23 @@ public class ShopPanel extends JPanel {
         add(colony);
         add(road);
         add(card);
+    }
+
+    public void setEnabledPanel(boolean b) {
+        card.setEnabled(b);
+        road.setEnabled(b);
+        city.setEnabled(b);
+        colony.setEnabled(b);
+        repaint();
+    }
+
+    public void updateEnablePanel(Game game) {
+        Player player = Main.hasServer() ? game.getPlayerClient() : game.getCurrentPlayer();
+        card.setEnabled(game.canDraw());
+        road.setEnabled(game.canBuildRoad());
+        city.setEnabled(game.canBuildCity());
+        colony.setEnabled(game.canBuildColony());
+        repaint();
     }
 
 }

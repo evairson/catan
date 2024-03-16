@@ -4,8 +4,12 @@ import view.utilities.ImgService;
 
 import javax.swing.*;
 
+import model.App;
 import model.Game;
 import model.Player;
+import network.NetworkObject;
+import network.PlayerClient;
+import network.NetworkObject.TypeObject;
 import view.utilities.Resolution;
 
 import java.awt.*;
@@ -108,12 +112,12 @@ public class RollingDice extends JPanel {
                     endTime = System.currentTimeMillis();
 
                 }
-                player.setHasTrowDices(true);
                 if (player.getDice() == 7) {
                     game.setThiefMode(true);
-                    game.getApp().getGamePanel().repaint();
+                    App.getActionPlayerPanel().update();
+                    App.getGamePanel().repaint();
                 }
-                game.update();
+                sendDices();
             } catch (InterruptedException e) {
                 System.out.println("Threading Error in class RollingDice " + e);
             }
@@ -125,5 +129,32 @@ public class RollingDice extends JPanel {
     public void newPlayer(Player player) {
         player.setHasTrowDices(false);
         this.player = player;
+    }
+
+    public void sendDices() {
+        if (player instanceof PlayerClient) {
+            try {
+                PlayerClient playerClient = (PlayerClient) player;
+                int id = playerClient.getId();
+                int[] tab = {getDiceOne(), getDiceTwo()};
+                NetworkObject object = new NetworkObject(TypeObject.Game, "dices", id, tab);
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
+        } else {
+            System.out.println("Problème de downCast");
+        }
+
+    }
+
+    public void networkThrowDices(int[] dices) {
+        player.setDices(dices[0], dices[1]);
+        player.setHasTrowDices(true);
+        ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
+        ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
+        repaint();
+        game.update();
     }
 }

@@ -1,9 +1,11 @@
 package model.tiles;
 
+import java.io.Serializable;
+
 import model.geometry.CubeCoordinates;
 import view.TileType;
 
-public class Tile {
+public class Tile implements Serializable {
     private int q;
     private int r;
     private int diceValue;

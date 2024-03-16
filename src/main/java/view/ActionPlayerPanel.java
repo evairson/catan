@@ -19,7 +19,12 @@ import model.cards.KnightCard;
 import model.cards.Monopoly;
 import model.cards.RoadBuilding;
 import model.cards.YearOfPlenty;
+import network.NetworkObject;
+import network.PlayerClient;
+import network.NetworkObject.TypeObject;
+import network.TradeObject;
 import others.Constants;
+import start.Main;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
@@ -38,6 +43,7 @@ public class ActionPlayerPanel extends JPanel {
     private Animation animate = new Animation();
     private JPanel cardsPanel;
     private JPanel cardPanel;
+    private JPanel chat;
     private PlayersPanel playersPanel;
     private RollingDice dice;
 
@@ -57,9 +63,14 @@ public class ActionPlayerPanel extends JPanel {
         initializeResourcesPanel();
         initializeShopPanel(game);
         initializeDeckPanel();
-        createPlayerPanel();
+        initializeChat();
+        //createPlayerPanel();
         createButton();
         setVisible(true);
+    }
+
+    public TradePanel getTradePanel() {
+        return tradePanel;
     }
 
     public RollingDice getRollingDice() {
@@ -70,6 +81,9 @@ public class ActionPlayerPanel extends JPanel {
         return resourcesPanel;
     }
 
+    public JPanel getChat() {
+        return chat;
+    }
 
     private void initializeRollingDicePanel() {
         int xCoord = Resolution.calculateResolution(1108, 440)[0];
@@ -155,7 +169,18 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeTradePanel() {
-        showTradePanel();
+        showTradePanel(null);
+    }
+
+    private void initializeChat() {
+        int xCoord = Resolution.calculateResolution(750, 200)[0];
+        int yCoord = Resolution.calculateResolution(750, 200)[1];
+
+        chat = new ChatPanel(this);
+        chat.setVisible(true);
+        chat.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
+                (int) (400 / Resolution.divider()));
+        add(chat);
     }
 
     private JFrame getMainFrame() {
@@ -169,11 +194,15 @@ public class ActionPlayerPanel extends JPanel {
         return null; // Si le JFrame n'est pas trouvé (ce qui ne devrait pas arriver)
     }
 
-    private void showTradePanel() {
+    public void showTradePanel(TradeObject tradeObject) {
         JFrame mainFrame = getMainFrame();
         JLayeredPane layeredPane = mainFrame.getLayeredPane();
         ListPlayers listPlayers = game.getPlayers();
-        TradePanel tradePanel = new TradePanel(listPlayers, resourcesPanel);
+        if (tradeObject == null) {
+            tradePanel = new TradePanel(listPlayers, resourcesPanel);
+        } else {
+            tradePanel = new TradePanel(tradeObject, listPlayers, resourcesPanel, game.getPlayerClient());
+        }
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);
         setComponentsEnabled(false);
@@ -241,7 +270,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void changeTurn() {
-        game.endTurn();
+        game.serverEndTurn();
         update();
     }
 
@@ -251,6 +280,12 @@ public class ActionPlayerPanel extends JPanel {
         }
         if (cardsPanel != null) {
             remove(cardsPanel);
+        }
+        Player player;
+        if (Main.hasServer()) {
+            player = game.getPlayerClient();
+        } else {
+            player = game.getCurrentPlayer();
         }
         cardsPanel = new JPanel();
         cardsPanel.setLayout(null);
@@ -354,11 +389,26 @@ public class ActionPlayerPanel extends JPanel {
         }
     }
 
+    public void drawCardServer() {
+        game.getCurrentPlayer().drawCard(game.getStack());
+    }
+
     private void drawCard() {
         if (!game.canDraw()) {
             return;
         }
         game.getCurrentPlayer().drawCard(game.getStack());
+        if (Main.hasServer() && game.getCurrentPlayer() instanceof PlayerClient) {
+            try {
+                PlayerClient player = game.getPlayerClient();
+                NetworkObject gameObject;
+                gameObject = new NetworkObject(TypeObject.Message, "DrawCard", player.getId(), null);
+                player.getOut().writeUnshared(gameObject);
+                player.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         if (cardPanel != null) {
             remove(cardPanel);
         }
@@ -385,17 +435,24 @@ public class ActionPlayerPanel extends JPanel {
         });
         cardPanel.setOpaque(false);
         add(cardPanel, 0);
+        updateShopPanel();
         revalidate();
         repaint();
     }
 
     private void createNamePlayer() throws IOException {
+        Player player;
+        if (Main.hasServer()) {
+            player = game.getPlayerClient();
+        } else {
+            player = game.getCurrentPlayer();
+        }
         String src = "src/main/resources/pion/pion";
-        String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
+        String imagePath = src + player.getColorString() + ".png";
         Image origiImg = ImageIO.read(new File(imagePath));
         int scale = (int) (40 / Resolution.divider());
         Image buttonImage = origiImg.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
-        String text = game.getCurrentPlayer().getName().toUpperCase();
+        String text = player.getName().toUpperCase();
         namePlayer = new JLabel(" " + text, new ImageIcon(buttonImage), JLabel.CENTER);
         namePlayer.setVerticalTextPosition(JLabel.CENTER);
         namePlayer.setHorizontalTextPosition(JLabel.RIGHT);
@@ -407,18 +464,21 @@ public class ActionPlayerPanel extends JPanel {
         add(namePlayer);
     }
 
-    private void createPlayerPanel() {
+    public void createPlayerPanel() {
         playersPanel = new PlayersPanel(game);
         add(playersPanel);
     }
 
     public void update() {
         Player currentPlayer = game.getCurrentPlayer();
-        //dice.newPlayer(currentPlayer);
-        resourcesPanel.updateResourceLabels(currentPlayer);
 
+        if (!Main.hasServer()) {
+            resourcesPanel.updateResourceLabels(currentPlayer);
+            namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
+        } else {
+            resourcesPanel.updateResourceLabels(game.getPlayerClient());
+        }
 
-        namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
         try {
             String src = "src/main/resources/pion/pion";
             String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
@@ -428,10 +488,37 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        updateTurn();
 
-        playersPanel.update(game);
-
+        if (playersPanel != null) {
+            playersPanel.update(game);
+        }
+        revalidate();
         repaint();
     }
 
+    public void updateShopPanel() {
+        shopPanel.updateEnablePanel(game);
+    }
+
+    public void updateTurn() {
+        if (Main.hasServer()) {
+            if (game.isMyTurn()) {
+                updateShopPanel();
+                if (game.canPass()) {
+                    endTurn.setEnabled(true);
+                } else {
+                    endTurn.setEnabled(false);
+                }
+            } else {
+                dice.setButtonIsOn(false);
+                shopPanel.setEnabledPanel(false);
+                endTurn.setEnabled(false);
+            }
+        }
+    }
+
+    public App getApp() {
+        return app;
+    }
 }
