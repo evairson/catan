@@ -89,9 +89,9 @@ public class ActionPlayerPanel extends JPanel {
         int xCoord = Resolution.calculateResolution(1108, 440)[0];
         int yCoord = Resolution.calculateResolution(1108, 440)[1];
 
-        dice = new RollingDice(game);
+        dice = new RollingDice(game, true);
         dice.setBounds(xCoord, yCoord, (int) (205 / Resolution.divider()),
-                (int) (150 / Resolution.divider()));
+                (int) (300 / Resolution.divider()));
         add(dice);
         dice.setOpaque(false);
     }

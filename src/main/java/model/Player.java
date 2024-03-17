@@ -15,6 +15,7 @@ import model.cards.DevelopmentCard;
 
 public class Player implements Serializable {
     static final int NUMBER_DICE = 6;
+    static final int NUMBER_D20 = 20;
     private static final long serialVersionUID = 1L;
 
     public enum Color {
@@ -44,6 +45,7 @@ public class Player implements Serializable {
     protected Boolean turn;
     protected int dice1;
     protected int dice2;
+    protected int d20;
     protected String name;
     protected Boolean hasThrowDices;
     protected HashMap<TileType, Integer> resources;
@@ -197,6 +199,9 @@ public class Player implements Serializable {
     public int getDice2() {
         return dice2;
     }
+    public int getD20() {
+        return d20;
+    }
 
     public int getPoints() {
         return points;
@@ -280,10 +285,17 @@ public class Player implements Serializable {
     public void throwDice2() {
         dice2 = (int) ((Math.random() * NUMBER_DICE) + 1);
     }
+    public void throwD20() {
+        d20 = (int) ((Math.random() * NUMBER_D20) + 1);
+    }
+
 
     public void throwDices() {
         throwDice1();
         throwDice2();
+
+        //TODO condition sur le menu de jeu
+        throwD20();
     }
 
     public void setDices(int dice1, int dice2) {
