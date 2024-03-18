@@ -184,8 +184,7 @@ public class RollingDice extends JPanel {
         if (d20Activated) {
             player.setDices(dices[0], dices[1], dices[2]);
             ImgService.updateImage(d20Img, "/view/d20/d" + getD20() + ".png", 0.75);
-        }
-        else{
+        } else {
             player.setDices(dices[0], dices[1]);
         }
         player.setHasTrowDices(true);

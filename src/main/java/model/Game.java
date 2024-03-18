@@ -220,7 +220,7 @@ public class Game implements StateMethods, Serializable {
     @Override
     public void update() {
         lootResources();
-        if (app.hasD20()){
+        if (app.hasD20()) {
             activateD20Event();
         }
     }
@@ -262,9 +262,9 @@ public class Game implements StateMethods, Serializable {
         App.getActionPlayerPanel().update();
     }
 
-    public void activateD20Event(){
+    public void activateD20Event() {
         if (getCurrentPlayer().hasThrowDices()) {
-            switch (getCurrentPlayer().getD20()){
+            switch (getCurrentPlayer().getD20()) {
                 case 1: killAllSheep();
                 default:
                     System.out.println("caca" + getCurrentPlayer().getD20());
@@ -619,8 +619,8 @@ public class Game implements StateMethods, Serializable {
     }
 
     // EVENTS DE JEU POUR LE D20
-    public void killAllSheep(){
-        for(Player player : players){
+    public void killAllSheep() {
+        for (Player player : players) {
             player.removeAllResource(TileType.WOOL);
         }
     }
