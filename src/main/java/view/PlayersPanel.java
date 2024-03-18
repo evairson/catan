@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 import model.Game;
 import model.Player;
+import model.geometry.Point;
 import view.utilities.Resolution;
 
 public class PlayersPanel extends JPanel {
@@ -61,5 +62,15 @@ public class PlayersPanel extends JPanel {
             label.getValue().setText(textUnderligne);
         }
         repaint();
+    }
+
+    public Point getPlayerLabelPosition(Player player) {
+        JLabel label = labels.get(player);
+        if (label != null) {
+            int x = label.getX() + label.getWidth() / 2;
+            int y = label.getY() + label.getHeight() / 2;
+            return new Point(x, y);
+        }
+        return null; // ou une position par défaut si le joueur n'est pas trouvé
     }
 }

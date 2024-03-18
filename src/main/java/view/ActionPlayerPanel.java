@@ -567,11 +567,17 @@ public class ActionPlayerPanel extends JPanel {
         add(resourcePanel);
 
         // Définir les coordonnées finales (emplacement dans l'UI des ressources du joueur)
-        model.geometry.Point endLocation = new model.geometry.Point(600, 900);
+        model.geometry.Point endLocation;
+        if (player.equals(game.getCurrentPlayer())) {
+            endLocation = new model.geometry.Point(600, 900); // Exemple pour l'inventaire du joueur actuel
+        } else {
+            model.geometry.Point labelPosition = playersPanel.getPlayerLabelPosition(player);
+            endLocation = labelPosition != null ? labelPosition : new model.geometry.Point(0, 0);
+        }
         model.geometry.Point controlPoint = new model.geometry.Point(700, 200);
         // Animer le déplacement du JPanel
         Animation animation = new Animation();
-        animation.animateAlongBezierCurve(startLocation, controlPoint, endLocation, 5,
+        animation.animateAlongBezierCurve(startLocation, controlPoint, endLocation, 2,
                 1000, resourcePanel, () -> {
                     this.remove(resourcePanel);
                     this.repaint();
