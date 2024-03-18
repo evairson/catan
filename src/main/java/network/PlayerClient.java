@@ -119,6 +119,10 @@ public class PlayerClient extends Player {
                     App.getActionPlayerPanel().update();
                 }
                 break;
+            case "changeThief" :
+                app.getBoard().changehighlitedTile((int) networkObject.getObject());
+                app.getBoard().changeThief();
+                break;
             default:
                 System.out.println("Pas de message correspondant");
                 break;

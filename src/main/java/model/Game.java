@@ -275,7 +275,7 @@ public class Game implements StateMethods, Serializable {
             networkBuildRoad();
             System.out.println("Building road");
         } else if (board.getThiefMode()) {
-            board.changeThief();
+            board.changeThiefNetwork();
             board.setThiefModeEnd(true);
         }
         App.getGamePanel().repaint();

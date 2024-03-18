@@ -114,8 +114,6 @@ public class RollingDice extends JPanel {
                 }
                 if (player.getDice() == 7) {
                     game.setThiefMode(true);
-                    App.getActionPlayerPanel().update();
-                    App.getGamePanel().repaint();
                 }
                 sendDices();
             } catch (InterruptedException e) {
