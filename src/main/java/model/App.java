@@ -2,9 +2,6 @@ package model;
 
 import others.Constants;
 import others.Music;
-import view.ActionPlayerPanel;
-import view.GamePanel;
-import view.GameWindow;
 import view.*;
 import view.menu.MainMenu;
 
@@ -15,6 +12,7 @@ public class App {
     private GamePanel gamePanel;
     private ActionPlayerPanel actionPlayer;
     private EndPanel endPanel;
+    private OptionPanel optionPanel;
     private GameWindow gameWindow;
     private Thread gameThread;
     private GameBoard board;
@@ -33,8 +31,10 @@ public class App {
 
     public App() {
         mainMenu = new MainMenu(this);
+        optionPanel = new OptionPanel();
         this.gameWindow = new GameWindow(mainMenu);
         mainMenu.requestFocus();
+        gameWindow.getContentPane().add(optionPanel, "optionPanel");
     }
     public void createNewGame() {
         this.game = new Game(this);
@@ -81,8 +81,8 @@ public class App {
         if (playing) {
             game.update();
             checkWin();
-            Music.update();
         }
+        Music.update();
     }
     public void checkWin() {
         if (game.getCurrentPlayer().hasWon()) {
