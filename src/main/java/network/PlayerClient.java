@@ -138,14 +138,16 @@ public class PlayerClient extends Player {
             case "changeTurn":
                 app.getGame().endTurn();
                 app.addMessageColor("C'est au tour de ", java.awt.Color.RED);
-                app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n", java.awt.Color.GREEN);
+                app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
+                    app.getGame().getCurrentPlayer().getColorAwt());
                 break;
             case "DrawCard":
                 if (id != networkObjet.getId()) {
                     App.getActionPlayerPanel().drawCardServer();
                 }
-                app.addMessageColor(app.getGame().getCurrentPlayer().getName()
-                    + " vient d'acheter une carte de developpement \n", java.awt.Color.RED);
+                app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                    app.getGame().getCurrentPlayer().getColorAwt());
+                app.addMessageColor(" vient d'acheter une carte de developpement \n", java.awt.Color.RED);
                 break;
             default:
                 throw new NetworkObjectException();
@@ -161,8 +163,9 @@ public class PlayerClient extends Player {
                     if (networkObject.getId() == id) {
                         App.getActionPlayerPanel().updateShopPanel();
                     }
-                    app.addMessageColor(app.getGame().getCurrentPlayer().getName()
-                        + " vient de placer une ville \n", java.awt.Color.RED);
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une ville \n", java.awt.Color.RED);
                     break;
                 case "buildColony":
                     int idColony = (int) networkObject.getObject();
@@ -170,8 +173,9 @@ public class PlayerClient extends Player {
                     if (networkObject.getId() == id) {
                         App.getActionPlayerPanel().updateShopPanel();
                     }
-                    app.addMessageColor(app.getGame().getCurrentPlayer().getName()
-                        + " vient de placer une colonie \n", java.awt.Color.RED);
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.RED);
                     break;
                 case "buildRoad":
                     int idRoad = (int) networkObject.getObject();
@@ -179,8 +183,9 @@ public class PlayerClient extends Player {
                     if (networkObject.getId() == id) {
                         App.getActionPlayerPanel().updateShopPanel();
                     }
-                    app.addMessageColor(app.getGame().getCurrentPlayer().getName()
-                        + " vient de placer une route \n", java.awt.Color.RED);
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une route \n", java.awt.Color.RED);
                     break;
                 default:
                     break;

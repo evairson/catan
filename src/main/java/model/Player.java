@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.awt.*;
 
 import model.buildings.*;
 import model.cards.VictoryPointCard;
@@ -163,6 +164,21 @@ public class Player implements Serializable {
                 return "Yellow";
             default:
                 return "none";
+        }
+    }
+
+    public java.awt.Color getColorAwt() {
+        switch (color) {
+            case GREEN:
+                return new java.awt.Color(0, 200, 0);
+            case BLUE:
+                return new java.awt.Color(0, 0, 200);
+            case RED:
+                return new java.awt.Color(200, 0, 0);
+            case YELLOW:
+                return new java.awt.Color(255, 189, 89);
+            default:
+                return null;
         }
     }
 
