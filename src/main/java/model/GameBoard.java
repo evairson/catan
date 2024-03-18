@@ -114,34 +114,25 @@ public class GameBoard implements Serializable {
 
     public void initialisePorts() {
         // Définir les coordonnées des ports classiques
-        Point[] classicPortsPoints = {
-            new Point(218, 155),
-            new Point(279, 120),
-            new Point(582, 225),
-            new Point(642, 260),
-            new Point(703, 365),
-            new Point(703, 435),
-            new Point(279, 680),
-            new Point(218, 645)
-        };
+        int[] classicPortsIds = {28, 27, 47, 51, 53, 52, 13, 12};
 
         // Définir les coordonnées des ports spécialisés et leur type de ressource associé
-        Map<Point, TileType> specializedPortsPoints = Map.of(
-            new Point(400, 120), TileType.WOOL,
-            new Point(461, 155), TileType.WOOL,
-            new Point(642, 540), TileType.CLAY,
-            new Point(582, 575), TileType.CLAY,
-            new Point(461, 645), TileType.WOOD,
-            new Point(400, 680), TileType.WOOD,
-            new Point(158, 540), TileType.WHEAT,
-            new Point(158, 470), TileType.WHEAT,
-            new Point(158, 330), TileType.ORE,
-            new Point(158, 260), TileType.ORE
+        Map<Integer, TileType> specializedPortsIds = Map.of(
+                40, TileType.WOOL,
+                39, TileType.WOOL,
+                45, TileType.CLAY,
+                36, TileType.CLAY,
+                22, TileType.WOOD,
+                24, TileType.WOOD,
+                8, TileType.WHEAT,
+                5, TileType.WHEAT,
+                2, TileType.ORE,
+                17, TileType.ORE
         );
 
         // Initialiser les ports classiques
-        for (Point point : classicPortsPoints) {
-            TileVertex harborVertex = findTileVertexByPoint(point);
+        for (int id : classicPortsIds) {
+            TileVertex harborVertex = findTileVertexById(id);
             if (harborVertex != null) {
                 Harbor port = new Harbor(harborVertex);
                 harborVertex.setHarbor(port);
@@ -150,8 +141,8 @@ public class GameBoard implements Serializable {
         }
 
         // Initialiser les ports spécialisés
-        specializedPortsPoints.forEach((point, type) -> {
-            TileVertex harborVertex = findTileVertexByPoint(point);
+        specializedPortsIds.forEach((id, type) -> {
+            TileVertex harborVertex = findTileVertexById(id);
             if (harborVertex != null) {
                 SpecializedHarbor specializedPort = new SpecializedHarbor(harborVertex, type);
                 harborVertex.setHarbor(specializedPort);
@@ -160,9 +151,9 @@ public class GameBoard implements Serializable {
         });
     }
 
-    private TileVertex findTileVertexByPoint(Point point) {
+    private TileVertex findTileVertexById(int id) {
         for (TileVertex vertex : verticesMap.values()) {
-            if (vertex.getCoordinates().equals(point)) {
+            if (vertex.getId() == id) {
                 return vertex;
             }
         }
