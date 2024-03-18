@@ -4,7 +4,7 @@ import view.utilities.ImgService;
 
 import javax.swing.*;
 
-import model.App;
+
 import model.Game;
 import model.Player;
 import network.NetworkObject;

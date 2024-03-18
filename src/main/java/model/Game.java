@@ -182,8 +182,7 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn || !resourcesGiven) {
             return false;
         }
-        int[] t = {0, 1, 1, 0, 1};
-        return getCurrentPlayer().hasEnough(t) && !start && !backwards;
+        return getCurrentPlayer().hasEnough(Constants.BuildingCosts.CARD) && !start && !backwards;
     }
 
     public ListPlayers getPlayers() {

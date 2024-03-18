@@ -10,6 +10,7 @@ import model.buildings.*;
 import model.cards.VictoryPointCard;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
+import others.Constants;
 import view.TileType;
 import model.cards.CardStack;
 import model.cards.DevelopmentCard;
@@ -365,12 +366,28 @@ public class Player implements Serializable {
     public void drawCard(CardStack stack) {
         if (!stack.getCardStack().isEmpty()) {
             DevelopmentCard card = stack.getCardStack().pop();
+            int[] cost = Constants.BuildingCosts.CARD;
+
+            resources.replace(TileType.CLAY, resources.get(TileType.CLAY) - cost[0]);
+            System.out.println("payed " + cost[0] + " clay");
+
+            resources.replace(TileType.ORE, resources.get(TileType.ORE) - cost[1]);
+            System.out.println("payed " + cost[1] + " ore");
+
+            resources.replace(TileType.WHEAT, resources.get(TileType.WHEAT) - cost[2]);
+            System.out.println("payed " + cost[2] + " wheat");
+
+            resources.replace(TileType.WOOD, resources.get(TileType.WOOD) - cost[3]);
+            System.out.println("payed " + cost[3] + " wood");
+
+            resources.replace(TileType.WOOL, resources.get(TileType.WOOL) - cost[4]);
+            System.out.println("payed " + cost[4] + " wool");
             if (card instanceof VictoryPointCard) {
                 points++;
                 App.checkWin();
             }
             cardsDev.add(card);
-
+            App.getActionPlayerPanel().update();
         } else {
             System.out.println("0 cartes dans le deck");
         }
