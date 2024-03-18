@@ -157,4 +157,8 @@ public class App {
     public boolean hasD20() {
         return hasD20;
     }
+
+    public static ActionPlayerPanel getActionPlayer() {
+        return actionPlayer;
+    }
 }

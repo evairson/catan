@@ -123,7 +123,7 @@ public class RollingDice extends JPanel {
                 while ((endTime - startTime) / 1000F < 3) {
                     //roll dice
 
-                    player.throwDices();
+                    player.throwDices(d20Activated);
 
                     //update dice images
                     ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
@@ -167,7 +167,7 @@ public class RollingDice extends JPanel {
             try {
                 PlayerClient playerClient = (PlayerClient) player;
                 int id = playerClient.getId();
-                int[] tab = {getDiceOne(), getDiceTwo()};
+                int[] tab = {getDiceOne(), getDiceTwo(), getD20()};
                 NetworkObject object = new NetworkObject(TypeObject.Game, "dices", id, tab);
                 playerClient.getOut().writeUnshared(object);
                 playerClient.getOut().flush();
@@ -181,7 +181,13 @@ public class RollingDice extends JPanel {
     }
 
     public void networkThrowDices(int[] dices) {
-        player.setDices(dices[0], dices[1]);
+        if (d20Activated) {
+            player.setDices(dices[0], dices[1], dices[2]);
+            ImgService.updateImage(d20Img, "/view/d20/d" + getD20() + ".png", 0.75);
+        }
+        else{
+            player.setDices(dices[0], dices[1]);
+        }
         player.setHasTrowDices(true);
         ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
         ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);

@@ -275,6 +275,14 @@ public class Player implements Serializable {
         resources.merge(resourceType, valueToAdd, Integer::sum);
     }
 
+    /**
+     * Remvoes all resource from specified type.
+     * @param resourceType Type of the resource
+     */
+    public void removeAllResource(TileType resourceType) {
+        resources.merge(resourceType, -resources.get(resourceType), Integer::sum);
+    }
+
 // ------------------------------------
 
 
@@ -290,17 +298,23 @@ public class Player implements Serializable {
     }
 
 
-    public void throwDices() {
+    public void throwDices(boolean d20Activated) {
         throwDice1();
         throwDice2();
 
-        //TODO condition sur le menu de jeu
-        throwD20();
+        if (d20Activated) {
+            throwD20();
+        }
     }
 
     public void setDices(int dice1, int dice2) {
         this.dice1 = dice1;
         this.dice2 = dice2;
+    }
+    public void setDices(int dice1, int dice2, int d20) {
+        this.dice1 = dice1;
+        this.dice2 = dice2;
+        this.d20 = d20;
     }
 
     public void placeBuilding(TileVertex vertex) {
