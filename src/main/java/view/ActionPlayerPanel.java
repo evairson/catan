@@ -400,7 +400,7 @@ public class ActionPlayerPanel extends JPanel {
         game.getCurrentPlayer().drawCard(game.getStack());
         if (Main.hasServer() && game.getCurrentPlayer() instanceof PlayerClient) {
             try {
-                PlayerClient player = game.getPlayerClient();
+                PlayerClient player = (PlayerClient) game.getPlayerClient();
                 NetworkObject gameObject;
                 gameObject = new NetworkObject(TypeObject.Message, "DrawCard", player.getId(), null);
                 player.getOut().writeUnshared(gameObject);
@@ -502,19 +502,17 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     public void updateTurn() {
-        if (Main.hasServer()) {
-            if (game.isMyTurn()) {
-                updateShopPanel();
-                if (game.canPass()) {
-                    endTurn.setEnabled(true);
-                } else {
-                    endTurn.setEnabled(false);
-                }
+        if (game.isMyTurn()) {
+            updateShopPanel();
+            if (game.canPass()) {
+                endTurn.setEnabled(true);
             } else {
-                dice.setButtonIsOn(false);
-                shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);
             }
+        } else {
+            dice.setButtonIsOn(false);
+            shopPanel.setEnabledPanel(false);
+            endTurn.setEnabled(false);
         }
     }
 

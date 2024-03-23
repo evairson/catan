@@ -884,7 +884,7 @@ public class GameBoard implements Serializable {
     public void changeThiefNetwork() {
         if (Main.hasServer()) {
             try {
-                PlayerClient player = game.getPlayerClient();
+                PlayerClient player = ((PlayerClient) game.getPlayerClient());
                 NetworkObject gameObject;
                 gameObject = new NetworkObject(TypeObject.Game, "changeThief", player.getId(),
                     highlightedTile.getId());

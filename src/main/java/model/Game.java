@@ -5,6 +5,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import model.IA.Bot;
+import model.IA.ThreadBot;
 import model.buildings.Building;
 import model.buildings.Colony;
 import model.cards.CardStack;
@@ -31,7 +33,7 @@ public class Game implements StateMethods, Serializable {
     private CardStack stack;
     private Thief thief;
     private boolean resourcesGiven;
-    private PlayerClient playerClient;
+    private Player playerClient;
     private boolean start = true;
     private boolean backwards = false;
     private App app;
@@ -52,6 +54,14 @@ public class Game implements StateMethods, Serializable {
         stack = new CardStack();
     }
 
+    public boolean isStart() {
+        return start;
+    }
+
+    public boolean isBackwards() {
+        return backwards;
+    }
+
     public App getApp() {
         return app;
     }
@@ -69,8 +79,8 @@ public class Game implements StateMethods, Serializable {
             try {
                 int id = playerClient.getId();
                 NetworkObject object = new NetworkObject(TypeObject.Message, "changeTurn", id, null);
-                playerClient.getOut().writeUnshared(object);
-                playerClient.getOut().flush();
+                ((PlayerClient) playerClient).getOut().writeUnshared(object);
+                ((PlayerClient) playerClient).getOut().flush();
             } catch (Exception e) {
                 e.getStackTrace();
             }
@@ -113,7 +123,7 @@ public class Game implements StateMethods, Serializable {
             }
         }
         getCurrentPlayer().addResource(t, amount);
-        app.getActionPlayerPanel().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
+        App.getActionPlayerPanel().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
         System.out.println("monopoly de " + amount + " " + t);
     }
 
@@ -174,8 +184,16 @@ public class Game implements StateMethods, Serializable {
         if (start || backwards) {
             getCurrentPlayer().setFreeColony(true);
         }
+
         App.getActionPlayerPanel().update();
+        app.addMessageColor("C'est au tour de ", java.awt.Color.RED);
+        app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
+            app.getGame().getCurrentPlayer().getColorAwt());
         App.getGamePanel().repaint();
+
+        if (!Main.hasServer()) {
+            startTurnBot();
+        }
     }
 
     public boolean canDraw() {
@@ -206,7 +224,7 @@ public class Game implements StateMethods, Serializable {
         board.draw(g);
     }
 
-    public PlayerClient getPlayerClient() {
+    public Player getPlayerClient() {
         return playerClient;
     }
 
@@ -433,8 +451,8 @@ public class Game implements StateMethods, Serializable {
                     int id = playerClient.getId();
                     NetworkObject object = new NetworkObject(TypeObject.Board, "buildColony",
                             id, cVertex.getId());
-                    playerClient.getOut().writeUnshared(object);
-                    playerClient.getOut().flush();
+                    ((PlayerClient) playerClient).getOut().writeUnshared(object);
+                    ((PlayerClient) playerClient).getOut().flush();
                 } catch (Exception e) {
                     e.getStackTrace();
                 }
@@ -454,15 +472,22 @@ public class Game implements StateMethods, Serializable {
 
     }
 
-    public void buildColony(int idVertex) throws ConstructBuildingException {
+    public boolean buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVerticesMap().values()) {
             if (vertex.getId() == idVertex) {
                 // rajouter un if ça a marché (transformer Player.buildCity en boolean)
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
-                getCurrentPlayer().buildColony(vertex);
-                App.getGamePanel().repaint();
-                return;
+                if (getCurrentPlayer().buildColony(vertex)) {
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.RED);
+                    App.getActionPlayerPanel().update();
+                    App.getGamePanel().repaint();
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
         throw new ConstructBuildingException();
@@ -480,8 +505,8 @@ public class Game implements StateMethods, Serializable {
                         int id = playerClient.getId();
                         NetworkObject object = new NetworkObject(TypeObject.Board, "buildRoad",
                                 id, cEdge.getId());
-                        playerClient.getOut().writeUnshared(object);
-                        playerClient.getOut().flush();
+                        ((PlayerClient) playerClient).getOut().writeUnshared(object);
+                        ((PlayerClient) playerClient).getOut().flush();
                     } catch (Exception e) {
                         e.getStackTrace();
                     }
@@ -489,13 +514,11 @@ public class Game implements StateMethods, Serializable {
             }
         } else {
             if (cEdge != null) {
-                //try {
-                if (board.canPlaceRoad(cEdge, getCurrentPlayer())) {
-                    getCurrentPlayer().buildRoad(cEdge);
-                }
-                /* } catch (ConstructBuildingException e) {
+                try {
+                    buildRoad(cEdge.getId());
+                } catch (ConstructBuildingException e) {
                     ConstructBuildingException.messageError();
-                }*/
+                }
             }
         }
         // rajouter un if ça a marché (transformer Player.buildRoad en boolean)
@@ -503,16 +526,22 @@ public class Game implements StateMethods, Serializable {
         board.setPlacingRoad(false);
     }
 
-    public void buildRoad(int idEdge) throws ConstructBuildingException {
+    public boolean buildRoad(int idEdge) throws ConstructBuildingException {
         for (TileEdge edge : board.getEdgeMap().values()) {
             if (edge.getId() == idEdge) {
                 System.out.println("yeah !");
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
-                getCurrentPlayer().buildRoad(edge);
-                App.getActionPlayerPanel().update();
-                App.getGamePanel().repaint();
-                return;
+                if (getCurrentPlayer().buildRoad(edge)) {
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une route \n", java.awt.Color.RED);
+                    App.getActionPlayerPanel().update();
+                    App.getGamePanel().repaint();
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
         throw new ConstructBuildingException();
@@ -530,8 +559,8 @@ public class Game implements StateMethods, Serializable {
                         int id = playerClient.getId();
                         NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity",
                                 id, cVertex.getId());
-                        playerClient.getOut().writeUnshared(object);
-                        playerClient.getOut().flush();
+                        ((PlayerClient) playerClient).getOut().writeUnshared(object);
+                        ((PlayerClient) playerClient).getOut().flush();
                     } catch (Exception e) {
                         e.getStackTrace();
                     }
@@ -554,14 +583,22 @@ public class Game implements StateMethods, Serializable {
 
     }
 
-    public void buildCity(int idVertex) throws ConstructBuildingException {
+    public boolean buildCity(int idVertex) throws ConstructBuildingException {
+        System.out.println(board.getVerticesMap().size());
         for (TileVertex vertex : board.getVerticesMap().values()) {
             if (vertex.getId() == idVertex) {
                 System.out.println("yeah !");
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
-                getCurrentPlayer().buildCity(vertex);
-                return;
+                if (getCurrentPlayer().buildCity(vertex)) {
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une ville \n", java.awt.Color.RED);
+                    App.getActionPlayerPanel().update();
+                    App.getGamePanel().repaint();
+                    return true;
+                }
+                return false;
             }
         }
         throw new ConstructBuildingException();
@@ -590,7 +627,7 @@ public class Game implements StateMethods, Serializable {
 
     }
 
-    public void setPlayerClient(PlayerClient player) {
+    public void setPlayerClient(Player player) {
         playerClient = player;
     }
 
@@ -602,5 +639,37 @@ public class Game implements StateMethods, Serializable {
         for (Player player : players) {
             player.setColor(Player.getColorId(player.getId()));
         }
+    }
+
+
+    // Fonction lié aux Bots :
+
+    public void startTurnBot() {
+        if (getCurrentPlayer() instanceof Bot) {
+            ThreadBot threadBot = new ThreadBot(this);
+            threadBot.start();
+        }
+    }
+
+    public void placeRoadAndColonyBot(boolean road) {
+        boolean hasPlaced = false;
+        while (!hasPlaced) {
+            int nbAlea = (int) (Math.random() * (road ? board.getEdgeMap().size()
+                : board.getVerticesMap().size()));
+            try {
+                if (!road) {
+                    if (buildColony(nbAlea)) {
+                        hasPlaced = true;
+                    }
+                } else {
+                    if (buildRoad(nbAlea)) {
+                        hasPlaced = true;
+                    }
+                }
+            } catch (ConstructBuildingException e) {
+                ConstructBuildingException.messageError();
+            }
+        }
+        App.getGamePanel().repaint();
     }
 }

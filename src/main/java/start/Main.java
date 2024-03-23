@@ -58,7 +58,7 @@ public class Main {
             server = false;
             SwingUtilities.invokeLater(() -> {
                 System.out.println("launching game");
-                Player player = new Player(Color.BLUE, name);
+                Player player = new Player(Color.BLUE, name, 0);
                 App game = new App(player);
             });
         }
