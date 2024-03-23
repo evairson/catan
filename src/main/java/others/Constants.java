@@ -21,6 +21,7 @@ public class Constants {
         public static final int[] ROAD = new int[] {1, 0, 0, 1, 0};
         public static final int[] COLONY = new int[] {1, 0, 1, 1, 1};
         public static final int[] CITY = new int[] {0, 3, 2, 0, 0};
+        public static final int[] CARD = {0, 1, 1, 0, 1};
 
         public static boolean canBuildRoad(HashMap<TileType, Integer> resources) {
             for (int i = 0; i < resources.size(); i++) {

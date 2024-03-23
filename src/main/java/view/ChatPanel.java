@@ -8,10 +8,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.text.*;
 
 public class ChatPanel extends JPanel {
     private ActionPlayerPanel actionPlayerPanel;
-    private JTextArea chatArea;
+    private JTextPane chatArea;
     private JTextField messageField;
     private JButton sendButton;
 
@@ -20,11 +21,11 @@ public class ChatPanel extends JPanel {
 
         setLayout(new BorderLayout());
 
-        chatArea = new JTextArea();
+        chatArea = new JTextPane();
         chatArea.setEditable(false);
         chatArea.setOpaque(false);
-        chatArea.setLineWrap(true); // Activation du retour automatique à la ligne
-        chatArea.setWrapStyleWord(true); // Séparation des mots pour le retour à la ligne
+        //chatArea.setLineWrap(true); // Activation du retour automatique à la ligne
+        //chatArea.setWrapStyleWord(true); // Séparation des mots pour le retour à la ligne
         JScrollPane scrollPane = new JScrollPane(chatArea);
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
@@ -71,12 +72,38 @@ public class ChatPanel extends JPanel {
         String message = messageField.getText();
         if (!message.isEmpty()) {
             String pName = actionPlayerPanel.getApp().getGame().getCurrentPlayer().getName();
-            chatArea.append(pName + ": " + message + "\n");
+            appendToPane(chatArea, pName + ": " + message + "\n", null);
             flushChat();
         }
     }
     public void addMessage(String message) {
-        chatArea.append(message + "\n");
+        appendToPane(chatArea, message + "\n", null);
+    }
+
+    public void addMessageColor(String message, Color color) {
+
+        StyledDocument doc = chatArea.getStyledDocument();
+
+        // Création d'un ensemble d'attributs et définition de la couleur du texte
+        SimpleAttributeSet attrs = new SimpleAttributeSet();
+        StyleConstants.setForeground(attrs, color);
+
+        try {
+            // Ajout du texte au document avec les attributs de couleur
+            doc.insertString(doc.getLength(), message, attrs);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void appendToPane(JTextPane tp, String msg, AttributeSet attr) {
+        Document doc = tp.getDocument();
+        try {
+            // Ajoute le texte à la fin du document
+            doc.insertString(doc.getLength(), msg, attr);
+        } catch (BadLocationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

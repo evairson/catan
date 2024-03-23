@@ -2,9 +2,6 @@ package model;
 
 import others.Constants;
 import others.Music;
-import view.ActionPlayerPanel;
-import view.GamePanel;
-import view.GameWindow;
 import view.*;
 import view.menu.MainMenu;
 
@@ -109,6 +106,10 @@ public class App {
     }
     public void addMessage(String message) {
         ((ChatPanel) actionPlayer.getChat()).addMessage(message);
+    }
+
+    public void addMessageColor(String message, Color color) {
+        ((ChatPanel) actionPlayer.getChat()).addMessageColor(message, color);
     }
 
     public void addPanels() {
