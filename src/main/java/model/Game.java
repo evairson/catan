@@ -130,18 +130,23 @@ public class Game implements StateMethods, Serializable {
     public boolean canPass() {
         Player p = getCurrentPlayer();
         if (p.getFreeRoad() > 0) {
+            System.out.println("freeRoad");
             return false;
         }
         if (monoWaiting || yearOfPlentyWaiting > 0) {
+            System.out.println("monoWaiting");
             return false;
         }
         if (p.getFreeColony()) {
+            System.out.println("freeColony");
             return false;
         }
         if (!p.hasThrowDices() && !start && !backwards) {
+            System.out.println("hasthrowdice");
             return false;
         }
         if (board.getThiefMode()) {
+            System.out.println("thief");
             return false;
         }
         return true;
@@ -149,6 +154,7 @@ public class Game implements StateMethods, Serializable {
 
     public void endTurn() {
         if (!canPass()) {
+            System.out.println("mince");
             return;
         }
 
@@ -296,6 +302,7 @@ public class Game implements StateMethods, Serializable {
             board.setThiefModeEnd(true);
         }
         App.getGamePanel().repaint();
+        App.getActionPlayerPanel().update();
     }
 
     @Override
@@ -529,7 +536,6 @@ public class Game implements StateMethods, Serializable {
     public boolean buildRoad(int idEdge) throws ConstructBuildingException {
         for (TileEdge edge : board.getEdgeMap().values()) {
             if (edge.getId() == idEdge) {
-                System.out.println("yeah !");
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
                 if (getCurrentPlayer().buildRoad(edge)) {

@@ -4,12 +4,14 @@ import view.utilities.ImgService;
 
 import javax.swing.*;
 
-
+import model.App;
 import model.Game;
 import model.Player;
+import model.IA.Bot;
 import network.NetworkObject;
 import network.PlayerClient;
 import network.NetworkObject.TypeObject;
+import start.Main;
 import view.utilities.Resolution;
 
 import java.awt.*;
@@ -114,8 +116,17 @@ public class RollingDice extends JPanel {
                 }
                 if (player.getDice() == 7) {
                     game.setThiefMode(true);
+                    if (player instanceof Bot) {
+                        game.getBoard().changeThiefBot();
+                    }
                 }
                 sendDices();
+                if (!Main.hasServer()) {
+                    player.setHasTrowDices(true);
+                }
+                game.update();
+                App.getActionPlayerPanel().update();
+                App.getActionPlayerPanel().repaint();
             } catch (InterruptedException e) {
                 System.out.println("Threading Error in class RollingDice " + e);
             }
@@ -141,10 +152,7 @@ public class RollingDice extends JPanel {
             } catch (Exception e) {
                 e.getStackTrace();
             }
-        } else {
-            System.out.println("Problème de downCast");
         }
-
     }
 
     public void networkThrowDices(int[] dices) {

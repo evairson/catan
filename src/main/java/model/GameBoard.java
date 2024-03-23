@@ -898,12 +898,22 @@ public class GameBoard implements Serializable {
         }
     }
 
+    public void changeThiefBot() {
+        int nbAlea = (int) (Math.random() * board.size());
+        for (Tile tile : board.values()) {
+            if (nbAlea == tile.getId()) {
+                highlightedTile = tile;
+            }
+        }
+        changeThief();
+    }
+
     public void changeThief() {
         thief.setTile(highlightedTile);
         game.setThiefMode(false);
         thiefMode = false;
-        App.getActionPlayerPanel().update();
         App.getGamePanel().repaint();
+        App.getActionPlayerPanel().update();
     }
 
     public TileEdge findClosestEdge() {
