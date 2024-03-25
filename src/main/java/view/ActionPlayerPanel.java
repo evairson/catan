@@ -470,24 +470,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     public void update() {
-        Player currentPlayer = game.getCurrentPlayer();
-
-        if (!Main.hasServer()) {
-            resourcesPanel.updateResourceLabels(currentPlayer);
-            namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
-        } else {
-            resourcesPanel.updateResourceLabels(game.getPlayerClient());
-        }
-
-        try {
-            String src = "src/main/resources/pion/pion";
-            String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
-            Image origiImg = ImageIO.read(new File(imagePath));
-            Image buttonImage = origiImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-            namePlayer.setIcon(new ImageIcon(buttonImage));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        resourcesPanel.updateResourceLabels(game.getPlayerClient());
         updateTurn();
 
         if (playersPanel != null) {

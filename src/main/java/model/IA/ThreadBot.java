@@ -29,13 +29,13 @@ public class ThreadBot extends Thread {
                     case 0:
                         if (game.canBuildRoad()) {
                             System.out.println("roro");
-                            game.placeRoadAndColonyBot(false);
+                            game.placeRoadAndColonyBot(true);
                         }
                         break;
                     case 1:
-                        if (game.canBuildRoad()) {
+                        if (game.canBuildColony()) {
                             System.out.println("coco");
-                            game.placeRoadAndColonyBot(true);
+                            game.placeRoadAndColonyBot(false);
                         }
                         break;
                     default:

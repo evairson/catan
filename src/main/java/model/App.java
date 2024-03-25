@@ -102,11 +102,11 @@ public class App {
             e.getStackTrace();
         }
     }
-    public void addMessage(String message) {
+    public static void addMessage(String message) {
         ((ChatPanel) actionPlayer.getChat()).addMessage(message);
     }
 
-    public void addMessageColor(String message, Color color) {
+    public static void addMessageColor(String message, Color color) {
         ((ChatPanel) actionPlayer.getChat()).addMessageColor(message, color);
     }
 

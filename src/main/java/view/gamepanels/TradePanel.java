@@ -2,6 +2,7 @@ package view.gamepanels;
 
 import model.App;
 import model.Player;
+import model.IA.Bot;
 import network.NetworkObject;
 import network.NetworkObject.TypeObject;
 import network.PlayerClient;
@@ -289,8 +290,17 @@ public class TradePanel extends JPanel {
             acceptButton.setEnabled(false);
             bankTradeButton.setEnabled(false);
         } else {
-            acceptButton.setEnabled(canFulfillRequest);
-            declineButton.setEnabled(true);
+            if (canFulfillRequest) {
+                if (((Bot) selectedPlayer).acceptTrade(resourcesRequested, resourcesOffered)) {
+                    performTrade(false);
+                    App.addMessageColor("Votre trade a été accepté \n", java.awt.Color.GREEN);
+                }
+            } else {
+                App.addMessageColor("Votre trade a été refusé \n", java.awt.Color.ORANGE);
+            }
+            closeTradePanel();
+            //acceptButton.setEnabled(canFulfillRequest);
+            //declineButton.setEnabled(true);
         }
     }
     private void bankTradeAction() {
