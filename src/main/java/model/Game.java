@@ -266,6 +266,9 @@ public class Game implements StateMethods, Serializable {
         if (getCurrentPlayer().hasThrowDices()) {
             switch (getCurrentPlayer().getD20()) {
                 case 1: killAllSheep();
+                case 4: lootThiefResources();
+                case 9: knightLoots();
+                case 14: worstWinVP();
                 default:
                     System.out.println("caca" + getCurrentPlayer().getD20());
             }
@@ -623,5 +626,49 @@ public class Game implements StateMethods, Serializable {
         for (Player player : players) {
             player.removeAllResource(TileType.WOOL);
         }
+    }
+    public void lootThiefResources() {
+        for (Player player : players) {
+            for (Building b : player.getBuildings()) {
+                if (b instanceof Colony) {
+                    Colony colony = (Colony) b;
+                    for (Tile tile : colony.getVertex().getTiles()) {
+                        if (tile == thief.getTile()) {
+                            if (colony.getIsCity()) {
+                                Integer number = player.getResources().get(tile.getResourceType());
+                                player.getResources().replace(tile.getResourceType(), number + 2);
+                            } else {
+                                Integer number = player.getResources().get(tile.getResourceType());
+                                player.getResources().replace(tile.getResourceType(), number + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        App.getActionPlayerPanel().update();
+    }
+    public void knightLoots() {
+        for (Player p : players) {
+            for (int i = 0; i < p.getKnights(); ++i) {
+                p.addOneRandom();
+            }
+        }
+    }
+
+    /**
+     * Fais en sorte que le joueur de la partie avec le moins de points gagne 1PV.
+     */
+    public void worstWinVP() {
+        Player min = getCurrentPlayer();
+        for (Player p : players) {
+            if (p.getPoints() == min.getPoints() && p != min) {
+                return;
+            } else if (p.getPoints() < min.getPoints()) {
+                min = p;
+            }
+        }
+        min.addOnePoint();
+        App.checkWin();
     }
 }

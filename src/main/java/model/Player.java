@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import model.buildings.*;
+import model.cards.KnightCard;
 import model.cards.VictoryPointCard;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
@@ -56,6 +57,7 @@ public class Player implements Serializable {
     protected Boolean freeColony = true;
 
     protected int points;
+    protected int knights;
     protected boolean hasBiggestArmy;
     protected boolean hasLongestRoute;
     protected int resourceCap;
@@ -417,11 +419,27 @@ public class Player implements Serializable {
             }
         }
     }
+    public void addOneRandom(){
+        Random rd = new Random();
+        TileType[] resTList = {TileType.CLAY, TileType.ORE, TileType.WHEAT, TileType.WOOD, TileType.WOOL};
+        int k = rd.nextInt(0, 5);
+        addResource(resTList[k], 1);
+    }
+
+    public void incrementKnights(){
+        knights++;
+    }
+
+    public int getKnights() {
+        return knights;
+    }
+    public void addOnePoint(){
+        points++;
+    }
 
     public boolean last(Game game) {
         return (game.getPlayers().get(game.getPlayers().size() - 1) == this);
     }
-
     public boolean first(Game game) {
         return game.getPlayers().get(0) == this;
     }

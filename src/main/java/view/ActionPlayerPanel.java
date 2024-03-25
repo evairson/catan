@@ -319,10 +319,12 @@ public class ActionPlayerPanel extends JPanel {
 
     private void useKnight() {
         removeCardsPanel();
-        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        Player p = game.getCurrentPlayer();
+        ArrayList<DevelopmentCard> cards = p.getCardsDev();
         for (int i = 0; i < cards.size(); i++) {
             if (cards.get(i) instanceof KnightCard) {
                 cards.remove(i);
+                p.incrementKnights();
                 break;
             }
         }
