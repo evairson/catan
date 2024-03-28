@@ -24,20 +24,22 @@ public class ThreadBot extends Thread {
                     si endTurn s'execute avant la fin du thread */
                 App.getActionPlayerPanel().getRollingDice().roll();
                 Thread.sleep(5000);
-                int nbAlea = (int) (Math.random() * 2);
+                int nbAlea = (int) (Math.random() * 3);
                 switch (nbAlea) {
                     case 0:
                         if (game.canBuildRoad()) {
-                            System.out.println("roro");
                             game.placeRoadAndColonyBot(true);
                         }
                         break;
                     case 1:
                         if (game.canBuildColony()) {
-                            System.out.println("coco");
                             game.placeRoadAndColonyBot(false);
                         }
                         break;
+                    //case 3:
+                        //if (game.canBuildCity()) {
+                            //game.placeCityBot();
+                        //}
                     default:
                         break;
                 }

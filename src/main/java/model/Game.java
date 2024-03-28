@@ -192,8 +192,8 @@ public class Game implements StateMethods, Serializable {
         }
 
         App.getActionPlayerPanel().update();
-        app.addMessageColor("C'est au tour de ", java.awt.Color.RED);
-        app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
+        App.addMessageColor("C'est au tour de ", java.awt.Color.RED);
+        App.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
             app.getGame().getCurrentPlayer().getColorAwt());
         App.getGamePanel().repaint();
 
