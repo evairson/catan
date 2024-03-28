@@ -457,11 +457,12 @@ public class Game implements StateMethods, Serializable {
     public void buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVerticesMap().values()) {
             if (vertex.getId() == idVertex) {
-                // rajouter un if ça a marché (transformer Player.buildCity en boolean)
-                board.setLookingForVertex(false);
-                board.setPlacingCity(false);
-                getCurrentPlayer().buildColony(vertex);
-                App.getGamePanel().repaint();
+                if (board.canPlaceColony(vertex, getCurrentPlayer())) {
+                    board.setLookingForVertex(false);
+                    board.setPlacingCity(false);
+                    getCurrentPlayer().buildColony(vertex);
+                    App.getGamePanel().repaint();
+                }
                 return;
             }
         }
