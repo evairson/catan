@@ -7,7 +7,6 @@ import model.Player.Color;
 import view.TileType;
 
 public class Bot extends Player {
-    private Strategie strategie;
 
     public Bot(Color c, String name, int id) {
         super(c, name, id);
