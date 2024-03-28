@@ -482,17 +482,17 @@ public class Game implements StateMethods, Serializable {
     public boolean buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVerticesMap().values()) {
             if (vertex.getId() == idVertex) {
-                // rajouter un if ça a marché (transformer Player.buildCity en boolean)
-                board.setLookingForVertex(false);
-                board.setPlacingCity(false);
-                if (getCurrentPlayer().buildColony(vertex)) {
-                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
-                        app.getGame().getCurrentPlayer().getColorAwt());
-                    app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.RED);
-                    App.getActionPlayerPanel().update();
-                    App.getGamePanel().repaint();
-                    return true;
-                } else {
+                if (board.canPlaceColony(vertex, playerClient)) {
+                    board.setLookingForVertex(false);
+                    board.setPlacingCity(false);
+                    if (getCurrentPlayer().buildColony(vertex)) {
+                        app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                            app.getGame().getCurrentPlayer().getColorAwt());
+                        app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.RED);
+                        App.getActionPlayerPanel().update();
+                        App.getGamePanel().repaint();
+                        return true;
+                    }
                     return false;
                 }
             }
