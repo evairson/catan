@@ -8,56 +8,47 @@ import java.util.ArrayList;
 import model.buildings.Building;
 import model.buildings.Colony;
 import model.cards.CardStack;
-import model.geometry.Layout;
-import model.geometry.Point;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
+import network.NetworkObject;
+import network.PlayerClient;
+import network.NetworkObject.TypeObject;
 import others.Constants;
 import others.ListPlayers;
+import start.Main;
 //import view.utilities.Resolution;
 import view.TileType;
 
-public class Game implements StateMethods {
-    private static GameBoard board;
+import java.io.Serializable;
+import java.util.HashSet;
+
+import exceptionclass.ConstructBuildingException;
+
+public class Game implements StateMethods, Serializable {
+    private GameBoard board;
     private ListPlayers players; // ListPlayers extends ArrayList
     private CardStack stack;
     private Thief thief;
     private boolean resourcesGiven;
+    private PlayerClient playerClient;
     private boolean start = true;
     private boolean backwards = false;
-    private boolean playingVoleur = false;
     private App app;
     private boolean blankTurn = false;
     private boolean monoWaiting = false;
     private int yearOfPlentyWaiting = 0;
+    private Player first;
 
-    public Game(App app) {
-        this.app = app;
-        resourcesGiven = false;
-        Player player1 = new Player(Player.Color.RED, "Player1", app);
-        Player player2 = new Player(Player.Color.YELLOW, "Player2", app);
-        Player player3 = new Player(Player.Color.BLUE, "Player3", app);
-        Player player4 = new Player(Player.Color.GREEN, "Player4", app);
-        players = new ListPlayers(0, player1, player2, player3, player4);
-        player1.setFreeColony(true);
-        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
-        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
-        System.out.println(scaleFactorX + " et " + scaleFactorY);
-        Point point1 = new Point(
-                (int) (267 * scaleFactorX),
-                (int) (267 * scaleFactorY)
-        );
-        System.out.println((int) (267 * scaleFactorX) + " et  ; " + (int) (47 * scaleFactorX));
-        Point point2 = new Point(
-                (int) (47 * scaleFactorX),
-                (int) (47 * scaleFactorY)
-        );
-//        Point point2 = new Point((int) (93 / Resolution.divider()), (int) (93 / Resolution.divider()));
-        Layout layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
+    public Game(HashSet<Player> playersSet) {
+        for (Player player : playersSet) {
+            playersSet.add(player);
+        }
+        players = new ListPlayers(0, playersSet);
+        players.getCurrentPlayer().setFreeColony(true);
+
         thief = new Thief();
-        board = new GameBoard(layout, thief, this);
-        app.setBoard(board);
+        board = new GameBoard(thief, this);
         stack = new CardStack();
     }
 
@@ -73,12 +64,31 @@ public class Game implements StateMethods {
         return thief;
     }
 
+    public void serverEndTurn() {
+        if (Main.hasServer()) {
+            try {
+                int id = playerClient.getId();
+                NetworkObject object = new NetworkObject(TypeObject.Message, "changeTurn", id, null);
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
+        } else {
+            endTurn();
+        }
+    }
+
     public boolean getBlankTurn() {
         return blankTurn;
     }
 
     public void setMonoWaiting(boolean b) {
         monoWaiting = b;
+    }
+
+    public void setYearOfPlenty(int i) {
+        yearOfPlentyWaiting = i;
     }
 
     public void resourceClicked(TileType t) {
@@ -88,6 +98,7 @@ public class Game implements StateMethods {
         }
         if (yearOfPlentyWaiting > 0) {
             getCurrentPlayer().addResource(t, 1);
+            System.out.println("gave " + t);
             yearOfPlentyWaiting--;
         }
     }
@@ -102,21 +113,25 @@ public class Game implements StateMethods {
             }
         }
         getCurrentPlayer().addResource(t, amount);
+        app.getActionPlayerPanel().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
         System.out.println("monopoly de " + amount + " " + t);
     }
 
     public boolean canPass() {
-        if (!getCurrentPlayer().hasThrowDices() && !start && !backwards) {
+        Player p = getCurrentPlayer();
+        if (p.getFreeRoad() > 0) {
             return false;
         }
-        if ((start || backwards)
-            && (getCurrentPlayer().getFreeRoad() || getCurrentPlayer().getFreeColony())) {
+        if (monoWaiting || yearOfPlentyWaiting > 0) {
             return false;
         }
-        if (playingVoleur) {
+        if (p.getFreeColony()) {
             return false;
         }
-        if (app.getActionPlayerPanel().getCardPlayed()) {
+        if (!p.hasThrowDices() && !start && !backwards) {
+            return false;
+        }
+        if (board.getThiefMode()) {
             return false;
         }
         return true;
@@ -138,10 +153,10 @@ public class Game implements StateMethods {
             }
         }
 
-        if (start && getCurrentPlayer().getName().equals("Player4")) {
+        if (start && getCurrentPlayer().last(this)) {
             start = false;
             backwards = true;
-        } else if (backwards && getCurrentPlayer().getName().equals("Player1")) {
+        } else if (backwards && getCurrentPlayer().first(this)) {
             backwards = false;
         } else if (backwards) {
             players.prev();
@@ -150,23 +165,24 @@ public class Game implements StateMethods {
         }
 
         if (!start && !backwards && !blankTurn) {
-            app.getActionPlayerPanel().getRollingDice().setButtonIsOn(true);
+            App.getActionPlayerPanel().getRollingDice().setButtonIsOn(true);
         }
         System.out.println("It's " + getCurrentPlayer() .getName() + "'s turn");
         resourcesGiven = false;
-        app.getActionPlayerPanel().getRollingDice().newPlayer(getCurrentPlayer());
+        App.getActionPlayerPanel().getRollingDice().newPlayer(getCurrentPlayer());
 
         if (start || backwards) {
             getCurrentPlayer().setFreeColony(true);
         }
+        App.getActionPlayerPanel().update();
+        App.getGamePanel().repaint();
     }
 
     public boolean canDraw() {
         if (blankTurn || !resourcesGiven) {
             return false;
         }
-        int[] t = {0, 1, 1, 0, 1};
-        return getCurrentPlayer().hasEnough(t) && !start && !backwards;
+        return getCurrentPlayer().hasEnough(Constants.BuildingCosts.CARD) && !start && !backwards;
     }
 
     public ListPlayers getPlayers() {
@@ -181,18 +197,17 @@ public class Game implements StateMethods {
         return board;
     }
 
-    public static void setBoard(GameBoard board) {
-        Game.board = board;
-    }
-
     public void setThiefMode(boolean b) {
-        playingVoleur = b;
         board.setThiefMode(b);
         divideRessourcesByTwo();
     }
 
     public void draw(Graphics g) {
         board.draw(g);
+    }
+
+    public PlayerClient getPlayerClient() {
+        return playerClient;
     }
 
     // Player action : -----------------
@@ -229,11 +244,9 @@ public class Game implements StateMethods {
                                 if (colony.getIsCity()) {
                                     Integer number = player.getResources().get(tile.getResourceType());
                                     player.getResources().replace(tile.getResourceType(), number + 2);
-                                    System.out.println("2 " + tile.getResourceType() + player.getName());
                                 } else {
                                     Integer number = player.getResources().get(tile.getResourceType());
                                     player.getResources().replace(tile.getResourceType(), number + 1);
-                                    System.out.println("1 " + tile.getResourceType() + player.getName());
                                 }
                             }
                         }
@@ -242,7 +255,7 @@ public class Game implements StateMethods {
             }
             resourcesGiven = true;
         }
-        app.getActionPlayerPanel().update();
+        App.getActionPlayerPanel().update();
     }
 
     @Override
@@ -252,17 +265,19 @@ public class Game implements StateMethods {
     @Override
     public void mouseClicked(MouseEvent e) {
         if (board.isPlacingCity()) {
-            buildCity();
+            networkBuildCity();
+            System.out.println("Building city");
         } else if (board.isPlacingColony()) {
-            buildColony();
+            networkBuildColony();
+            System.out.println("Building colony");
         } else if (board.isPlacingRoad()) {
-            buildRoad();
+            networkBuildRoad();
+            System.out.println("Building road");
         } else if (board.getThiefMode()) {
-            board.changeThief();
+            board.changeThiefNetwork();
             board.setThiefModeEnd(true);
         }
-
-        getCurrentPlayer().printResources();
+        App.getGamePanel().repaint();
     }
 
     @Override
@@ -294,11 +309,22 @@ public class Game implements StateMethods {
     }
 
     // Build methods ---------------
+
+    public boolean canBuildCity() {
+        if (blankTurn) {
+            return false;
+        }
+        if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
+            return true;
+        }
+        return false;
+    }
+
     public void buildCityButtonAction() {
         if (blankTurn) {
             return;
         }
-        if ((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven) {
+        if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
             if (getCurrentPlayer().hasColony()) {
                 if (board.isLookingForVertex()) {
                     board.setLookingForVertex(!board.isLookingForVertex());
@@ -319,6 +345,18 @@ public class Game implements StateMethods {
             }
         }
     }
+
+    public boolean canBuildColony() {
+        if (blankTurn) {
+            return false;
+        }
+        if (((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
+            || getCurrentPlayer().getFreeColony()) {
+            return true;
+        }
+        return false;
+    }
+
 
     public void buildColonyButtonAction() {
         if (blankTurn) {
@@ -345,12 +383,23 @@ public class Game implements StateMethods {
         }
     }
 
+    public boolean canBuildRoad() {
+        if (blankTurn) {
+            return false;
+        }
+        if (((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
+            || getCurrentPlayer().getFreeRoad() > 0) {
+            return true;
+        }
+        return false;
+    }
+
     public void buildRoadButtonAction() {
         if (blankTurn) {
             return;
         }
-        if (((!Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
-            || getCurrentPlayer().getFreeRoad()) {
+        if (((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
+            || getCurrentPlayer().getFreeRoad() > 0) {
             if (board.isLookingForEdge()) {
                 board.setLookingForEdge(!board.isLookingForEdge());
                 board.setPlacingCity(false);
@@ -370,37 +419,189 @@ public class Game implements StateMethods {
         }
     }
 
-    public void buildColony() {
+    public void networkBuildColony() {
+        TileVertex cVertex = null;
         if (board.isLookingForVertex()) {
-            TileVertex cVertex = board.getClosestTileVertex();
-            if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
+            cVertex = board.getClosestTileVertex();
+            if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                 getCurrentPlayer().buildColony(cVertex);
             }
         }
-        // rajouter un if ça a marché (transformer Player.buildColony en boolean)
-        board.setLookingForVertex(false);
-        board.setPlacingColony(false);
+        if (Main.hasServer()) {
+            if (cVertex != null) {
+                try {
+                    int id = playerClient.getId();
+                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildColony",
+                            id, cVertex.getId());
+                    playerClient.getOut().writeUnshared(object);
+                    playerClient.getOut().flush();
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+            }
+        } else {
+            if (cVertex != null) {
+                try {
+                    buildColony(cVertex.getId());
+                    App.getActionPlayerPanel().update();
+                    App.getGamePanel().repaint();
+                } catch (ConstructBuildingException e) {
+                    ConstructBuildingException.messageError();
+                }
+            }
+        }
+
+
     }
 
-    public void buildRoad() {
+    public void buildColony(int idVertex) throws ConstructBuildingException {
+        for (TileVertex vertex : board.getVertices()) {
+            if (vertex.getId() == idVertex) {
+                if (board.canPlaceColony(vertex, getCurrentPlayer())) {
+                    board.setLookingForVertex(false);
+                    board.setPlacingCity(false);
+                    getCurrentPlayer().buildColony(vertex);
+                    App.getGamePanel().repaint();
+                }
+                return;
+            }
+        }
+        throw new ConstructBuildingException();
+    }
+
+    public void networkBuildRoad() {
+        TileEdge cEdge = null;
         if (board.isLookingForEdge()) {
-            TileEdge cEdge = board.getClosestTileEdge();
-            getCurrentPlayer().buildRoad(cEdge);
+            cEdge = board.getClosestTileEdge();
+        }
+        if (Main.hasServer()) {
+            if (cEdge != null) {
+                if (board.canPlaceRoad(cEdge, getCurrentPlayer())) {
+                    try {
+                        int id = playerClient.getId();
+                        NetworkObject object = new NetworkObject(TypeObject.Board, "buildRoad",
+                                id, cEdge.getId());
+                        playerClient.getOut().writeUnshared(object);
+                        playerClient.getOut().flush();
+                    } catch (Exception e) {
+                        e.getStackTrace();
+                    }
+                }
+            }
+        } else {
+            if (cEdge != null) {
+                //try {
+                if (board.canPlaceRoad(cEdge, getCurrentPlayer())) {
+                    getCurrentPlayer().buildRoad(cEdge);
+                }
+                /* } catch (ConstructBuildingException e) {
+                    ConstructBuildingException.messageError();
+                }*/
+            }
         }
         // rajouter un if ça a marché (transformer Player.buildRoad en boolean)
         board.setLookingForEdge(false);
         board.setPlacingRoad(false);
     }
 
-    public void buildCity() {
+    public void buildRoad(int idEdge) throws ConstructBuildingException {
+        for (TileEdge edge : board.getEdgeMap().values()) {
+            if (edge.getId() == idEdge) {
+                System.out.println("yeah !");
+                board.setLookingForVertex(false);
+                board.setPlacingCity(false);
+                getCurrentPlayer().buildRoad(edge);
+                App.getActionPlayerPanel().update();
+                App.getGamePanel().repaint();
+                return;
+            }
+        }
+        throw new ConstructBuildingException();
+    }
+
+    public void networkBuildCity() {
+        TileVertex cVertex = null;
         if (board.isLookingForVertex()) {
-            TileVertex cVertex = board.getClosestTileVertex();
-            if (board.isVertexTwoRoadsAwayFromCities(cVertex)) {
-                getCurrentPlayer().buildCity(cVertex);
+            cVertex = board.getClosestTileVertex();
+        }
+        if (Main.hasServer()) {
+            if (cVertex != null) {
+                if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
+                    try {
+                        int id = playerClient.getId();
+                        NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity",
+                                id, cVertex.getId());
+                        playerClient.getOut().writeUnshared(object);
+                        playerClient.getOut().flush();
+                    } catch (Exception e) {
+                        e.getStackTrace();
+                    }
+                }
+            }
+        } else {
+            if (cVertex != null) {
+                if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
+                    try {
+                        buildCity(cVertex.getId());
+                        App.getActionPlayerPanel().update();
+                        App.getGamePanel().repaint();
+                    } catch (ConstructBuildingException e) {
+                        ConstructBuildingException.messageError();
+                    }
+                }
             }
         }
         // rajouter un if ça a marché (transformer Player.buildCity en boolean)
-        board.setLookingForVertex(false);
-        board.setPlacingCity(false);
+
+    }
+
+    public void buildCity(int idVertex) throws ConstructBuildingException {
+        for (TileVertex vertex : board.getVertices()) {
+            if (vertex.getId() == idVertex) {
+                System.out.println("yeah !");
+                board.setLookingForVertex(false);
+                board.setPlacingCity(false);
+                getCurrentPlayer().buildCity(vertex);
+                return;
+            }
+        }
+        throw new ConstructBuildingException();
+    }
+
+    public void initialiseGameAfterTransfer(App app) {
+        this.app = app;
+        app.setBoard(board);
+        board.initialiseBoardAfterTransfer();
+
+        if (Main.hasServer()) {
+            for (int i = 0; i < players.size(); i++) {
+                if (players.get(i).getId() == playerClient.getId()) {
+                    Boolean isCurrentPlayer = false;
+                    if (getCurrentPlayer() == players.get(i)) {
+                        isCurrentPlayer = true;
+                    }
+                    players.set(i, playerClient);
+                    if (isCurrentPlayer) {
+                        players.setCurrentPlayer(playerClient);
+                    }
+                }
+            }
+            updatePlayerColor();
+        }
+
+    }
+
+    public void setPlayerClient(PlayerClient player) {
+        playerClient = player;
+    }
+
+    public boolean isMyTurn() {
+        return playerClient.isMyTurn(this);
+    }
+
+    public void updatePlayerColor() {
+        for (Player player : players) {
+            player.setColor(Player.getColorId(player.getId()));
+        }
     }
 }

@@ -1,12 +1,13 @@
 package model;
 
-import model.buildings.Building;
-import model.buildings.Colony;
-import model.buildings.Road;
+import model.buildings.*;
 import model.geometry.*;
-import model.geometry.Point;
 import model.tiles.*;
+import network.NetworkObject;
+import network.NetworkObject.TypeObject;
+import network.PlayerClient;
 import others.Constants;
+import start.Main;
 import view.TileImageLoader;
 import view.TileType;
 import view.utilities.Resolution;
@@ -14,18 +15,29 @@ import view.utilities.Resolution;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.FontMetrics;
+import java.awt.Color;
+import java.awt.BasicStroke;
+import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameBoard {
-    private HashMap<CubeCoordinates, Tile> board;
+public class GameBoard implements Serializable {
+    private LinkedHashMap<CubeCoordinates, Tile> board;
+    private final Map<TileVertex, Harbor> harborMap = new HashMap<>();
     private Layout layout;
     private int gridSize = 2;
     private ArrayList<TileVertex> vertices;
@@ -40,14 +52,13 @@ public class GameBoard {
     private double minDistanceToCenterTile;
     private Thief thief;
     private boolean thiefMode;
-    private Map<TileType, BufferedImage> tileImages = TileImageLoader.loadAndResizeTileImages(false);
-    private Map<TileType, BufferedImage> tileImagesS = TileImageLoader.loadAndResizeTileImages(true);
+    private Map<TileType, BufferedImage> tileImages;
+    private Map<TileType, BufferedImage> tileImagesS;
     private boolean lookingForVertex = false;
     private boolean lookingForEdge = false;
     private boolean placingRoad = false;
     private boolean placingColony = false;
     private boolean placingCity = false;
-    private boolean waitingChoice = false;
     private Game game;
     private App app;
 
@@ -61,8 +72,7 @@ public class GameBoard {
 
     private Map<Integer, BufferedImage> diceValueImages = new HashMap<>();
 
-    private BufferedImage boardImage = new BufferedImage(Constants.Game.WIDTH,
-            Constants.Game.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+    private BufferedImage boardImage;
 
     private static Font baseFont = new Font("SansSerif", Font.BOLD,
             (int) (30 / Constants.Game.DIVIDER));
@@ -70,14 +80,97 @@ public class GameBoard {
             Font.BOLD, (int) (35 / Constants.Game.DIVIDER));
 
     private Map<Building, Image> scaledBuildingImages = new HashMap<>();
+    private BufferedImage harborImage;
 
-    public GameBoard(Layout layout, Thief thief, Game game) {
-        loadImages();
+    public GameBoard(Thief thief, Game game) {
+
         this.thief = thief;
+
+        board = new LinkedHashMap<CubeCoordinates, Tile>();
         this.game = game;
-        board = new HashMap<CubeCoordinates, Tile>();
-        this.layout = layout;
         this.initialiseBoard();
+    }
+
+    private void loadHarborImage() {
+        try {
+            BufferedImage originalImage = ImageIO.read(new File("src/main/resources/harbor.png"));
+            // Ajustez la taille comme nécessaire
+            int width = originalImage.getWidth() / 5; // Exemple de réduction de la taille
+            int height = originalImage.getHeight() / 5;
+            harborImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = harborImage.createGraphics();
+            g2d.drawImage(originalImage, 0, 0, width, height, null);
+            g2d.dispose();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void drawPorts(Graphics g) {
+        for (Map.Entry<TileVertex, Harbor> entry : harborMap.entrySet()) {
+            TileVertex vertex = entry.getKey();
+            Point location = vertex.getCoordinates();
+            // Dessinez l'image du port à l'emplacement du vertex
+            g.drawImage(harborImage, (int) location.getX() - harborImage.getWidth() / 2,
+                    (int) location.getY() - harborImage.getHeight() / 2, null);
+        }
+    }
+
+    public void initialisePorts() {
+        // Définir les coordonnées des ports classiques
+        Point[] classicPortsPoints = {
+            new Point(218, 155),
+            new Point(279, 120),
+            new Point(582, 225),
+            new Point(642, 260),
+            new Point(703, 365),
+            new Point(703, 435),
+            new Point(279, 680),
+            new Point(218, 645)
+        };
+
+        // Définir les coordonnées des ports spécialisés et leur type de ressource associé
+        Map<Point, TileType> specializedPortsPoints = Map.of(
+            new Point(400, 120), TileType.WOOL,
+            new Point(461, 155), TileType.WOOL,
+            new Point(642, 540), TileType.CLAY,
+            new Point(582, 575), TileType.CLAY,
+            new Point(461, 645), TileType.WOOD,
+            new Point(400, 680), TileType.WOOD,
+            new Point(158, 540), TileType.WHEAT,
+            new Point(158, 470), TileType.WHEAT,
+            new Point(158, 330), TileType.ORE,
+            new Point(158, 260), TileType.ORE
+        );
+
+        // Initialiser les ports classiques
+        for (Point point : classicPortsPoints) {
+            TileVertex harborVertex = findTileVertexByPoint(point);
+            if (harborVertex != null) {
+                Harbor port = new Harbor(harborVertex);
+                harborVertex.setHarbor(port);
+                harborMap.put(harborVertex, port);
+            }
+        }
+
+        // Initialiser les ports spécialisés
+        specializedPortsPoints.forEach((point, type) -> {
+            TileVertex harborVertex = findTileVertexByPoint(point);
+            if (harborVertex != null) {
+                SpecializedHarbor specializedPort = new SpecializedHarbor(harborVertex, type);
+                harborVertex.setHarbor(specializedPort);
+                harborMap.put(harborVertex, specializedPort);
+            }
+        });
+    }
+
+    private TileVertex findTileVertexByPoint(Point point) {
+        for (TileVertex vertex : vertices) {
+            if (vertex.getCoordinates().equals(point)) {
+                return vertex;
+            }
+        }
+        return null;
     }
 
     public void setThiefModeEnd(boolean b) {
@@ -85,6 +178,8 @@ public class GameBoard {
     }
 
     private void loadImages() {
+        boardImage = new BufferedImage(Constants.Game.WIDTH,
+        Constants.Game.HEIGHT, BufferedImage.TYPE_INT_ARGB);
         loadedImages = new HashMap<>();
 
         String basePath = "src/main/resources/building/pions/";
@@ -194,6 +289,14 @@ public class GameBoard {
         return lookingForEdge;
     }
 
+    public HashMap<Point, TileEdge> getEdgeMap() {
+        return edgesMap;
+    }
+
+    public ArrayList<TileVertex> getVertices() {
+        return vertices;
+    }
+
     public void addTile(Tile t) {
         int q = t.getQ();
         int r = t.getR();
@@ -231,18 +334,11 @@ public class GameBoard {
                     if (neighbour.getCoordinates().equals(edge.getStart())) {
                         if (checkIfNeighbourInArray(neighbours, neighbour)) {
                             continue;
-
                         }
                         neighbours[index] = neighbour;
-
                         index++;
                     }
                 }
-            }
-        }
-        for (TileVertex v : neighbours) {
-            if (v != null) {
-                System.out.println("Neighbour: " + v.getCoordinates());
             }
         }
         return neighbours;
@@ -258,13 +354,28 @@ public class GameBoard {
         }
         return false;
     }
-    public TileEdge[] getNeighbourTileEdgesToVertex(TileVertex vertex) {
-        TileEdge[] neighbours = new TileEdge[3];
+
+    public boolean checkIfNeighbourInArray(TileEdge[] neighbours, TileEdge edge) {
+        for (TileEdge e : neighbours) {
+            if (e != null) {
+                if (e.getStart().equals(edge.getStart()) && e.getEnd().equals(edge.getEnd())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public TileVertex[] getNeighbourTileVerticesToEdge(TileEdge edge) {
+        TileVertex[] neighbours = new TileVertex[2];
         int i = 0;
-        for (TileEdge edge : edgesMap.values()) {
-            if (edge.getStart().equals(vertex.getCoordinates())
-                    || edge.getEnd().equals(vertex.getCoordinates())) {
-                neighbours[i] = edge;
+        for (TileVertex vertex : vertices) {
+            if (vertex.getCoordinates().equals(edge.getStart())) {
+                neighbours[i] = vertex;
+                i++;
+            }
+            if (vertex.getCoordinates().equals(edge.getEnd())) {
+                neighbours[i] = vertex;
                 i++;
             }
         }
@@ -275,12 +386,32 @@ public class GameBoard {
         TileEdge[] neighbours = new TileEdge[4];
         int i = 0;
         for (TileEdge e : edgesMap.values()) {
-            if (e.getStart().equals(edge.getStart()) || e.getEnd().equals(edge.getStart())
-                    || e.getStart().equals(edge.getEnd()) || e.getEnd().equals(edge.getEnd())) {
-                if (!e.equals(edge)) {
-                    neighbours[i] = e;
-                    i++;
-                }
+            if (checkIfNeighbourInArray(neighbours, e)) {
+                continue;
+            }
+            if ((e.getStart().equals(edge.getStart()) && !e.getEnd().equals(edge.getEnd()))
+                || (e.getEnd().equals(edge.getStart()) && !e.getStart().equals(edge.getEnd()))) {
+                neighbours[i] = e;
+                i++;
+            }
+            if ((e.getStart().equals(edge.getEnd()) && !e.getEnd().equals(edge.getStart()))
+                || (e.getEnd().equals(edge.getEnd()) && !e.getStart().equals(edge.getStart()))) {
+                neighbours[i] = e;
+                i++;
+            }
+        }
+        return neighbours;
+
+    }
+
+    public TileEdge[] getNeighbourTileEdgesToVertex(TileVertex vertex) {
+        TileEdge[] neighbours = new TileEdge[3];
+        int i = 0;
+        for (TileEdge edge : edgesMap.values()) {
+            if (edge.getStart().equals(vertex.getCoordinates())
+                || edge.getEnd().equals(vertex.getCoordinates())) {
+                neighbours[i] = edge;
+                i++;
             }
         }
         return neighbours;
@@ -288,12 +419,84 @@ public class GameBoard {
 
     public boolean isVertexTwoRoadsAwayFromCities(TileVertex vertex) {
         TileVertex[] neighbours = getNeighbourTileVerticesToVertex(vertex);
-        for (TileVertex neighbour : neighbours) {
-            if (neighbour.getBuilding() != null) {
-                return false;
+        for (TileVertex v : neighbours) {
+            if (v != null) {
+                if (v.getBuilding() != null) {
+                    return false;
+                }
             }
         }
         return true;
+    }
+    public boolean isRoadNextToCity(TileEdge edge, Player player) {
+        TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
+        for (TileVertex v : neighbours) {
+            if (v != null) {
+                if (v.getBuilding() != null) {
+                    if (v.getBuilding().getOwner() == player) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isRoadNextToRoad(TileEdge edge, Player player) {
+        TileEdge[] neighbours = getNeighbourTileEdgesToEdge(edge);
+        for (TileEdge e : neighbours) {
+            if (e != null) {
+                if (e.getBuilding() != null) {
+                    if (e.getBuilding().getOwner() == player) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isVertexNextToRoad(TileVertex vertex, Player player) {
+        TileEdge[] neighbours = getNeighbourTileEdgesToVertex(vertex);
+        for (TileEdge e : neighbours) {
+            if (e != null) {
+                if (e.getBuilding() != null) {
+                    if (e.getBuilding().getOwner() == player) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean canPlaceColony(TileVertex vertex, Player player) {
+        if (game.getCurrentPlayer().getFreeColony()) {
+            return true;
+        }
+        if (vertex.getBuilding() != null) {
+            return false;
+        }
+        if (!isVertexTwoRoadsAwayFromCities(vertex)) {
+            return false;
+        }
+        if (!isVertexNextToRoad(vertex, player)) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean canPlaceRoad(TileEdge edge, Player player) {
+        if (edge.getBuilding() != null) {
+            return false;
+        }
+        if (isRoadNextToCity(edge, player)) {
+            return true;
+        }
+        if (isRoadNextToRoad(edge, player)) {
+            return true;
+        }
+        return false;
     }
 
     public void addTile(int q, int r, int diceValue, TileType resourceType) {
@@ -337,10 +540,6 @@ public class GameBoard {
                 }
             }
         }
-        initialiseVertices();
-        initialiseEdges();
-        initialiseBoardImage();
-        initDiceValueImages();
     }
 
     public void initialiseBoardImage() {
@@ -458,6 +657,8 @@ public class GameBoard {
                     // Si le sommet n'est pas trouvé, créer un nouvel objet TileVertex pour ce
                     // sommet
                     TileVertex tileVertex = new TileVertex();
+                    tileVertex.setId(TileVertex.getIdClass());
+                    TileVertex.addIdClass();
                     // Ajouter la tuile actuelle à la liste des tuiles associées à ce sommet
                     tileVertex.addTile(tile);
                     // Mettre ce sommet dans la map avec comme valeur l'objet TileVertex
@@ -472,7 +673,8 @@ public class GameBoard {
     }
 
     private void initialiseEdges() {
-        edgesMap = new HashMap<>();
+        TileEdge.resetIdClass();
+        edgesMap = new LinkedHashMap<>();
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
             Tile tile = entry.getValue();
@@ -483,11 +685,27 @@ public class GameBoard {
                 start = new Point((Math.round(start.getX())), (Math.round(start.getY())));
                 end = new Point((Math.round(end.getX())), (Math.round(end.getY())));
                 TileEdge edge = new TileEdge(start, end);
+                edge.setId(TileEdge.getIdClass());
+                TileEdge.addIdClass();
                 Point edgeMidPoint = new Point((int) ((start.getX() + end.getX()) / 2),
                         (int) ((start.getY() + end.getY()) / 2));
+                if (edgesMapContainsEdge(edge)) {
+                    continue;
+                }
                 edgesMap.put(edgeMidPoint, edge);
             }
         }
+    }
+
+    public boolean edgesMapContainsEdge(TileEdge edge) {
+        for (TileEdge e : edgesMap.values()) {
+            if (e.getStart().equals(edge.getStart()) && e.getEnd().equals(edge.getEnd())) {
+                return true;
+            } else if (e.getStart().equals(edge.getEnd()) && e.getEnd().equals(edge.getStart())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean arePointsEqual(Point p1, Point p2) {
@@ -515,12 +733,10 @@ public class GameBoard {
                 (int) (size / Resolution.divider()), Image.SCALE_SMOOTH));
         }
         int placement = (isCity ? 40 : 30);
-
         g2d.drawImage(scaledBuildingImages.get(building),
                 (int) vertex.getX() - (int) (placement / Resolution.divider()),
                 (int) vertex.getY() - (int) (placement / Resolution.divider()), null);
     }
-
     private void drawVertices(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK); // Color for the vertices
@@ -547,7 +763,6 @@ public class GameBoard {
             }
             g2d.drawImage(boardImage, 0, 0, null);
         }
-
     }
 
     private void drawEdgeWithImage(Graphics2D g2d, Point start, Point end, BufferedImage edgeImage) {
@@ -593,6 +808,7 @@ public class GameBoard {
         drawImagesInHexes(g);
         drawEdges(g);
         drawVertices(g);
+        drawPorts(g);
 
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             CubeCoordinates cubeCoord = entry.getKey();
@@ -612,21 +828,24 @@ public class GameBoard {
 
     public void draw(Graphics g) {
         drawBoard(g);
-        if (minDistanceToVertex < 20) {
+        if (minDistanceToVertex < 20 && lookingForVertex) {
             g.setColor(Color.RED);
             g.fillOval((int) closestVertex.getX() - 10,
                     (int) closestVertex.getY() - 10, 20, 20);
         }
-        try {
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setColor(Color.RED);
-            TileEdge edge = this.edgesMap.get(this.closestEdge);
-            g2d.setStroke(new BasicStroke(6));
-            g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
-                    (int) edge.getEnd().getX(),
-                    (int) edge.getEnd().getY());
-        } catch (Exception e) { // null seulement la première fois qu'on survole un hexagone
+        if (lookingForEdge) {
+            try {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(Color.RED);
+                TileEdge edge = this.edgesMap.get(this.closestEdge);
+                g2d.setStroke(new BasicStroke(6));
+                g2d.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(),
+                        (int) edge.getEnd().getX(),
+                        (int) edge.getEnd().getY());
+            } catch (Exception e) { // null seulement la première fois qu'on survole un hexagone
+            }
         }
+
         drawThief(g);
     }
 
@@ -655,26 +874,45 @@ public class GameBoard {
                 if (distance < minDistanceToCenterTile) {
                     minDistanceToCenterTile = distance;
                     highlightedTile = board.get(coordinatesTile);
+                    App.getGamePanel().repaint();
                 }
             }
         }
-        app.getGamePanel().repaint();
+    }
+
+    public void changeThiefNetwork() {
+        if (Main.hasServer()) {
+            try {
+                PlayerClient player = game.getPlayerClient();
+                NetworkObject gameObject;
+                gameObject = new NetworkObject(TypeObject.Game, "changeThief", player.getId(),
+                    highlightedTile.getId());
+                player.getOut().writeUnshared(gameObject);
+                player.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            changeThief();
+        }
     }
 
     public void changeThief() {
         thief.setTile(highlightedTile);
         game.setThiefMode(false);
         thiefMode = false;
+        App.getActionPlayerPanel().update();
+        App.getGamePanel().repaint();
     }
 
     public TileEdge findClosestEdge() {
-        TileEdge closestTileEdge = new TileEdge();
         for (Point edge : this.edgesMap.keySet()) {
             double distance = edge.distance(mousePosition);
             if (distance < minDistanceToEdge) {
                 minDistanceToEdge = distance;
                 closestEdge = edge;
                 closestTileEdge = this.edgesMap.get(edge);
+                App.getGamePanel().repaint();
             }
         }
         return closestTileEdge;
@@ -692,6 +930,45 @@ public class GameBoard {
             }
         }
         return closestTileVertex;
+    }
+
+    public void initialiseBoardAfterTransfer() {
+        initialiseLayout();
+        loadImages();
+        tileImages = TileImageLoader.loadAndResizeTileImages(false);
+        tileImagesS = TileImageLoader.loadAndResizeTileImages(true);
+        initialiseVertices();
+        initialiseEdges();
+        initialiseBoardImage();
+        initDiceValueImages();
+        this.initialisePorts();
+        loadHarborImage();
+    }
+
+    public void initialiseLayout() {
+        double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
+        double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
+        System.out.println(scaleFactorX + " et " + scaleFactorY);
+        Point point1 = new Point(
+                (int) (267 * scaleFactorX),
+                (int) (267 * scaleFactorY)
+        );
+        System.out.println((int) (267 * scaleFactorX) + " et  ; " + (int) (47 * scaleFactorX));
+        Point point2 = new Point(
+                (int) (47 * scaleFactorX),
+                (int) (47 * scaleFactorY)
+        );
+//      Point point2 = new Point((int) (93 / Resolution.divider()), (int) (93 / Resolution.divider()));
+        layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
+    }
+
+
+    public void changehighlitedTile(int tileId) {
+        for (Tile tile : board.values()) {
+            if (tile.getId() == tileId) {
+                highlightedTile = tile;
+            }
+        }
     }
 
 }

@@ -1,49 +1,69 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.awt.*;
 
 import model.buildings.*;
 import model.cards.VictoryPointCard;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
+import others.Constants;
 import view.TileType;
-import model.buildings.Building;
 import model.cards.CardStack;
 import model.cards.DevelopmentCard;
 
-public class Player {
+public class Player implements Serializable {
     static final int NUMBER_DICE = 6;
+    private static final long serialVersionUID = 1L;
 
     public enum Color {
         RED,
         YELLOW,
         BLUE,
-        GREEN
+        GREEN,
     }
 
-    private Color color;
-    private Boolean turn;
-    private int dice1;
-    private int dice2;
-    private String name;
-    private Boolean hasThrowDices = false;
-    private HashMap<TileType, Integer> resources;
-    private ArrayList<DevelopmentCard> cardsDev;
-    private ArrayList<Building> buildings;
-    private Boolean freeRoad = false;
-    private Boolean freeColony = true;
+    public static Color getColorId(int i) {
+        switch (i) {
+            case 0:
+                return Color.RED;
+            case 1:
+                return Color.YELLOW;
+            case 2:
+                return Color.BLUE;
+            case 3:
+                return Color.GREEN;
+            default:
+                return Color.RED;
+        }
+    }
 
-    private int points;
-    private boolean hasBiggestArmy;
-    private boolean hasLongestRoute;
-    private int resourceCap;
-    private App app;
+    protected int id;
+    protected Color color;
+    protected Boolean turn;
+    protected int dice1;
+    protected int dice2;
+    protected String name;
+    protected Boolean hasThrowDices;
+    protected HashMap<TileType, Integer> resources;
+    protected ArrayList<DevelopmentCard> cardsDev;
+    protected ArrayList<Building> buildings;
 
-    public Player(Color c, String name, App app) {
+    protected int freeRoad = 0;
+    protected Boolean freeColony = true;
+
+    protected int points;
+    protected boolean hasBiggestArmy;
+    protected boolean hasLongestRoute;
+    protected int resourceCap;
+    protected App app;
+
+    public Player(Color c, String name, int id) {
+        this.id = id;
         color = c;
-        this.app = app;
         this.name = name;
         resources = new HashMap<>();
         resources.put(TileType.CLAY, 0);
@@ -60,18 +80,36 @@ public class Player {
         resourceCap = 7;
     }
 
+    public Player(Color c, String name) {
+        color = c;
+        this.name = name;
+        resources = new HashMap<>();
+        resources.put(TileType.CLAY, 6);
+        resources.put(TileType.ORE, 6);
+        resources.put(TileType.WHEAT, 6);
+        resources.put(TileType.WOOD, 6);
+        resources.put(TileType.WOOL, 6);
+        buildings = new ArrayList<>();
+        cardsDev = new ArrayList<>();
+        hasThrowDices = false;
+        points = 0;
+        hasBiggestArmy = false;
+        hasLongestRoute = false;
+        resourceCap = 7;
+    }
+
     public void printBuildings() {
         for (Building b : buildings) {
             System.out.println(b);
         }
     }
 
-    public boolean getFreeRoad() {
+    public int getFreeRoad() {
         return freeRoad;
     }
 
-    public void setFreeRoad(boolean b) {
-        freeRoad = b;
+    public void setFreeRoad(int i) {
+        freeRoad = i;
     }
 
     public boolean getFreeColony() {
@@ -95,7 +133,6 @@ public class Player {
         for (TileType r : resources.keySet()) {
             System.out.print(r + " ");
         }
-        System.out.println();
     }
 
     // Getter / Setter : ---------------
@@ -128,6 +165,21 @@ public class Player {
                 return "Yellow";
             default:
                 return "none";
+        }
+    }
+
+    public java.awt.Color getColorAwt() {
+        switch (color) {
+            case GREEN:
+                return new java.awt.Color(0, 200, 0);
+            case BLUE:
+                return new java.awt.Color(0, 0, 200);
+            case RED:
+                return new java.awt.Color(200, 0, 0);
+            case YELLOW:
+                return new java.awt.Color(255, 189, 89);
+            default:
+                return null;
         }
     }
 
@@ -221,6 +273,10 @@ public class Player {
         this.cardsDev = cardsDev;
     }
 
+    public int getId() {
+        return id;
+    }
+
     /**
      * This function adds an amount of resource to the specified resource type.
      * @param resourceType The resource type we want to increase
@@ -247,6 +303,11 @@ public class Player {
         throwDice2();
     }
 
+    public void setDices(int dice1, int dice2) {
+        this.dice1 = dice1;
+        this.dice2 = dice2;
+    }
+
     public void placeBuilding(TileVertex vertex) {
         // TODO :
     }
@@ -254,13 +315,14 @@ public class Player {
     public void buildRoad(TileEdge edge) {
         if (edge.getBuilding() == null) {
             Road r = new Road(this);
-            if (freeRoad) {
+            if (freeRoad > 0) {
                 r.place(this, edge);
-                setFreeRoad(false);
+                freeRoad--;
                 return;
             }
             r.buyAndPlace(this, edge);
         }
+        App.getGamePanel().repaint();
     }
 
     public void buildColony(TileVertex vertex) {
@@ -268,14 +330,16 @@ public class Player {
             Colony c = new Colony(this);
             if (freeColony) {
                 setFreeColony(false);
-                setFreeRoad(true);
+                freeRoad++;
                 c.place(this, false, vertex);
+                return;
             }
             if (c.buyAndPlace(this, false, vertex)) {
                 points++;
-                app.checkWin();
+                App.checkWin();
             }
         }
+        App.getGamePanel().repaint();
     }
 
     public void buildCity(TileVertex vertex) {
@@ -284,10 +348,11 @@ public class Player {
                 Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
                     points++;
-                    app.checkWin();
+                    App.checkWin();
                 }
             }
         }
+        App.getGamePanel().repaint();
     }
 
     public void createOrBuy() {
@@ -301,12 +366,28 @@ public class Player {
     public void drawCard(CardStack stack) {
         if (!stack.getCardStack().isEmpty()) {
             DevelopmentCard card = stack.getCardStack().pop();
+            int[] cost = Constants.BuildingCosts.CARD;
+
+            resources.replace(TileType.CLAY, resources.get(TileType.CLAY) - cost[0]);
+            System.out.println("payed " + cost[0] + " clay");
+
+            resources.replace(TileType.ORE, resources.get(TileType.ORE) - cost[1]);
+            System.out.println("payed " + cost[1] + " ore");
+
+            resources.replace(TileType.WHEAT, resources.get(TileType.WHEAT) - cost[2]);
+            System.out.println("payed " + cost[2] + " wheat");
+
+            resources.replace(TileType.WOOD, resources.get(TileType.WOOD) - cost[3]);
+            System.out.println("payed " + cost[3] + " wood");
+
+            resources.replace(TileType.WOOL, resources.get(TileType.WOOL) - cost[4]);
+            System.out.println("payed " + cost[4] + " wool");
             if (card instanceof VictoryPointCard) {
                 points++;
-                app.checkWin();
+                App.checkWin();
             }
             cardsDev.add(card);
-
+            App.getActionPlayerPanel().update();
         } else {
             System.out.println("0 cartes dans le deck");
         }
@@ -342,5 +423,13 @@ public class Player {
                 }
             }
         }
+    }
+
+    public boolean last(Game game) {
+        return (game.getPlayers().get(game.getPlayers().size() - 1) == this);
+    }
+
+    public boolean first(Game game) {
+        return game.getPlayers().get(0) == this;
     }
 }

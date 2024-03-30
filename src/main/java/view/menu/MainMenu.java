@@ -2,10 +2,17 @@ package view.menu;
 
 import others.Constants;
 import view.OptionPanel;
+import start.Main;
 import view.utilities.ButtonImage;
 import javax.swing.*;
 
 import model.App;
+import model.Game;
+
+import java.util.HashSet;
+
+import model.Player;
+import model.Player.Color;
 
 import java.awt.*;
 
@@ -16,8 +23,10 @@ public class MainMenu extends JPanel {
     private JButton quitBtn;
     private Image backgroundImage;
     private App app;
+    private Player player;
 
-    public MainMenu(App app) {
+    public MainMenu(App app, Player p) {
+        this.player = p;
         this.app = app;
         setLayout(null); // Disposer les boutons verticalement
         loadBackgroundImage("src/main/resources/mainMenu.png");
@@ -43,7 +52,7 @@ public class MainMenu extends JPanel {
     private void initializeButtons() {
         String basePath = "src/main/resources/";
         playBtn = new ButtonImage(basePath + "playButton.png", basePath + "playButtonHover.png",
-                500, 100, 1, this::startapp, null);
+                500, 100, 1, this::startAll, null);
         optionsBtn = new ButtonImage(basePath + "optionsButton.png", basePath + "optionsButtonHover.png",
                 550, 330, 1, this::startOptions, null);
         quitBtn = new ButtonImage(basePath + "quitButton.png", basePath + "quitButtonHover.png",
@@ -53,17 +62,32 @@ public class MainMenu extends JPanel {
         add(quitBtn);
     }
 
-    public void startapp() {
+    public void startAll() {
+        if (Main.hasServer()) {
+            app.tryStartGame();
+        } else {
+            HashSet<Player> players = new HashSet<>();
+            players.add(player);
+            players.add(new Player(Color.GREEN, "Player2"));
+            players.add(new Player(Color.RED, "Player3"));
+            players.add(new Player(Color.YELLOW, "Player4"));
+            Game game = new Game(players);
+            startapp(game);
+        }
+    }
+
+    public void startapp(Game game) {
         System.out.println("Lancement du jeu...");
         Container parent = getParent();
-        app.createNewGame();
+        app.createNewGame(game);
         CardLayout parentLayout = (CardLayout) parent.getLayout();
         app.addPanels();
         app.setPlaying(true);
+        App.getActionPlayerPanel().createPlayerPanel();
         parentLayout.show(parent, "actionPlayerPanel");
-        app.getActionPlayerPanel().revalidate();
-        app.getActionPlayerPanel().repaint();
         app.update();
+        App.getActionPlayerPanel().revalidate();
+        App.getActionPlayerPanel().repaint();
     }
 
     public void startOptions() {

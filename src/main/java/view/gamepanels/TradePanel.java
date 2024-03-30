@@ -1,8 +1,18 @@
 package view.gamepanels;
 
+import model.App;
 import model.Player;
+import network.NetworkObject;
+import network.NetworkObject.TypeObject;
+import network.PlayerClient;
+import network.TradeObject;
+import model.buildings.Colony;
+import model.buildings.Harbor;
+import model.buildings.SpecializedHarbor;
+import model.tiles.TileVertex;
 import others.Constants;
 import others.ListPlayers;
+import start.Main;
 import view.GameWindow;
 import view.TileType;
 import view.utilities.ButtonImage;
@@ -14,8 +24,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 public class TradePanel extends JPanel {
     private Image backgroundImage;
@@ -28,6 +38,7 @@ public class TradePanel extends JPanel {
     private final int[] buttonYPositions = {378, 312, 446, 245, 515};
     private ListPlayers listPlayers;
     private Player selectedPlayer;
+    private Player player;
     private JLabel selectedPlayerLabel;
     private JLabel selectedPlayerLabelIcon;
     private ButtonImage proposeButton;
@@ -36,12 +47,15 @@ public class TradePanel extends JPanel {
     private Image playerIcon;
     private ButtonImage bankTradeButton;
     private Map<String, TileType> resourceNameToTileType = new HashMap<>();
-    private HashMap<TileType, Integer> resourcesRequested = new HashMap<>();
-    private HashMap<TileType, Integer> resourcesOffered = new HashMap<>();
+    private HashMap<TileType, Integer> resourcesRequested;
+    private HashMap<TileType, Integer> resourcesOffered;
     private ResourcesPanel resourcesPanel;
     private boolean isBank = false;
+    private boolean trader = false;
 
     public TradePanel(ListPlayers listPlayers, ResourcesPanel resourcesPanel) {
+        resourcesOffered = new HashMap<>();
+        resourcesRequested = new HashMap<>();
         this.listPlayers = listPlayers;
         this.resourcesPanel = resourcesPanel;
         initializeSelectedPlayerLabel();
@@ -54,6 +68,34 @@ public class TradePanel extends JPanel {
         createPlayersButtons();
         initializeSelectedPlayerImage();
         updateProposeButtonState();
+        initializeReturnButton();
+    }
+
+    public TradePanel(TradeObject tradeObject, ListPlayers listPlayers,
+        ResourcesPanel resourcesPanel, Player player) {
+        trader = true;
+        this.player = player;
+        this.listPlayers = listPlayers;
+        this.resourcesPanel = resourcesPanel;
+        this.resourcesOffered = TradeObject.toTileType(tradeObject.getResourcesRequested());
+        this.resourcesRequested = TradeObject.toTileType(tradeObject.getResourcesOffered());
+        initializeSelectedPlayerLabel();
+        initializeResourceNameMap();
+        setLayout(null);
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+        loadBackgroundImage("src/main/resources/tradePanel.png");
+        createResourceButtons(false);
+
+        createTradeButtons();
+        //createPlayersButtons();
+        initializeSelectedPlayerImage();
+        System.out.println(playerOneLabels);
+        updateProposeButtonState();
+        actionPlayerButton(listPlayers.getCurrentPlayer());
+        bankTradeButton.setEnabled(false);
+        acceptButton.setEnabled(canSelectedPlayerFulfillRequest());
+        declineButton.setEnabled(true);
+        repaint();
     }
 
     // -------- Fonctions affichant les boutons ressources et leurs labels respectifs -------- //
@@ -73,17 +115,30 @@ public class TradePanel extends JPanel {
             TileType type = resourceNameToTileType.get(resourceNames[i]);
             configurePlayerOneButton(playerOneButtons[i], playerOneLabels[i], type);
             configurePlayerTwoButton(playerTwoButtons[i], playerTwoLabels[i]);
+            if (trader) {
+                updateCounterLabel(i);
+            } else {
+                resourcesOffered.put(resourceNameToTileType.get(resourceNames[i]), 0);
+                resourcesRequested.put(resourceNameToTileType.get(resourceNames[i]), 0);
+            }
         }
     }
     private JLabel createCounterLabel(int x, int y, int height) {
         int[] coords = Resolution.calculateResolution(x, y);
-        JLabel label = new JLabel("0", SwingConstants.CENTER);
+        JLabel label;
+        label = new JLabel("0", SwingConstants.CENTER);
         label.setForeground(Color.RED);
         label.setBounds(coords[0], coords[1], 20, height);
         int scale = (int) (32 / Resolution.divider());
         label.setFont(new Font("SansSerif", Font.BOLD, scale));
         add(label);
         return label;
+    }
+
+    private void updateCounterLabel(int i) {
+        TileType resourceType = resourceNameToTileType.get(resourceNames[i]);
+        playerOneLabels[i].setText(String.valueOf(resourcesRequested.get(resourceType)));
+        playerTwoLabels[i].setText(String.valueOf(resourcesOffered.get(resourceType)));
     }
 
     // -------- Fonctions configurant les boutons ressources et leurs labels respectifs -------- //
@@ -93,7 +148,12 @@ public class TradePanel extends JPanel {
         Player currentPlayer = listPlayers.getCurrentPlayer();
         button.addActionListener(e -> {
             int currentValue = Integer.parseInt(counterLabel.getText());
-            int playerResourceAmount = currentPlayer.getResources().getOrDefault(resourceType, 0);
+            int playerResourceAmount;
+            if (trader) {
+                playerResourceAmount = player.getResources().getOrDefault(resourceType, 0);
+            } else {
+                playerResourceAmount = currentPlayer.getResources().getOrDefault(resourceType, 0);
+            }
             if (currentValue < playerResourceAmount) {
                 currentValue++;
                 counterLabel.setText(String.valueOf(currentValue));
@@ -133,7 +193,6 @@ public class TradePanel extends JPanel {
             }
         });
     }
-
     private void gatherResourcesOffered() {
         resourcesOffered.clear();
         for (int i = 0; i < playerOneLabels.length; i++) {
@@ -141,10 +200,11 @@ public class TradePanel extends JPanel {
             int amount = Integer.parseInt(playerOneLabels[i].getText());
             if (amount > 0) {
                 resourcesOffered.put(resourceType, amount);
+            } else {
+                resourcesOffered.put(resourceType, 0);
             }
         }
     }
-
     private void gatherResourcesRequested() {
         resourcesRequested.clear();
         for (int i = 0; i < playerTwoLabels.length; i++) {
@@ -152,6 +212,8 @@ public class TradePanel extends JPanel {
             int amount = Integer.parseInt(playerTwoLabels[i].getText());
             if (amount > 0) {
                 resourcesRequested.put(resourceType, amount);
+            } else {
+                resourcesRequested.put(resourceType, 0);
             }
         }
     }
@@ -181,8 +243,20 @@ public class TradePanel extends JPanel {
     }
 
     // -------- Fonctions traitant les mécanismes des boutons d'échange -------- //
-
     private boolean canSelectedPlayerFulfillRequest() {
+        if (trader) {
+            HashMap<TileType, Integer> selectedPlayerResources = player.getResources();
+            for (Map.Entry<TileType, Integer> entry : resourcesRequested.entrySet()) {
+                TileType requestedResource = entry.getKey();
+                Integer requestedAmount = entry.getValue();
+                if (selectedPlayerResources.getOrDefault(requestedResource, 0) < requestedAmount) {
+                    System.out.println(requestedResource);
+                    System.out.println(selectedPlayerResources.get(requestedResource));
+                    return false;
+                }
+            }
+            return true;
+        }
         if (selectedPlayer == null) {
             return false;
         }
@@ -198,7 +272,6 @@ public class TradePanel extends JPanel {
 
         return true;
     }
-
     private void proposeAction() {
         gatherResourcesRequested();
         displayResources(resourcesRequested);
@@ -207,11 +280,18 @@ public class TradePanel extends JPanel {
         displayResources(resourcesOffered);
 
         boolean canFulfillRequest = canSelectedPlayerFulfillRequest();
-        acceptButton.setEnabled(canFulfillRequest);
-
         toggleTradeInterface(false);
         notifyOfferToPlayer(selectedPlayer);
-        declineButton.setEnabled(true);
+
+        if (Main.hasServer() && !trader) {
+            declineButton.setEnabled(false);
+            proposeButton.setEnabled(false);
+            acceptButton.setEnabled(false);
+            bankTradeButton.setEnabled(false);
+        } else {
+            acceptButton.setEnabled(canFulfillRequest);
+            declineButton.setEnabled(true);
+        }
     }
     private void bankTradeAction() {
         isBank = true;
@@ -224,8 +304,26 @@ public class TradePanel extends JPanel {
     private void notifyOfferToPlayer(Player player) {
         // TODO : Implémentez la notification pour le joueur sélectionné.
         // Cela peut être un changement de couleur, un message pop-up, etc.
+
+        if (listPlayers.getCurrentPlayer() instanceof PlayerClient) {
+            try {
+                PlayerClient playerClient = (PlayerClient) listPlayers.getCurrentPlayer();
+                int id = playerClient.getId();
+                HashMap<String, Integer> offered = TradeObject.toString(resourcesOffered);
+                HashMap<String, Integer> requested = TradeObject.toString(resourcesRequested);
+                TradeObject tradeObject = new TradeObject(id, player.getId(), offered,
+                    requested);
+                NetworkObject object = new NetworkObject(TypeObject.Game, "trade", id, tradeObject);
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Problème de downCast");
+        }
     }
-    private void acceptAction(boolean isBank) {
+    public void acceptAction(boolean isBank) {
         performTrade(isBank);
         closeTradePanel();
     }
@@ -234,63 +332,67 @@ public class TradePanel extends JPanel {
         acceptButton.setEnabled(false);
         toggleTradeInterface(true);
     }
-    private void performTrade(boolean isBank) {
+    public void performTrade(boolean isBank) {
         HashMap<TileType, Integer> currentPlayerResources = listPlayers.getCurrentPlayer().getResources();
 
         if (isBank) {
-            // Transaction avec la banque
-            gatherResourcesOffered();
-            gatherResourcesRequested();
-
-            for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
-                TileType resource = entry.getKey();
-                Integer amount = entry.getValue();
-
-                // Retirer les ressources offertes du joueur courant
-                currentPlayerResources.put(resource, currentPlayerResources.getOrDefault(resource,
-                        0) - amount);
-            }
-
-            for (Map.Entry<TileType, Integer> entry : resourcesRequested.entrySet()) {
-                TileType resource = entry.getKey();
-                Integer amount = entry.getValue();
-
-                // Ajouter la ressource demandée au joueur courant
-                currentPlayerResources.put(resource, currentPlayerResources.getOrDefault(resource,
-                        0) + amount);
-            }
+            // Mise à jour des ressources pour une transaction avec la banque
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested, false);
         } else {
             // Transaction avec un autre joueur
-            HashMap<TileType, Integer> selectedPlayerResources = selectedPlayer.getResources();
-
-            for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
-                TileType resource = entry.getKey();
-                Integer amount = entry.getValue();
-
-                currentPlayerResources.put(resource, currentPlayerResources.getOrDefault(resource,
-                        0) - amount);
-                selectedPlayerResources.put(resource, selectedPlayerResources.getOrDefault(resource,
-                        0) + amount);
+            HashMap<TileType, Integer> selectedPlayerResources;
+            if (trader) {
+                selectedPlayerResources = player.getResources();
+            } else {
+                selectedPlayerResources = selectedPlayer.getResources();
             }
+            // Mise à jour des ressources pour une transaction entre deux joueurs
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true);
+            updateResources(selectedPlayerResources, resourcesOffered, false);
 
-            for (Map.Entry<TileType, Integer> entry : resourcesRequested.entrySet()) {
-                TileType resource = entry.getKey();
-                Integer amount = entry.getValue();
-
-                currentPlayerResources.put(resource, currentPlayerResources.getOrDefault(resource,
-                        0) + amount);
-                selectedPlayerResources.put(resource, selectedPlayerResources.getOrDefault(resource,
-                        0) - amount);
-            }
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested, false);
+            updateResources(selectedPlayerResources, resourcesRequested, true);
         }
-
         // Effacer les ressources demandées et offertes après la transaction
         resourcesRequested.clear();
         resourcesOffered.clear();
 
         // Mettre à jour l'affichage des ressources pour les joueurs impliqués
         resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
+        App.getActionPlayerPanel().update();
+
+        if (player instanceof PlayerClient) {
+            try {
+                PlayerClient playerClient = (PlayerClient) player;
+                int id = playerClient.getId();
+                NetworkObject object = new NetworkObject(TypeObject.Game, "tradeAccept", id,
+                    listPlayers.getCurrentPlayer().getId());
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Problème de downCast");
+        }
     }
+
+    /**
+     * Met à jour les ressources d'un joueur en fonction des ressources offertes ou demandées.
+     * @param playerResources Les ressources actuelles du joueur.
+     * @param changes Les changements à appliquer (offertes/demandées).
+     * @param subtract Si vrai, les ressources seront soustraites (offertes),
+     *                 sinon elles seront ajoutées (demandées).
+     */
+    private void updateResources(HashMap<TileType, Integer> playerResources,
+                                 HashMap<TileType, Integer> changes, boolean subtract) {
+        changes.forEach((resource, amount) -> {
+            int currentAmount = playerResources.getOrDefault(resource, 0);
+            playerResources.put(resource, subtract ? currentAmount - amount : currentAmount + amount);
+        });
+    }
+
     private void toggleTradeInterface(boolean enable) {
         for (ButtonImage button : playerOneButtons) {
             button.setEnabled(enable);
@@ -304,7 +406,7 @@ public class TradePanel extends JPanel {
         boolean isPlayerSelected = selectedPlayer != null;
         boolean hasValidResourceValues = checkIfAnyResourcesSelected(playerOneLabels)
                 && checkIfAnyResourcesSelected(playerTwoLabels);
-        proposeButton.setEnabled(isPlayerSelected && hasValidResourceValues);
+        proposeButton.setEnabled(isPlayerSelected && hasValidResourceValues && !trader);
     }
     private int getTotalSelectedResources(JLabel[] resourceLabels) {
         int total = 0;
@@ -327,25 +429,61 @@ public class TradePanel extends JPanel {
             acceptButton.setEnabled(isValidBankTrade());
         }
     }
+    private List<Harbor> getCurrentPlayerHarbors() {
+        List<Harbor> accessiblesHarbors = new ArrayList<>();
+        Player currentPlayer = listPlayers.getCurrentPlayer();
+        ArrayList<Colony> colonies = currentPlayer.getColony();
+
+        for (Colony colony : colonies) {
+            TileVertex colonyVertex = colony.getVertex();
+            Harbor connectedHarbor = colonyVertex.getHarbor();
+            if (connectedHarbor != null) {
+                accessiblesHarbors.add(connectedHarbor);
+            }
+        }
+        return accessiblesHarbors;
+    }
 
     private boolean isValidBankTrade() {
-        gatherResourcesOffered();
-        gatherResourcesRequested();
-        int totalMultiplesOfFour = 0;
-        for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
-            if (entry.getValue() % 4 != 0) {
-                // Si l'une des ressources offertes n'est pas un multiple de 4, l'échange n'est pas valide.
-                return false;
-            }
-            totalMultiplesOfFour += entry.getValue() / 4;
+        List<Harbor> currentPlayerPorts = getCurrentPlayerHarbors();
+        // Définir le taux général à 4 par défaut
+        int generalTradeRate = 4;
+
+        // Vérifier la présence d'un port classique
+        boolean hasGeneralPort = currentPlayerPorts.stream().anyMatch(port ->
+                !(port instanceof SpecializedHarbor));
+        if (hasGeneralPort) {
+            generalTradeRate = 3;
         }
 
-        // Calcul du nombre total de ressources demandées.
-        int totalRequestedResources = getTotalSelectedResources(playerTwoLabels);
+        gatherResourcesOffered();
+        gatherResourcesRequested();
+        int totalExchanges = 0;
 
-        // Et il doit y avoir exactement k types de ressources demandées pour k multiples de 4 offerts.
-        return totalMultiplesOfFour == totalRequestedResources;
+        for (Map.Entry<TileType, Integer> entry : resourcesOffered.entrySet()) {
+            TileType offeredResource = entry.getKey();
+            Integer offeredAmount = entry.getValue();
+            int requiredTradeRate = generalTradeRate; // Taux général par défaut.
+
+            // Vérifier si un port spécialisé ajuste le taux pour cette ressource.
+            for (Harbor harbor : currentPlayerPorts) {
+                if (harbor instanceof SpecializedHarbor
+                        && ((SpecializedHarbor) harbor).getResourceType() == offeredResource) {
+                    requiredTradeRate = 2; // Taux spécialisé.
+                    break;
+                }
+            }
+
+            if (offeredAmount % requiredTradeRate != 0) {
+                return false; // Si les ressources offertes ne correspondent pas au taux d'échange requis.
+            }
+            totalExchanges += offeredAmount / requiredTradeRate;
+        }
+
+        int totalRequestedResources = getTotalSelectedResources(playerTwoLabels);
+        return totalExchanges == totalRequestedResources;
     }
+
     // -------- Fonctions affichant et traitant les boutons
     // et leur mécanisme pour la séléction des joueurs -------- //
 
@@ -411,6 +549,8 @@ public class TradePanel extends JPanel {
                 (int) (80 / Resolution.divider()));
         add(selectedPlayerLabelIcon);
     }
+
+
     private void updateSelectedPlayerImage(String imagePath) {
         try {
             playerIcon = ImgService.loadImage(imagePath, 5.0);
@@ -451,13 +591,18 @@ public class TradePanel extends JPanel {
         }
     }
 
+    private void initializeReturnButton() {
+        ButtonImage returnButton = new ButtonImage("src/main/resources/backGame.png",
+                "src/main/resources/backGame.png", 100, 620, 1.2, this::closeTradePanel, null);
+        add(returnButton);
+    }
+
     // -------- Fonctions d'affichage du panel et de son background -------- //
 
     private void loadBackgroundImage(String path) {
         ImageIcon icon = new ImageIcon(path);
         backgroundImage = icon.getImage().getScaledInstance(this.getWidth(),
                 this.getHeight(), Image.SCALE_SMOOTH);
-        System.out.println("derchos" + Constants.Game.WIDTH + " ; " + Constants.Game.HEIGHT);
     }
     @Override
     protected void paintComponent(Graphics g) {

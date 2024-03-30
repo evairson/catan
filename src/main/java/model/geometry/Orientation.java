@@ -1,6 +1,8 @@
 package model.geometry;
 
-public class Orientation {
+import java.io.Serializable;
+
+public class Orientation implements Serializable {
 
     private double startAngle; // multiple of 60 degrees
 

@@ -1,8 +1,10 @@
 package others;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import model.Player;
+import network.PlayerClient;
 
 public class ListPlayers extends ArrayList<Player> {
 
@@ -13,7 +15,7 @@ public class ListPlayers extends ArrayList<Player> {
         return currentPlayer;
     }
 
-    public ListPlayers(int start, Player... players) {
+    public ListPlayers(int start, HashSet<Player> players) {
         super();
         for (Player player : players) {
             this.add(player);
@@ -34,12 +36,22 @@ public class ListPlayers extends ArrayList<Player> {
             currentPlayerIndex++;
         }
         currentPlayer = this.get(currentPlayerIndex);
+        System.out.println(currentPlayer instanceof PlayerClient);
         return currentPlayer;
+    }
+
+    public void setCurrentPlayer(Player p) {
+        currentPlayer = p;
+        for (int i = 0; i < size(); i++) {
+            if (get(i) == p) {
+                currentPlayerIndex = i;
+            }
+        }
     }
 
     public Player prev() {
         if (currentPlayerIndex - 1 < 0) {
-            currentPlayerIndex = this.size();
+            currentPlayerIndex = this.size() - 1;
         } else {
             currentPlayerIndex--;
         }
