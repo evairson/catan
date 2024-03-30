@@ -32,7 +32,7 @@ public class IA {
     public double vertexToValue(TileVertex vertex) {
         double value = 0;
         for (Tile t : vertex.getTiles()) {
-            switch (t.getResourceType()) { //juste la somme des dés
+            /*switch (t.getResourceType()) { //juste la somme des dés
                 case WOOD: value += diceValueToPoints(t.getDiceValue()); break;
                 case WHEAT: value += diceValueToPoints(t.getDiceValue()); break;
                 case WOOL: value += diceValueToPoints(t.getDiceValue()); break;
@@ -40,7 +40,7 @@ public class IA {
                 case CLAY: value += diceValueToPoints(t.getDiceValue()); break;
                 default: return 0;
             }
-            /*
+            */
             switch (t.getResourceType()) {
                 case WOOD: value += diceValueToPoints(t.getDiceValue()) * (1 - proportionWood); break;
                 case WHEAT: value += diceValueToPoints(t.getDiceValue()) * (1 - proportionWheat); break;
@@ -48,7 +48,7 @@ public class IA {
                 case ORE: value += diceValueToPoints(t.getDiceValue()) * (1 - proportionOre); break;
                 case CLAY: value += diceValueToPoints(t.getDiceValue()) * (1 - proportionClay); break;
                 default: return 0;
-            }*/
+            }
         }
         return value;
     }
