@@ -513,7 +513,7 @@ public class GameBoard implements Serializable {
         return board.get(new CubeCoordinates(q, r, s));
     }
 
-    public HashMap<CubeCoordinates, Tile> getBoard() {
+    public LinkedHashMap<CubeCoordinates, Tile> getBoard() {
         return board;
     }
 
