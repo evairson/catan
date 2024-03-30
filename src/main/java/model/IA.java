@@ -73,11 +73,8 @@ public class IA {
         boardStats(board);
         double maxValue = 0;
         TileVertex maxVertex = null;
-        System.out.println("cc");
-        System.out.println(v);
         for (TileVertex vertex : v) {
             double value = vertexToValue(vertex);
-            System.out.println(value);
             if (value > maxValue) {
                 maxValue = value;
                 maxVertex = vertex;

@@ -264,7 +264,6 @@ public class Game implements StateMethods, Serializable {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println(e.getX() + " " + e.getY());
         if (board.isPlacingCity()) {
             networkBuildCity();
             System.out.println("Building city");
