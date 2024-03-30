@@ -645,8 +645,8 @@ public class GameBoard implements Serializable {
 
                 for (TileVertex v : vertices) {
                     Point storedVertex = v.getCoordinates();
-                    v.addTile(tile);
                     if (arePointsEqual(vertex, storedVertex)) {
+                        v.addTile(tile);
                         // Si oui, ajouter la tuile actuelle à la liste des tuiles
                         // associées à ce sommet
                         found = true;

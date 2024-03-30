@@ -32,14 +32,23 @@ public class IA {
     public double vertexToValue(TileVertex vertex) {
         double value = 0;
         for (Tile t : vertex.getTiles()) {
+            switch (t.getResourceType()) { //juste la somme des dés
+                case WOOD: value += diceValueToPoints(t.getDiceValue()); break;
+                case WHEAT: value += diceValueToPoints(t.getDiceValue()); break;
+                case WOOL: value += diceValueToPoints(t.getDiceValue()); break;
+                case ORE: value += diceValueToPoints(t.getDiceValue()); break;
+                case CLAY: value += diceValueToPoints(t.getDiceValue()); break;
+                default: return 0;
+            }
+            /*
             switch (t.getResourceType()) {
                 case WOOD: value += diceValueToPoints(t.getDiceValue()) * (1 - proportionWood); break;
                 case WHEAT: value += diceValueToPoints(t.getDiceValue()) * (1 - proportionWheat); break;
                 case WOOL: value += diceValueToPoints(t.getDiceValue()) * (1 - proportionWool); break;
                 case ORE: value += diceValueToPoints(t.getDiceValue()) * (1 - proportionOre); break;
                 case CLAY: value += diceValueToPoints(t.getDiceValue()) * (1 - proportionClay); break;
-                default:
-            }
+                default: return 0;
+            }*/
         }
         return value;
     }
@@ -74,7 +83,11 @@ public class IA {
         double maxValue = 0;
         TileVertex maxVertex = null;
         for (TileVertex vertex : v) {
+            for (Tile t : vertex.getTiles()) {
+                System.out.println(t.getDiceValue());
+            }
             double value = vertexToValue(vertex);
+            System.out.println(value);
             if (value > maxValue) {
                 maxValue = value;
                 maxVertex = vertex;
