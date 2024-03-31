@@ -112,15 +112,42 @@ public class Bot extends Player {
 
     public static TileEdge getRoadNext(Game game, TileVertex vertex) {
         for (TileEdge edge: game.getBoard().getEdgeMap().values()) {
+            if (edge.getBuilding() != null) {
+                continue;
+            }
             if (edge.getStart().getX() == vertex.getCoordinates().getX()
                 && edge.getStart().getY() == vertex.getCoordinates().getY()
                 || edge.getEnd().getX() == vertex.getCoordinates().getX()
                 && edge.getEnd().getY() == vertex.getCoordinates().getY()) {
-                System.out.println(edge);
                 return edge;
             }
         }
         return null;
+    }
+
+    public Tile getThiefTile(Game game) {
+        Tile bestTile = null;
+        for (Tile tile : game.getBoard().getBoard().values()) {
+            if (bestTile == null) {
+                bestTile = tile;
+            }
+            if (getNumberColoniesEnnemies(tile) > getNumberColoniesEnnemies(bestTile)) {
+                bestTile = tile;
+            }
+        }
+        return bestTile;
+    }
+
+    public int getNumberColoniesEnnemies(Tile tile) {
+        int numberColonies = 0;
+        for (TileVertex vertex : tile.getVertices()) {
+            if (vertex.getBuilding() != null) {
+                if (vertex.getBuilding().getOwner().getId() != getId()) {
+                    numberColonies++;
+                }
+            }
+        }
+        return numberColonies;
     }
 
 }

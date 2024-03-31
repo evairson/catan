@@ -68,6 +68,7 @@ public class TileEdge implements Serializable {
 
     public void addTile(Tile tile) {
         tiles.add(tile);
+        tile.addEdge(this);
     }
 
     public void setBuilding(Building building) {

@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import model.geometry.CubeCoordinates;
 import view.TileType;
+import java.util.Set;
+import java.util.HashSet;
 
 public class Tile implements Serializable {
     private int q;
@@ -11,6 +13,8 @@ public class Tile implements Serializable {
     private int diceValue;
     private TileType resourceType;
     private int id;
+    private Set<TileEdge> edges;
+    private Set<TileVertex> vertices;
     private static int idClass = 0;
 
     public Tile(int q, int r) {
@@ -19,6 +23,8 @@ public class Tile implements Serializable {
         this.diceValue = 0;
         id = idClass;
         idClass++;
+        edges = new HashSet<>();
+        vertices = new HashSet<>();
     }
 
     public Tile(int q, int r, int diceValue) {
@@ -27,6 +33,8 @@ public class Tile implements Serializable {
         this.diceValue = diceValue;
         id = idClass;
         idClass++;
+        edges = new HashSet<>();
+        vertices = new HashSet<>();
     }
 
     public Tile(int q, int r, int diceValue, TileType resourceType) {
@@ -36,6 +44,8 @@ public class Tile implements Serializable {
         this.resourceType = resourceType;
         id = idClass;
         idClass++;
+        edges = new HashSet<>();
+        vertices = new HashSet<>();
     }
 
     public TileType getResourceType() {
@@ -84,5 +94,29 @@ public class Tile implements Serializable {
 
     public static int getIdClass() {
         return idClass;
+    }
+
+    public void addEdge(TileEdge edge) {
+        edges.add(edge);
+    }
+
+    public void addVertex(TileVertex vertex) {
+        vertices.add(vertex);
+    }
+
+    public Set<TileEdge> getEdges() {
+        return edges;
+    }
+
+    public void setEdges(Set<TileEdge> edges) {
+        this.edges = edges;
+    }
+
+    public Set<TileVertex> getVertices() {
+        return vertices;
+    }
+
+    public void setVertices(Set<TileVertex> vertices) {
+        this.vertices = vertices;
     }
 }

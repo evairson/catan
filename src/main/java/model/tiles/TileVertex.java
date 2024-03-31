@@ -50,6 +50,7 @@ public class TileVertex implements Serializable {
 
     public void addTile(Tile tile) {
         tiles.add(tile);
+        tile.addVertex(this);
     }
     public void setCoordinates(Point coordinates) {
         this.coordinates = coordinates;

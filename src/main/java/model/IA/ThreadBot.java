@@ -50,7 +50,12 @@ public class ThreadBot extends Thread {
                         break;
                     case 1:
                         if (game.canBuildColony()) {
-                            game.placeRoadAndColonyBot(false);
+                            TileVertex vertex = Bot.getBetterVertex(game);
+                            try {
+                                game.buildColony(vertex.getId());
+                            } catch (ConstructBuildingException e) {
+                                System.out.println("erreur lors du placement de la colony");
+                            }
                         }
                         break;
                     //case 3:

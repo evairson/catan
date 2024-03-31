@@ -1,5 +1,6 @@
 package model;
 
+import model.IA.Bot;
 import model.buildings.*;
 import model.geometry.*;
 import model.tiles.*;
@@ -897,12 +898,7 @@ public class GameBoard implements Serializable {
     }
 
     public void changeThiefBot() {
-        int nbAlea = (int) (Math.random() * board.size());
-        for (Tile tile : board.values()) {
-            if (nbAlea == tile.getId()) {
-                highlightedTile = tile;
-            }
-        }
+        highlightedTile = ((Bot) game.getCurrentPlayer()).getThiefTile(game);
         changeThief();
     }
 
