@@ -1,22 +1,39 @@
 package model.IA;
 
+import exceptionclass.ConstructBuildingException;
 import model.App;
 import model.Game;
+import model.tiles.TileEdge;
+import model.tiles.TileVertex;
 
 public class ThreadBot extends Thread {
     private Game game;
+    private Bot bot;
 
-    public ThreadBot(Game game) {
+    public ThreadBot(Game game, Bot bot) {
         this.game = game;
+        this.bot = bot;
     }
 
     public void run() {
         try {
             Thread.sleep(3000);
             if (game.isStart() || game.isBackwards()) {
-                game.placeRoadAndColonyBot(false);
+                TileVertex vertex = Bot.getBetterVertex(game);
+                try {
+                    game.buildColony(vertex.getId());
+                } catch (ConstructBuildingException e) {
+                    System.out.println("erreur lors du placement de la colony");
+                }
                 Thread.sleep(3000);
-                game.placeRoadAndColonyBot(true);
+                TileEdge edge = Bot.getRoadNext(game, vertex);
+                try {
+                    if (edge != null) {
+                        game.buildRoad(edge.getId());
+                    }
+                } catch (ConstructBuildingException e) {
+                    ConstructBuildingException.messageError();
+                }
                 Thread.sleep(3000);
                 game.endTurn();
             } else {

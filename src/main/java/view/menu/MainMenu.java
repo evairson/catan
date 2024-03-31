@@ -1,6 +1,7 @@
 package view.menu;
 
 import others.Constants;
+import view.OptionPanel;
 import start.Main;
 import view.utilities.ButtonImage;
 import javax.swing.*;
@@ -33,6 +34,8 @@ public class MainMenu extends JPanel {
         initializeButtons();
         setVisible(true);
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+        OptionPanel optionPanel = new OptionPanel();
+        add(optionPanel);
     }
 
     private void loadBackgroundImage(String path) {
@@ -90,7 +93,11 @@ public class MainMenu extends JPanel {
     }
 
     public void startOptions() {
-        System.out.println("Options du jeu...");
+        Container parent = getParent();
+        CardLayout parentLayout = (CardLayout) parent.getLayout();
+        parentLayout.show(parent, "optionPanel");
+        System.out.println("caca");
+        app.update();
     }
 
     public void quitapp() {

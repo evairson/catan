@@ -480,15 +480,15 @@ public class Game implements StateMethods, Serializable {
     }
 
     public boolean buildColony(int idVertex) throws ConstructBuildingException {
-        for (TileVertex vertex : board.getVerticesMap().values()) {
+        for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
                 if (board.canPlaceColony(vertex, playerClient)) {
                     board.setLookingForVertex(false);
                     board.setPlacingCity(false);
                     if (getCurrentPlayer().buildColony(vertex)) {
-                        app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        App.addMessageColor(app.getGame().getCurrentPlayer().getName(),
                             app.getGame().getCurrentPlayer().getColorAwt());
-                        app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.RED);
+                        App.addMessageColor(" vient de placer une colonie \n", java.awt.Color.RED);
                         App.getActionPlayerPanel().update();
                         App.getGamePanel().repaint();
                         return true;
@@ -589,17 +589,16 @@ public class Game implements StateMethods, Serializable {
 
     }
 
-    public boolean buildCity(int idVertex) throws ConstructBuildingException {
-        System.out.println(board.getVerticesMap().size());
-        for (TileVertex vertex : board.getVerticesMap().values()) {
+    public Boolean buildCity(int idVertex) throws ConstructBuildingException {
+        for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
                 System.out.println("yeah !");
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
                 if (getCurrentPlayer().buildCity(vertex)) {
-                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                    App.addMessageColor(app.getGame().getCurrentPlayer().getName(),
                         app.getGame().getCurrentPlayer().getColorAwt());
-                    app.addMessageColor(" vient de placer une ville \n", java.awt.Color.RED);
+                    App.addMessageColor(" vient de placer une ville \n", java.awt.Color.RED);
                     App.getActionPlayerPanel().update();
                     App.getGamePanel().repaint();
                     return true;
@@ -652,7 +651,7 @@ public class Game implements StateMethods, Serializable {
 
     public void startTurnBot() {
         if (getCurrentPlayer() instanceof Bot) {
-            ThreadBot threadBot = new ThreadBot(this);
+            ThreadBot threadBot = new ThreadBot(this, (Bot) getCurrentPlayer());
             threadBot.start();
         }
     }
@@ -661,7 +660,7 @@ public class Game implements StateMethods, Serializable {
         boolean hasPlaced = false;
         while (!hasPlaced) {
             int nbAlea = (int) (Math.random() * (road ? board.getEdgeMap().size()
-                : board.getVerticesMap().size()));
+                : board.getVertices().size()));
             try {
                 if (!road) {
                     if (buildColony(nbAlea)) {

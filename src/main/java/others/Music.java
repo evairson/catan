@@ -28,7 +28,7 @@ public class Music {
                 i = 0;
             }
             System.out.println("Playing " + musicToPlay.get(i));
-            currentClip = playMusic(MUSIC_DIRECTORY + "/" + musicToPlay.get(i));
+            playMusic(MUSIC_DIRECTORY + "/" + musicToPlay.get(i));
             i++;
         } catch (Exception e) {
         }
@@ -49,22 +49,23 @@ public class Music {
     }
 
 
-    public static Clip playMusic(String filepath) {
+    public static void playMusic(String filepath) {
         try {
             File musicPath = new File(filepath);
             if (musicPath.exists()) {
                 AudioInputStream audioInput = AudioSystem.getAudioInputStream(musicPath);
-                Clip clip = AudioSystem.getClip();
-                clip.open(audioInput);
-                FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(-20.0f);
-                clip.start();
-                return clip;
+                currentClip = AudioSystem.getClip();
+                currentClip.open(audioInput);
+                currentClip.start();
             }
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
         }
-        return null;
+    }
+
+    public static void setVolume(float db) {
+        FloatControl gainControl = (FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN);
+        gainControl.setValue(db);
     }
 }

@@ -17,6 +17,7 @@ public class App {
     private static GamePanel gamePanel;
     private static ActionPlayerPanel actionPlayer;
     private static EndPanel endPanel;
+    private OptionPanel optionPanel;
     private static GameWindow gameWindow;
     private Thread gameThread;
     private GameBoard board;
@@ -129,9 +130,10 @@ public class App {
         if (playing) {
             game.update();
             checkWin();
-            Music.update();
         }
+        Music.update();
     }
+
     public static void checkWin() {
         if (game.getCurrentPlayer().hasWon()) {
             endPanel = new EndPanel(true, game.getCurrentPlayer());
@@ -146,6 +148,7 @@ public class App {
 
     public void render(Graphics g) {
         game.draw(g);
+        gamePanel.repaint();
     }
 
     public Player getPlayer() {
