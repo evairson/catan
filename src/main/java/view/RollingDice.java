@@ -4,7 +4,7 @@ import view.utilities.ImgService;
 
 import javax.swing.*;
 
-import model.App;
+
 import model.Game;
 import model.Player;
 import network.NetworkObject;
@@ -114,8 +114,6 @@ public class RollingDice extends JPanel {
                 }
                 if (player.getDice() == 7) {
                     game.setThiefMode(true);
-                    App.getActionPlayerPanel().update();
-                    App.getGamePanel().repaint();
                 }
                 sendDices();
             } catch (InterruptedException e) {

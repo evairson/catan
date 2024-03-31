@@ -182,8 +182,7 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn || !resourcesGiven) {
             return false;
         }
-        int[] t = {0, 1, 1, 0, 1};
-        return getCurrentPlayer().hasEnough(t) && !start && !backwards;
+        return getCurrentPlayer().hasEnough(Constants.BuildingCosts.CARD) && !start && !backwards;
     }
 
     public ListPlayers getPlayers() {
@@ -274,7 +273,7 @@ public class Game implements StateMethods, Serializable {
             networkBuildRoad();
             System.out.println("Building road");
         } else if (board.getThiefMode()) {
-            board.changeThief();
+            board.changeThiefNetwork();
             board.setThiefModeEnd(true);
         }
         App.getGamePanel().repaint();
@@ -457,11 +456,12 @@ public class Game implements StateMethods, Serializable {
     public void buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVerticesMap().values()) {
             if (vertex.getId() == idVertex) {
-                // rajouter un if ça a marché (transformer Player.buildCity en boolean)
-                board.setLookingForVertex(false);
-                board.setPlacingCity(false);
-                getCurrentPlayer().buildColony(vertex);
-                App.getGamePanel().repaint();
+                if (board.canPlaceColony(vertex, getCurrentPlayer())) {
+                    board.setLookingForVertex(false);
+                    board.setPlacingCity(false);
+                    getCurrentPlayer().buildColony(vertex);
+                    App.getGamePanel().repaint();
+                }
                 return;
             }
         }
