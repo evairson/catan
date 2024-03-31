@@ -1,5 +1,6 @@
 package model.buildings;
 
+import model.App;
 import model.Player;
 import others.Constants;
 import java.awt.*;
@@ -33,6 +34,7 @@ public class Road extends Building {
     public boolean buyAndPlace(Player player, TileEdge edge) {
         if (buy(player)) {
             place(player, edge);
+            App.getGamePanel().repaint();
             return true;
         }
         return false;

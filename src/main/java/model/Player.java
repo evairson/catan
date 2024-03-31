@@ -290,6 +290,10 @@ public class Player implements Serializable {
 // ------------------------------------
 
 
+    public boolean isMyTurn(Game game) {
+        return id == game.getCurrentPlayer().getId();
+    }
+
     public void throwDice1() {
         dice1 = (int) ((Math.random() * NUMBER_DICE) + 1); // (max-min+1)*min
     }
@@ -312,20 +316,21 @@ public class Player implements Serializable {
         // TODO :
     }
 
-    public void buildRoad(TileEdge edge) {
+    public boolean buildRoad(TileEdge edge) {
         if (edge.getBuilding() == null) {
             Road r = new Road(this);
             if (freeRoad > 0) {
                 r.place(this, edge);
                 freeRoad--;
-                return;
+                App.getGamePanel().repaint();
+                return true;
             }
-            r.buyAndPlace(this, edge);
+            return r.buyAndPlace(this, edge);
         }
-        App.getGamePanel().repaint();
+        return false;
     }
 
-    public void buildColony(TileVertex vertex) {
+    public boolean buildColony(TileVertex vertex) {
         if (vertex.getBuilding() == null) {
             Colony c = new Colony(this);
             if (freeColony) {
@@ -333,27 +338,32 @@ public class Player implements Serializable {
                 setFreeColony(false);
                 freeRoad++;
                 c.place(this, false, vertex);
-                return;
+                App.getGamePanel().repaint();
+                return true;
             }
             if (c.buyAndPlace(this, false, vertex)) {
                 points++;
                 App.checkWin();
+                App.getGamePanel().repaint();
+                return true;
             }
         }
-        App.getGamePanel().repaint();
+        return false;
     }
 
-    public void buildCity(TileVertex vertex) {
+    public boolean buildCity(TileVertex vertex) {
         if (vertex.getBuilding() != null && vertex.getBuilding() instanceof Colony) {
             if (vertex.getBuilding().getOwner().equals(this)) {
                 Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
                     points++;
                     App.checkWin();
+                    App.getGamePanel().repaint();
+                    return true;
                 }
             }
         }
-        App.getGamePanel().repaint();
+        return false;
     }
 
     public void createOrBuy() {

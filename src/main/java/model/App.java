@@ -22,7 +22,7 @@ public class App {
     private GameBoard board;
     private static Game game;
     private static MainMenu mainMenu;
-    private PlayerClient player;
+    private Player player;
     private static boolean playing;
     private static BackgroundPanel background;
 
@@ -43,16 +43,14 @@ public class App {
         board.setApp(this);
     }
 
-    public App(Player p) {
-        mainMenu = new MainMenu(this, p);
-        App.gameWindow = new GameWindow(mainMenu);
-        mainMenu.requestFocus();
-    }
-
-    public App(PlayerClient playerClient) {
+    public App(Player playerClient) {
         player = playerClient;
-        player.setApp(this);
-        mainMenu = new MainMenu(this, null);
+        if (playerClient instanceof PlayerClient) {
+            ((PlayerClient) player).setApp(this);
+            mainMenu = new MainMenu(this, null);
+        } else {
+            mainMenu = new MainMenu(this, player);
+        }
         App.gameWindow = new GameWindow(mainMenu);
         mainMenu.requestFocus();
     }
@@ -87,8 +85,8 @@ public class App {
         try {
             NetworkObject gameObject;
             gameObject = new NetworkObject(TypeObject.Message, "tryStartGame", player.getId(), null);
-            player.getOut().writeUnshared(gameObject);
-            player.getOut().flush();
+            ((PlayerClient) player).getOut().writeUnshared(gameObject);
+            ((PlayerClient) player).getOut().flush();
         } catch (Exception e) {
             e.getStackTrace();
         }
@@ -98,17 +96,17 @@ public class App {
         try {
             game = new Game(hashSet);
             NetworkObject gameObject = new NetworkObject(TypeObject.Game, "startGame", player.getId(), game);
-            player.getOut().writeUnshared(gameObject);
-            player.getOut().flush();
+            ((PlayerClient) player).getOut().writeUnshared(gameObject);
+            ((PlayerClient) player).getOut().flush();
         } catch (Exception e) {
             e.getStackTrace();
         }
     }
-    public void addMessage(String message) {
+    public static void addMessage(String message) {
         ((ChatPanel) actionPlayer.getChat()).addMessage(message);
     }
 
-    public void addMessageColor(String message, Color color) {
+    public static void addMessageColor(String message, Color color) {
         ((ChatPanel) actionPlayer.getChat()).addMessageColor(message, color);
     }
 
@@ -150,7 +148,7 @@ public class App {
         game.draw(g);
     }
 
-    public PlayerClient getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 }

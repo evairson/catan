@@ -433,7 +433,7 @@ public class ActionPlayerPanel extends JPanel {
         game.getCurrentPlayer().drawCard(game.getStack());
         if (Main.hasServer() && game.getCurrentPlayer() instanceof PlayerClient) {
             try {
-                PlayerClient player = game.getPlayerClient();
+                PlayerClient player = (PlayerClient) game.getPlayerClient();
                 NetworkObject gameObject;
                 gameObject = new NetworkObject(TypeObject.Message, "DrawCard", player.getId(), null);
                 player.getOut().writeUnshared(gameObject);
@@ -503,24 +503,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     public void update() {
-        Player currentPlayer = game.getCurrentPlayer();
-
-        if (!Main.hasServer()) {
-            resourcesPanel.updateResourceLabels(currentPlayer);
-            namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
-        } else {
-            resourcesPanel.updateResourceLabels(game.getPlayerClient());
-        }
-
-        try {
-            String src = "src/main/resources/pion/pion";
-            String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
-            Image origiImg = ImageIO.read(new File(imagePath));
-            Image buttonImage = origiImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-            namePlayer.setIcon(new ImageIcon(buttonImage));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        resourcesPanel.updateResourceLabels(game.getPlayerClient());
         updateTurn();
 
         if (playersPanel != null) {
@@ -589,19 +572,17 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     public void updateTurn() {
-        if (Main.hasServer()) {
-            if (game.isMyTurn()) {
-                updateShopPanel();
-                if (game.canPass()) {
-                    endTurn.setEnabled(true);
-                } else {
-                    endTurn.setEnabled(false);
-                }
+        if (game.isMyTurn()) {
+            updateShopPanel();
+            if (game.canPass()) {
+                endTurn.setEnabled(true);
             } else {
-                dice.setButtonIsOn(false);
-                shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);
             }
+        } else {
+            dice.setButtonIsOn(false);
+            shopPanel.setEnabledPanel(false);
+            endTurn.setEnabled(false);
         }
     }
 

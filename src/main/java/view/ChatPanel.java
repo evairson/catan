@@ -39,7 +39,7 @@ public class ChatPanel extends JPanel {
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                PlayerClient playerClient = actionPlayerPanel.getApp().getPlayer();
+                PlayerClient playerClient = ((PlayerClient) actionPlayerPanel.getApp().getPlayer());
                 if (Main.hasServer()) {
                         try {
                             int id = playerClient.getId();
