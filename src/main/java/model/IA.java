@@ -8,17 +8,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class IA {
-    private double proportionWood;
-    private double proportionWool;
-    private double proportionOre;
-    private double proportionWheat;
-    private double proportionClay;
-
-    public IA() {
-
+    private int proportionClay = 0;
+    private int proportionWheat = 0;
+    private int proportionOre = 0;
+    private int proportionWood = 0;
+    private int proportionWool = 0;
+    public IA(LinkedHashMap<CubeCoordinates, Tile> b) {
+        ArrayList<Tile> board = new ArrayList<>(b.values());
+        boardStats(board);
     }
 
-    public int diceValueToPoints(int diceValue) {
+    private static int diceValueToPoints(int diceValue) {
         switch (diceValue) {
             case 2: case 12: return 1;
             case 3: case 11: return 2;
@@ -29,7 +29,7 @@ public class IA {
         }
     }
 
-    public double vertexToValue(TileVertex vertex) {
+    private double vertexToValue(TileVertex vertex) {
         double value = 0;
         for (Tile t : vertex.getTiles()) {
             /*switch (t.getResourceType()) { //juste la somme des dés
@@ -53,7 +53,7 @@ public class IA {
         return value;
     }
 
-    public void boardStats(ArrayList<Tile> board) {
+    private void boardStats(ArrayList<Tile> board) {
         int diceValueOre = 0;
         int diceValueWheat = 0;
         int diceValueWool = 0;
@@ -77,9 +77,7 @@ public class IA {
         proportionWool = diceValueWool / 126;
     }
 
-    public TileVertex getBetterVertex(LinkedHashMap<CubeCoordinates, Tile> b, ArrayList<TileVertex> v) {
-        ArrayList<Tile> board = new ArrayList<>(b.values());
-        boardStats(board);
+    public TileVertex getBetterVertex(ArrayList<TileVertex> v) {
         double maxValue = 0;
         TileVertex maxVertex = null;
         for (TileVertex vertex : v) {
