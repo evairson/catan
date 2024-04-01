@@ -46,6 +46,7 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel chat;
     private PlayersPanel playersPanel;
     private RollingDice dice;
+    private boolean harboursDisabled = false;
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -199,9 +200,10 @@ public class ActionPlayerPanel extends JPanel {
         JLayeredPane layeredPane = mainFrame.getLayeredPane();
         ListPlayers listPlayers = game.getPlayers();
         if (tradeObject == null) {
-            tradePanel = new TradePanel(listPlayers, resourcesPanel);
+            tradePanel = new TradePanel(listPlayers, resourcesPanel, this);
         } else {
-            tradePanel = new TradePanel(tradeObject, listPlayers, resourcesPanel, game.getPlayerClient());
+            tradePanel = new TradePanel(tradeObject, listPlayers, resourcesPanel,
+                    game.getPlayerClient(), this);
         }
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);
@@ -522,5 +524,13 @@ public class ActionPlayerPanel extends JPanel {
 
     public App getApp() {
         return app;
+    }
+
+    public boolean isHarboursDisabled() {
+        return harboursDisabled;
+    }
+
+    public void setHarboursDisabled(boolean harboursDisabled) {
+        this.harboursDisabled = harboursDisabled;
     }
 }

@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.awt.*;
 
 import model.buildings.*;
-import model.cards.KnightCard;
 import model.cards.VictoryPointCard;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
@@ -305,7 +303,7 @@ public class Player implements Serializable {
 
     public void clearResources() {
         for (TileType t : resources.keySet()) {
-           removeAllResource(t);
+            removeAllResource(t);
         }
     }
 
@@ -459,21 +457,21 @@ public class Player implements Serializable {
             }
         }
     }
-    public void addOneRandom(){
+    public void addOneRandom() {
         Random rd = new Random();
         TileType[] resTList = {TileType.CLAY, TileType.ORE, TileType.WHEAT, TileType.WOOD, TileType.WOOL};
         int k = rd.nextInt(0, 5);
         addResource(resTList[k], 1);
     }
 
-    public void incrementKnights(){
+    public void incrementKnights() {
         knights++;
     }
 
     public int getKnights() {
         return knights;
     }
-    public void addOnePoint(){
+    public void addOnePoint() {
         points++;
     }
 
@@ -492,7 +490,7 @@ public class Player implements Serializable {
         }
         return acc;
     }
-    public void swapResources(Player other){
+    public void swapResources(Player other) {
         for (TileType t : resources.keySet()) {
             int temp = resources.get(t);
             resources.put(t, other.resources.get(t));

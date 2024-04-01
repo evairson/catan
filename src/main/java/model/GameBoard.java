@@ -555,33 +555,33 @@ public class GameBoard implements Serializable {
         board.get(new CubeCoordinates(q, r, s)).setDiceValue(diceValue);
     }
 
-    public void exchangeTwelveTwoToEightSix(){
+    public void exchangeTwelveTwoToEightSix() {
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             Tile tile = entry.getValue();
-            if(tile.getDiceValue() == 12){
+            if (tile.getDiceValue() == 12) {
                 tile.setDiceValue(8);
-            } else if(tile.getDiceValue() == 2){
+            } else if (tile.getDiceValue() == 2) {
                 tile.setDiceValue(6);
-            }else if(tile.getDiceValue() == 8){
+            } else if (tile.getDiceValue() == 8) {
                 tile.setDiceValue(12);
-            }else if(tile.getDiceValue() == 6){
+            } else if (tile.getDiceValue() == 6) {
                 tile.setDiceValue(2);
-            }else if(tile.getDiceValue() == 3){
+            } else if (tile.getDiceValue() == 3) {
                 tile.setDiceValue(9);
-            }else if(tile.getDiceValue() == 9){
+            } else if (tile.getDiceValue() == 9) {
                 tile.setDiceValue(3);
-            }else if(tile.getDiceValue() == 4){
+            } else if (tile.getDiceValue() == 4) {
                 tile.setDiceValue(10);
-            }else if(tile.getDiceValue() == 10){
+            } else if (tile.getDiceValue() == 10) {
                 tile.setDiceValue(4);
-            }else if(tile.getDiceValue() == 5){
+            } else if (tile.getDiceValue() == 5) {
                 tile.setDiceValue(11);
-            }else if(tile.getDiceValue() == 11){
+            } else if (tile.getDiceValue() == 11) {
                 tile.setDiceValue(5);
             }
         }
     }
-    public void eventChangeDiceValues(){
+    public void eventChangeDiceValues() {
         exchangeTwelveTwoToEightSix();
     }
 
@@ -654,9 +654,6 @@ public class GameBoard implements Serializable {
             diceValueImages.put(value, image);
         }
     }
-
-    
-
     private TileType getTileType(int resourceType) {
         switch (resourceType) {
             case 1:

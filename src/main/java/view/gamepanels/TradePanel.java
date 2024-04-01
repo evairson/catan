@@ -13,6 +13,7 @@ import model.tiles.TileVertex;
 import others.Constants;
 import others.ListPlayers;
 import start.Main;
+import view.ActionPlayerPanel;
 import view.GameWindow;
 import view.TileType;
 import view.utilities.ButtonImage;
@@ -28,6 +29,7 @@ import java.util.*;
 import java.util.List;
 
 public class TradePanel extends JPanel {
+    private ActionPlayerPanel actionPlayerPanel;
     private Image backgroundImage;
     private ButtonImage[] playerOneButtons = new ButtonImage[5];
     private ButtonImage[] playerTwoButtons = new ButtonImage[5];
@@ -53,7 +55,9 @@ public class TradePanel extends JPanel {
     private boolean isBank = false;
     private boolean trader = false;
 
-    public TradePanel(ListPlayers listPlayers, ResourcesPanel resourcesPanel) {
+    public TradePanel(ListPlayers listPlayers, ResourcesPanel resourcesPanel,
+                      ActionPlayerPanel actionPlayerPanel) {
+        this.actionPlayerPanel = actionPlayerPanel;
         resourcesOffered = new HashMap<>();
         resourcesRequested = new HashMap<>();
         this.listPlayers = listPlayers;
@@ -72,7 +76,8 @@ public class TradePanel extends JPanel {
     }
 
     public TradePanel(TradeObject tradeObject, ListPlayers listPlayers,
-        ResourcesPanel resourcesPanel, Player player) {
+        ResourcesPanel resourcesPanel, Player player, ActionPlayerPanel actionPlayerPanel) {
+        this.actionPlayerPanel = actionPlayerPanel;
         trader = true;
         this.player = player;
         this.listPlayers = listPlayers;
@@ -468,7 +473,8 @@ public class TradePanel extends JPanel {
             // Vérifier si un port spécialisé ajuste le taux pour cette ressource.
             for (Harbor harbor : currentPlayerPorts) {
                 if (harbor instanceof SpecializedHarbor
-                        && ((SpecializedHarbor) harbor).getResourceType() == offeredResource) {
+                        && ((SpecializedHarbor) harbor).getResourceType() == offeredResource
+                        && !actionPlayerPanel.isHarboursDisabled()) {
                     requiredTradeRate = 2; // Taux spécialisé.
                     break;
                 }

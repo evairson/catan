@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import model.buildings.Building;
 import model.buildings.Colony;
 import model.cards.CardStack;
+import model.cards.DevelopmentCard;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
@@ -18,6 +19,7 @@ import others.Constants;
 import others.ListPlayers;
 import start.Main;
 //import view.utilities.Resolution;
+import view.ChatPanel;
 import view.TileType;
 
 import java.io.Serializable;
@@ -41,6 +43,7 @@ public class Game implements StateMethods, Serializable {
     private boolean monoWaiting = false;
     private int yearOfPlentyWaiting = 0;
     private Player first;
+    private int turnsBeforeHarbourActivated = 0;
 
     public Game(HashSet<Player> playersSet) {
         for (Player player : playersSet) {
@@ -79,6 +82,7 @@ public class Game implements StateMethods, Serializable {
         } else {
             endTurn();
         }
+        checkForHarboursDisabled();
     }
 
     public boolean getBlankTurn() {
@@ -160,7 +164,7 @@ public class Game implements StateMethods, Serializable {
             backwards = true;
         } else if (backwards && getCurrentPlayer().first(this)) {
             backwards = false;
-        }else if(eventOrderJustChanged){
+        } else if (eventOrderJustChanged) {
             eventOrderJustChanged = false;
         } else if (backwards || changeOrder) {
             players.prev();
@@ -268,9 +272,11 @@ public class Game implements StateMethods, Serializable {
         if (getCurrentPlayer().hasThrowDices()) {
             switch (getCurrentPlayer().getD20()) {
                 case 1: killAllSheep(); break;
+                case 2 : showDevCards();
                 case 3: christmas(); break;
                 case 4: lootThiefResources(); break;
                 case 5: swapHands(); break;
+                case 7: disableHarbour();
                 case 8: eventChangeDiceValues(); break;
                 case 9: knightLoots(); break;
                 case 10: eventChangeOrder(); break;
@@ -641,9 +647,19 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    //event 2
+    public void showDevCards() {
+        for (Player player : players) {
+            for (DevelopmentCard card : player.getCardsDev()) {
+                String message = player.getName() + " a " + card.getName();
+                ((ChatPanel) App.getActionPlayer().getChat()).addMessageColor(message, player.getColorAwt());
+            }
+        }
+    }
+
     //event 3
-    public void christmas(){
-        for(Player p : players){
+    public void christmas() {
+        for (Player p : players) {
             p.addOneRandom();
             p.addOneRandom();
         }
@@ -690,8 +706,22 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    //event 7
+    public void disableHarbour() {
+        App.getActionPlayer().setHarboursDisabled(true);
+        turnsBeforeHarbourActivated = 8;
+    }
+    //Fonction auxiliaire pour gérer la désactivation des ports
+    public void checkForHarboursDisabled() {
+        if (turnsBeforeHarbourActivated == 0) {
+            App.getActionPlayer().setHarboursDisabled(false);
+        } else if (turnsBeforeHarbourActivated > 0) {
+            turnsBeforeHarbourActivated--;
+        }
+    }
+
     //event 8
-    public void eventChangeDiceValues(){
+    public void eventChangeDiceValues() {
         board.eventChangeDiceValues();
     }
 
@@ -709,7 +739,6 @@ public class Game implements StateMethods, Serializable {
         changeOrder = !changeOrder;
         eventOrderJustChanged = true;
     }
-    
     //event 13
     public void capitalismPoorGetsPoorer() {
         ListPlayers pChecks = (ListPlayers) players.clone();
@@ -749,22 +778,21 @@ public class Game implements StateMethods, Serializable {
     }
 
     //event 16
-    public void taxCollector(){
+    public void taxCollector() {
         ListPlayers pChecks = (ListPlayers) players.clone();
         for (Player p : pChecks) {
             int nbColAndCity = p.getNbCitiesAndColonies();
-            if(nbColAndCity >= p.getResourcesSum()){
+            if (nbColAndCity >= p.getResourcesSum()) {
                 p.clearResources();
-            }else{
+            } else {
                 for (int i = 0; i < nbColAndCity; i++) {
                     p.removeOneRandom();
                 }
             }
         }
     }
-    
     //event 17
-    public void happyBirthday(){
+    public void happyBirthday() {
         ListPlayers pChecks = (ListPlayers) players.clone();
         pChecks.remove(getCurrentPlayer());
         for (Player p : pChecks) {
