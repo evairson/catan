@@ -152,11 +152,23 @@ public class Game implements StateMethods, Serializable {
         return true;
     }
 
+//    public Player getFirstPlayer() {
+//        // Assurez-vous que la liste des joueurs n'est pas vide
+//        if (!players.isEmpty()) {
+//            return players.get(0); // Retourne le premier joueur de la liste
+//        }
+//        return null; // Si la liste est vide, retourne null
+//    }
+//
+
     public void endTurn() {
         if (!canPass()) {
             System.out.println("mince");
             return;
         }
+
+        boolean isEndOfTurnAnimationNeeded = !start && !backwards;
+        boolean isNewTurnAnimationNeeded = true;
 
         if (start || backwards) {
             ArrayList<Colony> colony = getCurrentPlayer().getColony();
@@ -169,23 +181,33 @@ public class Game implements StateMethods, Serializable {
             }
         }
 
+//        App.getActionPlayerPanel().endTurnPanels(getCurrentPlayer(), isEndOfTurnAnimationNeeded);
+
         if (start && getCurrentPlayer().last(this)) {
             start = false;
             backwards = true;
+            System.out.println("Derchos 180");
         } else if (backwards && getCurrentPlayer().first(this)) {
             backwards = false;
+            System.out.println("Derchos 170");
         } else if (backwards) {
             players.prev();
+            System.out.println("Derchos 160");
         } else {
+            System.out.println("Derchos278: VRAI DEBUT DE PARTIE : " + start + " & " + backwards);
             players.next();
+//            if (getCurrentPlayer().equals(getFirstPlayer()) && !start && !backwards) {
+//                isNewTurnAnimationNeeded = false;
+//            }
         }
-
         if (!start && !backwards && !blankTurn) {
             App.getActionPlayerPanel().getRollingDice().setButtonIsOn(true);
         }
         System.out.println("It's " + getCurrentPlayer() .getName() + "'s turn");
         resourcesGiven = false;
         App.getActionPlayerPanel().getRollingDice().newPlayer(getCurrentPlayer());
+
+//        App.getActionPlayerPanel().newTurnPanels(getCurrentPlayer(), isNewTurnAnimationNeeded);
 
         if (start || backwards) {
             getCurrentPlayer().setFreeColony(true);
@@ -269,7 +291,7 @@ public class Game implements StateMethods, Serializable {
                                 Integer number = player.getResources().get(tile.getResourceType());
                                 player.getResources().replace(tile.getResourceType(), number + amount);
                                 //animation pour la resource
-                                getApp().getActionPlayerPanel().animateResourceGain(tile.getResourceType(),
+                                App.getActionPlayerPanel().animateResourceGain(tile.getResourceType(),
                                         colony.getVertex().getCoordinates(), player);
                             }
                         }

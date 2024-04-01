@@ -334,7 +334,6 @@ public class Player implements Serializable {
         if (vertex.getBuilding() == null) {
             Colony c = new Colony(this);
             if (freeColony) {
-                System.out.println("derchos 99 : " + vertex.getId());
                 setFreeColony(false);
                 freeRoad++;
                 c.place(this, false, vertex);

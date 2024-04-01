@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.concurrent.*;
 
 public class ActionPlayerPanel extends JPanel {
-    private JPanel testBezier;
     private ButtonImage endTurn;
     private JLabel namePlayer;
     private App app;
@@ -73,8 +72,6 @@ public class ActionPlayerPanel extends JPanel {
         //createPlayerPanel();
         createButton();
         setVisible(true);
-//        initializeTest();
-//        initializeTestAnimation();
     }
 
     public void preloadResourceImages() {
@@ -286,7 +283,7 @@ public class ActionPlayerPanel extends JPanel {
 
     private void initializeTradeButtonPanel() {
         int xCoord = Resolution.calculateResolution(50, 560)[0];
-        int yCoord = Resolution.calculateResolution(50, 560)[1];
+        int yCoord = Resolution.calculateResolution(50, 560)[1]; // - 175 x
         tradeButtonPanel = new TradeButtonPanel(this::initializeTradePanel);
         tradeButtonPanel.setVisible(true);
         tradeButtonPanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
@@ -513,30 +510,37 @@ public class ActionPlayerPanel extends JPanel {
         repaint();
     }
 
-    public void initializeTest() {
-        testBezier = new JPanel();
-        testBezier.add(new ButtonImage("src/main/resources/resources/clay.png",
-                "src/main/resources/resources/clay.png",
-                0, 0, 5, null, null));
-        testBezier.setBounds(300, 500, 50, 80);
-//        testBezier.setBackground(Color.red);
-        testBezier.setVisible(true);
-//        testBezier.setOpaque(true);
-        add(testBezier);
+    public void endTurnPanels(Player currentPlayer, boolean toAnimate) {
+        if (!toAnimate || !currentPlayer.equals(game.getPlayerClient())) {
+            return;
+        }
+        int yCoordEndTurnButton = endTurn.getY();
+        int yCoordNamePlayerLabel = namePlayer.getY();
+        int xCoordDicePanel = dice.getX();
+        int xCoordTradeButton = tradeButtonPanel.getX();
+        animate.jLabelYDown(yCoordNamePlayerLabel, yCoordNamePlayerLabel + 100, 2, 1, namePlayer);
+        animate.jPanelXLeft(xCoordTradeButton, xCoordTradeButton - 300, 2, 1, tradeButtonPanel);
+        animate.jPanelXRight(xCoordDicePanel, xCoordDicePanel + 300, 2, 1, dice);
+        animate.buttonImageYDown(yCoordEndTurnButton, yCoordEndTurnButton + 300, 2, 1, endTurn);
     }
 
-    public void initializeTestAnimation() {
-        Point p0 = new Point(300, 500);
-        Point p1 = new Point(600, 200);
-        Point p2 = new Point(650, 900);
-//        animate.animateAlongBezierCurve(p0, p1, p2, 2, 1000, tradeButtonPanel);
+    public void newTurnPanels(Player currentPlayer, boolean toAnimate) {
+        if (!toAnimate || !currentPlayer.equals(game.getPlayerClient())) {
+            return;
+        }
+        int yCoordNamePlayerLabel = namePlayer.getY();
+        int yCoordEndTurnButton = endTurn.getY();
+        int xCoordDicePanel = dice.getX();
+        int xCoordTradeButton = tradeButtonPanel.getX();
+        animate.jLabelYUp(yCoordNamePlayerLabel, yCoordNamePlayerLabel - 100, 2, 1, namePlayer);
+        animate.jPanelXRight(xCoordTradeButton, xCoordTradeButton + 300, 2, 1, tradeButtonPanel);
+        animate.jPanelXLeft(xCoordDicePanel, xCoordDicePanel - 300, 2, 1, dice);
+        animate.buttonImageYUp(yCoordEndTurnButton, yCoordEndTurnButton - 300, 2, 1, endTurn);
     }
 
     public void animateResourceGain(TileType resourceType,
                                     model.geometry.Point startLocation, Player player) {
-        // Trouver l'image de la ressource
         BufferedImage resourceImage = resourceImages.get(resourceType);
-        // Créer un JPanel temporaire pour l'animation
         JPanel resourcePanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -544,28 +548,31 @@ public class ActionPlayerPanel extends JPanel {
                 g.drawImage(resourceImage, 0, 0, null);
             }
         };
+        resourcePanel.setOpaque(false);
+
         resourcePanel.setSize(resourceImage.getWidth(), resourceImage.getHeight());
         resourcePanel.setLocation((int) startLocation.getX(), (int) startLocation.getY());
-
         add(resourcePanel);
 
-        // Définir les coordonnées finales (emplacement dans l'UI des ressources du joueur)
         model.geometry.Point endLocation;
-        if (player.equals(game.getCurrentPlayer())) {
-            endLocation = new model.geometry.Point(600, 900); // Exemple pour l'inventaire du joueur actuel
+        // Si le joueur client est le joueur gagnant, animez vers l'inventaire du joueur.
+        if (player.equals(game.getPlayerClient())) {
+            endLocation = new model.geometry.Point(600, 900); // TODO Adapter taille d'écran
         } else {
+            // Si le joueur client n'est pas le joueur gagnant, animez vers le pseudo du joueur
             model.geometry.Point labelPosition = playersPanel.getPlayerLabelPosition(player);
             endLocation = labelPosition != null ? labelPosition : new model.geometry.Point(0, 0);
         }
+
         model.geometry.Point controlPoint = new model.geometry.Point(700, 200);
-        // Animer le déplacement du JPanel
         Animation animation = new Animation();
         animation.animateAlongBezierCurve(startLocation, controlPoint, endLocation, 2,
                 1000, resourcePanel, () -> {
-                    this.remove(resourcePanel);
-                    this.repaint();
+                    remove(resourcePanel);
+                    repaint();
                 });
     }
+
 
     public void updateShopPanel() {
         shopPanel.updateEnablePanel(game);
