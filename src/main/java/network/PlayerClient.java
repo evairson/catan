@@ -7,6 +7,9 @@ import model.Game;
 import model.Player;
 import network.NetworkObject.TypeObject;
 
+import javax.swing.*;
+import java.awt.*;
+
 import java.net.InetAddress;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -41,34 +44,7 @@ public class PlayerClient extends Player {
                     NetworkObject networkObject = ((NetworkObject) object);
                     switch (networkObject.getType()) {
                         case Game:
-                            switch (networkObject.getMessage()) {
-                                case "startGame" :
-                                    app.getMainMenu().startapp((Game) (networkObject.getObject()));
-                                    break;
-                                case "dices" :
-                                    int[] tab = (int[]) networkObject.getObject();
-                                    App.getActionPlayerPanel().getRollingDice().networkThrowDices(tab);
-                                    if (networkObject.getId() == id) {
-                                        App.getActionPlayerPanel().updateShopPanel();
-                                    }
-                                    break;
-                                case "trade" :
-                                    TradeObject tradeObject = (TradeObject) networkObject.getObject();
-                                    if (tradeObject.getIdPlayer() == id) {
-                                        App.getActionPlayerPanel().showTradePanel(tradeObject);
-                                    }
-                                    break;
-                                case "tradeAccept" :
-                                    int idTrader = (int) networkObject.getObject();
-                                    if (idTrader == id) {
-                                        App.getActionPlayerPanel().getTradePanel().acceptAction(false);
-                                        App.getActionPlayerPanel().update();
-                                    }
-                                    break;
-                                default:
-                                    System.out.println("Pas de message correspondant");
-                                    break;
-                            }
+                            game(networkObject);
                             break;
                         case Message:
                             message(networkObject);
@@ -118,6 +94,41 @@ public class PlayerClient extends Player {
         return id == game.getCurrentPlayer().getId();
     }
 
+    public void game(NetworkObject networkObject) {
+        switch (networkObject.getMessage()) {
+            case "startGame" :
+                app.getMainMenu().startapp((Game) (networkObject.getObject()));
+                break;
+            case "dices" :
+                int[] tab = (int[]) networkObject.getObject();
+                App.getActionPlayerPanel().getRollingDice().networkThrowDices(tab);
+                if (networkObject.getId() == id) {
+                    App.getActionPlayerPanel().updateShopPanel();
+                }
+                break;
+            case "trade" :
+                TradeObject tradeObject = (TradeObject) networkObject.getObject();
+                if (tradeObject.getIdPlayer() == id) {
+                    App.getActionPlayerPanel().showTradePanel(tradeObject);
+                }
+                break;
+            case "tradeAccept" :
+                int idTrader = (int) networkObject.getObject();
+                if (idTrader == id) {
+                    App.getActionPlayerPanel().getTradePanel().acceptAction(false);
+                    App.getActionPlayerPanel().update();
+                }
+                break;
+            case "changeThief" :
+                app.getBoard().changehighlitedTile((int) networkObject.getObject());
+                app.getBoard().changeThief();
+                break;
+            default:
+                System.out.println("Pas de message correspondant");
+                break;
+        }
+    }
+
     public void message(NetworkObject networkObjet) throws NetworkObjectException {
         switch (networkObjet.getMessage()) {
             case "ID":
@@ -130,11 +141,17 @@ public class PlayerClient extends Player {
                 break;
             case "changeTurn":
                 app.getGame().endTurn();
+                app.addMessageColor("C'est au tour de ", java.awt.Color.RED);
+                app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
+                    app.getGame().getCurrentPlayer().getColorAwt());
                 break;
             case "DrawCard":
                 if (id != networkObjet.getId()) {
                     App.getActionPlayerPanel().drawCardServer();
                 }
+                app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                    app.getGame().getCurrentPlayer().getColorAwt());
+                app.addMessageColor(" vient d'acheter une carte de developpement \n", java.awt.Color.RED);
                 break;
             default:
                 throw new NetworkObjectException();
@@ -150,6 +167,9 @@ public class PlayerClient extends Player {
                     if (networkObject.getId() == id) {
                         App.getActionPlayerPanel().updateShopPanel();
                     }
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une ville \n", java.awt.Color.RED);
                     break;
                 case "buildColony":
                     int idColony = (int) networkObject.getObject();
@@ -157,6 +177,9 @@ public class PlayerClient extends Player {
                     if (networkObject.getId() == id) {
                         App.getActionPlayerPanel().updateShopPanel();
                     }
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.RED);
                     break;
                 case "buildRoad":
                     int idRoad = (int) networkObject.getObject();
@@ -164,6 +187,9 @@ public class PlayerClient extends Player {
                     if (networkObject.getId() == id) {
                         App.getActionPlayerPanel().updateShopPanel();
                     }
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une route \n", java.awt.Color.RED);
                     break;
                 default:
                     break;

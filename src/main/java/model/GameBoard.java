@@ -3,7 +3,11 @@ package model;
 import model.buildings.*;
 import model.geometry.*;
 import model.tiles.*;
+import network.NetworkObject;
+import network.NetworkObject.TypeObject;
+import network.PlayerClient;
 import others.Constants;
+import start.Main;
 import view.TileImageLoader;
 import view.TileType;
 import view.utilities.Resolution;
@@ -475,15 +479,18 @@ public class GameBoard implements Serializable {
     }
 
     public boolean canPlaceColony(TileVertex vertex, Player player) {
+        if (game.getCurrentPlayer().getFreeColony()) {
+            return true;
+        }
         if (vertex.getBuilding() != null) {
             return false;
         }
         if (!isVertexTwoRoadsAwayFromCities(vertex)) {
             return false;
         }
-        // if(!isVertexNextToRoad(vertex, player)){
-        //     return false;
-        // }
+        if (!isVertexNextToRoad(vertex, player)) {
+            return false;
+        }
         return true;
     }
 
@@ -915,10 +922,29 @@ public class GameBoard implements Serializable {
         }
     }
 
+    public void changeThiefNetwork() {
+        if (Main.hasServer()) {
+            try {
+                PlayerClient player = game.getPlayerClient();
+                NetworkObject gameObject;
+                gameObject = new NetworkObject(TypeObject.Game, "changeThief", player.getId(),
+                    highlightedTile.getId());
+                player.getOut().writeUnshared(gameObject);
+                player.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            changeThief();
+        }
+    }
+
     public void changeThief() {
         thief.setTile(highlightedTile);
         game.setThiefMode(false);
         thiefMode = false;
+        App.getActionPlayerPanel().update();
+        App.getGamePanel().repaint();
     }
 
     public TileEdge findClosestEdge() {
@@ -975,6 +1001,15 @@ public class GameBoard implements Serializable {
         );
 //      Point point2 = new Point((int) (93 / Resolution.divider()), (int) (93 / Resolution.divider()));
         layout = new Layout(Constants.OrientationConstants.POINTY, point1, point2);
+    }
+
+
+    public void changehighlitedTile(int tileId) {
+        for (Tile tile : board.values()) {
+            if (tile.getId() == tileId) {
+                highlightedTile = tile;
+            }
+        }
     }
 
 }
