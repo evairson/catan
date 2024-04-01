@@ -34,6 +34,8 @@ public class Game implements StateMethods, Serializable {
     private PlayerClient playerClient;
     private boolean start = true;
     private boolean backwards = false;
+    private boolean changeOrder = false;
+    private boolean eventOrderJustChanged = false;
     private App app;
     private boolean blankTurn = false;
     private boolean monoWaiting = false;
@@ -158,7 +160,9 @@ public class Game implements StateMethods, Serializable {
             backwards = true;
         } else if (backwards && getCurrentPlayer().first(this)) {
             backwards = false;
-        } else if (backwards) {
+        }else if(eventOrderJustChanged){
+            eventOrderJustChanged = false;
+        } else if (backwards || changeOrder) {
             players.prev();
         } else {
             players.next();
@@ -227,7 +231,6 @@ public class Game implements StateMethods, Serializable {
 
     public void divideRessourcesByTwo() {
         ListPlayers pChecks = (ListPlayers) players.clone();
-        pChecks.remove(getCurrentPlayer());
         for (Player p : pChecks) {
             if (p.getResourcesSum() > p.getResourceCap()) {
                 for (int i = 0; i < p.getResourcesSum() / 2; i++) {
@@ -265,10 +268,18 @@ public class Game implements StateMethods, Serializable {
     public void activateD20Event() {
         if (getCurrentPlayer().hasThrowDices()) {
             switch (getCurrentPlayer().getD20()) {
-                case 1: killAllSheep();
-                case 4: lootThiefResources();
-                case 9: knightLoots();
-                case 14: worstWinVP();
+                case 1: killAllSheep(); break;
+                case 3: christmas(); break;
+                case 4: lootThiefResources(); break;
+                case 5: swapHands(); break;
+                case 8: eventChangeDiceValues(); break;
+                case 9: knightLoots(); break;
+                case 10: eventChangeOrder(); break;
+                case 13: capitalismPoorGetsPoorer(); break;
+                case 14: worstWinVP(); break;
+                case 15: wildfire(); break;
+                case 16: taxCollector(); break;
+                case 17: happyBirthday(); break;
                 default:
                     System.out.println("caca" + getCurrentPlayer().getD20());
             }
@@ -622,11 +633,23 @@ public class Game implements StateMethods, Serializable {
     }
 
     // EVENTS DE JEU POUR LE D20
+
+    //event 1
     public void killAllSheep() {
         for (Player player : players) {
             player.removeAllResource(TileType.WOOL);
         }
     }
+
+    //event 3
+    public void christmas(){
+        for(Player p : players){
+            p.addOneRandom();
+            p.addOneRandom();
+        }
+    }
+
+    //event 4
     public void lootThiefResources() {
         for (Player player : players) {
             for (Building b : player.getBuildings()) {
@@ -648,6 +671,31 @@ public class Game implements StateMethods, Serializable {
         }
         App.getActionPlayerPanel().update();
     }
+
+    //event 5
+    public void swapHands() {
+        ListPlayers pChecks = (ListPlayers) players.clone();
+        Player bestPlayer = pChecks.get(0);
+        Player worstPlayer = pChecks.get(0);
+        for (Player p : pChecks) {
+            if (p.getPoints() > bestPlayer.getPoints()) {
+                bestPlayer = p;
+            }
+            if (p.getPoints() < worstPlayer.getPoints()) {
+                worstPlayer = p;
+            }
+        }
+        if (bestPlayer != worstPlayer) {
+            bestPlayer.swapResources(worstPlayer);
+        }
+    }
+
+    //event 8
+    public void eventChangeDiceValues(){
+        board.eventChangeDiceValues();
+    }
+
+    //event 9
     public void knightLoots() {
         for (Player p : players) {
             for (int i = 0; i < p.getKnights(); ++i) {
@@ -656,7 +704,27 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    //event 10
+    public void eventChangeOrder() {
+        changeOrder = !changeOrder;
+        eventOrderJustChanged = true;
+    }
+    
+    //event 13
+    public void capitalismPoorGetsPoorer() {
+        ListPlayers pChecks = (ListPlayers) players.clone();
+        for (Player p : pChecks) {
+            System.out.println("Ressources sum : " + p.getResourcesSum());
+            if (p.getResourcesSum() <= p.getResourceCap()) {
+                for (int i = 0; i < p.getResourcesSum() / 2; i++) {
+                    p.removeOneRandom();
+                }
+            }
+        }
+    }
+
     /**
+     * Event 14
      * Fais en sorte que le joueur de la partie avec le moins de points gagne 1PV.
      */
     public void worstWinVP() {
@@ -670,5 +738,37 @@ public class Game implements StateMethods, Serializable {
         }
         min.addOnePoint();
         App.checkWin();
+    }
+
+    //event 15
+    public void wildfire() {
+        for (Player p : players) {
+            p.removeAllResource(TileType.WOOD);
+            p.removeAllResource(TileType.WHEAT);
+        }
+    }
+
+    //event 16
+    public void taxCollector(){
+        ListPlayers pChecks = (ListPlayers) players.clone();
+        for (Player p : pChecks) {
+            int nbColAndCity = p.getNbCitiesAndColonies();
+            if(nbColAndCity >= p.getResourcesSum()){
+                p.clearResources();
+            }else{
+                for (int i = 0; i < nbColAndCity; i++) {
+                    p.removeOneRandom();
+                }
+            }
+        }
+    }
+    
+    //event 17
+    public void happyBirthday(){
+        ListPlayers pChecks = (ListPlayers) players.clone();
+        pChecks.remove(getCurrentPlayer());
+        for (Player p : pChecks) {
+            p.giftOneRandomResource(getCurrentPlayer());
+        }
     }
 }
