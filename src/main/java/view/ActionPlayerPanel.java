@@ -497,6 +497,8 @@ public class ActionPlayerPanel extends JPanel {
     public void createPlayerPanel() {
         playersPanel = new PlayersPanel(game);
         add(playersPanel);
+//        playersPanel.setBackground(Color.CYAN);
+//        playersPanel.setOpaque(true);
     }
 
     public void update() {
