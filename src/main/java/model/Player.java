@@ -66,11 +66,11 @@ public class Player implements Serializable {
         color = c;
         this.name = name;
         resources = new HashMap<>();
-        resources.put(TileType.CLAY, 0);
-        resources.put(TileType.ORE, 0);
-        resources.put(TileType.WHEAT, 0);
-        resources.put(TileType.WOOD, 0);
-        resources.put(TileType.WOOL, 0);
+        resources.put(TileType.CLAY, 6);
+        resources.put(TileType.ORE, 6);
+        resources.put(TileType.WHEAT, 6);
+        resources.put(TileType.WOOD, 6);
+        resources.put(TileType.WOOL, 6);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;

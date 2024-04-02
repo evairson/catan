@@ -539,9 +539,9 @@ public class Game implements StateMethods, Serializable {
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
                 if (getCurrentPlayer().buildRoad(edge)) {
-                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                    App.addMessageColor(app.getGame().getCurrentPlayer().getName(),
                         app.getGame().getCurrentPlayer().getColorAwt());
-                    app.addMessageColor(" vient de placer une route \n", java.awt.Color.RED);
+                    App.addMessageColor(" vient de placer une route \n", java.awt.Color.RED);
                     App.getActionPlayerPanel().update();
                     App.getGamePanel().repaint();
                     return true;
@@ -676,5 +676,56 @@ public class Game implements StateMethods, Serializable {
             }
         }
         App.getGamePanel().repaint();
+    }
+
+    // Route la plus longue
+
+    public int getNumberRoads(TileEdge edge, int idPlayer) {
+        ArrayList<TileEdge> edgesNext = new ArrayList<>();
+        for (TileEdge edgeNext : board.getEdgeMap().values()) {
+            if (edgeNext == edge) {
+                continue;
+            }
+            if (edgeNext.getEnd().distance(edge.getEnd()) == 0
+                || edgeNext.getStart().distance(edge.getEnd()) == 0) {
+                if (edgeNext.getBuilding() != null && edgeNext.getBuilding().getOwner().getId() == idPlayer) {
+                    edgesNext.add(edgeNext);
+                }
+            }
+        }
+        if (edgesNext.size() == 0) {
+            return 1;
+        } else if (edgesNext.size() == 1) {
+            return 1 + getNumberRoads(edgesNext.get(0), idPlayer);
+        } else {
+            return 1 + Math.max(getNumberRoads(edgesNext.get(0), idPlayer),
+                getNumberRoads(edgesNext.get(1), idPlayer));
+        }
+    }
+
+    public TileEdge getRoadMax(TileEdge edge, int idPlayer) {
+        ArrayList<TileEdge> edgesNext = new ArrayList<>();
+        for (TileEdge edgeNext : board.getEdgeMap().values()) {
+            if (edgeNext == edge) {
+                continue;
+            }
+            if (edgeNext.getEnd().distance(edge.getEnd()) == 0
+                || edgeNext.getStart().distance(edge.getEnd()) == 0) {
+                if (edgeNext.getBuilding() != null && edgeNext.getBuilding().getOwner().getId() == idPlayer) {
+                    edgesNext.add(edgeNext);
+                }
+            }
+        }
+        if (edgesNext.size() == 0) {
+            return edge;
+        } else if (edgesNext.size() == 1) {
+            return getRoadMax(edgesNext.get(0), idPlayer);
+        } else {
+            if (getNumberRoads(edgesNext.get(0), idPlayer) > getNumberRoads(edgesNext.get(1), idPlayer)) {
+                return getRoadMax(edgesNext.get(0), idPlayer);
+            } else {
+                return getRoadMax(edgesNext.get(1), idPlayer);
+            }
+        }
     }
 }

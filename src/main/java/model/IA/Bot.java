@@ -3,6 +3,7 @@ package model.IA;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import exceptionclass.ConstructBuildingException;
 import model.Game;
 import model.Player;
 import model.Player.Color;
@@ -124,6 +125,50 @@ public class Bot extends Player {
         }
         return null;
     }
+
+    public void buildBestRoad(Game game) {
+        TileEdge edge = getBestBeforeRoad(game);
+        System.out.println(edge);
+        for (TileEdge edgePossible : game.getBoard().getEdgeMap().values()) {
+            if (edgePossible.getBuilding() != null || edgePossible == edge) {
+                continue;
+            }
+            if (edgePossible.getEnd().distance(edge.getStart()) == 0
+                || edgePossible.getStart().distance(edge.getStart()) == 0) {
+                try {
+                    game.buildRoad(edgePossible.getId());
+                    return;
+                } catch (ConstructBuildingException e) {
+                    ConstructBuildingException.messageError();
+                }
+            }
+        }
+    }
+
+    public TileEdge getBestBeforeRoad(Game game) {
+        int numbersRoadsMax = 0;
+        TileEdge edgeLastMax = null;
+        for (TileEdge edge: game.getBoard().getEdgeMap().values()) {
+            if (edge.getBuilding() != null && edge.getBuilding().getOwner().getId() == id) {
+                if (edgeLastMax == null) {
+                    edgeLastMax = edge;
+                }
+                if (edge.getNumberEdgesBefore(game) == 0) {
+                    System.out.println("y'en a pas avant");
+                    int numberRoads = game.getNumberRoads(edge, id);
+                    TileEdge edgeLast = game.getRoadMax(edge, id);
+                    if (numberRoads > numbersRoadsMax) {
+                        numbersRoadsMax = numberRoads;
+                        edgeLastMax = edgeLast;
+                    }
+                }
+            }
+        }
+
+        System.out.println(numbersRoadsMax);
+        return edgeLastMax;
+    }
+
 
     public Tile getThiefTile(Game game) {
         Tile bestTile = null;
