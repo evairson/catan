@@ -127,7 +127,7 @@ public class Bot extends Player {
     }
 
     public void buildBestRoad(Game game) {
-        TileEdge edge = getBestBeforeRoad(game);
+        TileEdge edge = game.getBestBeforeRoad(id);
         System.out.println(edge);
         for (TileEdge edgePossible : game.getBoard().getEdgeMap().values()) {
             if (edgePossible.getBuilding() != null || edgePossible == edge) {
@@ -145,29 +145,7 @@ public class Bot extends Player {
         }
     }
 
-    public TileEdge getBestBeforeRoad(Game game) {
-        int numbersRoadsMax = 0;
-        TileEdge edgeLastMax = null;
-        for (TileEdge edge: game.getBoard().getEdgeMap().values()) {
-            if (edge.getBuilding() != null && edge.getBuilding().getOwner().getId() == id) {
-                if (edgeLastMax == null) {
-                    edgeLastMax = edge;
-                }
-                if (edge.getNumberEdgesBefore(game) == 0) {
-                    System.out.println("y'en a pas avant");
-                    /*int numberRoads = game.getNumberRoads(edge, id);
-                    TileEdge edgeLast = game.getRoadMax(edge, id);
-                    if (numberRoads > numbersRoadsMax) {
-                        numbersRoadsMax = numberRoads;
-                        edgeLastMax = edgeLast;
-                    }*/
-                }
-            }
-        }
 
-        System.out.println(numbersRoadsMax);
-        return edgeLastMax;
-    }
 
 
     public Tile getThiefTile(Game game) {

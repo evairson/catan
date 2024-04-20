@@ -750,4 +750,28 @@ public class Game implements StateMethods, Serializable {
             }
         }
     }
+
+    public TileEdge getBestBeforeRoad(int id) {
+        int numbersRoadsMax = 0;
+        TileEdge edgeFirstMax = null;
+        ArrayList<TileEdge> edges = new ArrayList<>();
+        for (TileEdge edge: board.getEdgeMap().values()) {
+            edges.add(edge);
+        }
+        for (TileEdge edge: board.getEdgeMap().values()) {
+            if (edge.getBuilding() != null && edge.getBuilding().getOwner().getId() == id) {
+                if (edgeFirstMax == null) {
+                    edgeFirstMax = edge;
+                }
+                int numberRoads = Game.getNumberRoads(edges, edge, id);
+                if (numberRoads > numbersRoadsMax) {
+                    numbersRoadsMax = numberRoads;
+                    edgeFirstMax = edge;
+                }
+            }
+        }
+
+        System.out.println(numbersRoadsMax);
+        return edgeFirstMax;
+    }
 }
