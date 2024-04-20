@@ -92,6 +92,11 @@ public class GameBoard implements Serializable {
         this.initialiseBoard();
     }
 
+    public GameBoard(HashMap<Point, TileEdge> edge, Game game) {
+        edgesMap = edge;
+        this.game = game;
+    }
+
     private void loadHarborImage() {
         try {
             BufferedImage originalImage = ImageIO.read(new File("src/main/resources/harbor.png"));

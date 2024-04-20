@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import model.geometry.*;
 import model.IA.Bot;
 import model.IA.ThreadBot;
 import model.buildings.Building;
@@ -24,6 +25,7 @@ import view.TileType;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.HashMap;
 
 import exceptionclass.ConstructBuildingException;
 
@@ -41,6 +43,12 @@ public class Game implements StateMethods, Serializable {
     private boolean monoWaiting = false;
     private int yearOfPlentyWaiting = 0;
     private Player first;
+
+    public Game(HashMap<Point, TileEdge> edge) { // Pour les tests
+        thief = new Thief();
+        board = new GameBoard(edge, this);
+        stack = new CardStack();
+    }
 
     public Game(HashSet<Player> playersSet) {
         for (Player player : playersSet) {
@@ -680,9 +688,10 @@ public class Game implements StateMethods, Serializable {
 
     // Route la plus longue
 
-    public int getNumberRoads(TileEdge edge, int idPlayer) {
+    public static int getNumberRoads(ArrayList<TileEdge> edges, TileEdge edge, int idPlayer) {
         ArrayList<TileEdge> edgesNext = new ArrayList<>();
-        for (TileEdge edgeNext : board.getEdgeMap().values()) {
+        ArrayList<TileEdge> edgesCopy = (ArrayList<TileEdge>) edges.clone();
+        for (TileEdge edgeNext : edges) {
             if (edgeNext == edge) {
                 continue;
             }
@@ -690,22 +699,30 @@ public class Game implements StateMethods, Serializable {
                 || edgeNext.getStart().distance(edge.getEnd()) == 0) {
                 if (edgeNext.getBuilding() != null && edgeNext.getBuilding().getOwner().getId() == idPlayer) {
                     edgesNext.add(edgeNext);
+                    edgesCopy.remove(edgeNext);
                 }
             }
         }
         if (edgesNext.size() == 0) {
             return 1;
         } else if (edgesNext.size() == 1) {
-            return 1 + getNumberRoads(edgesNext.get(0), idPlayer);
+            return 1 + getNumberRoads(edgesCopy, edgesNext.get(0), idPlayer);
         } else {
-            return 1 + Math.max(getNumberRoads(edgesNext.get(0), idPlayer),
-                getNumberRoads(edgesNext.get(1), idPlayer));
+            return 1 + Math.max(getNumberRoads(edges, edgesNext.get(0), idPlayer),
+                getNumberRoads(edgesCopy, edgesNext.get(1), idPlayer));
         }
     }
 
-    public TileEdge getRoadMax(TileEdge edge, int idPlayer) {
+    /**
+     * @param edges : Edge de départ
+     * @param edge : Edge de départ
+     * @param idPlayer : L'id du player voulu
+     * @return edge d'arrivé du plus long chemin
+     */
+    public static TileEdge getRoadMax(ArrayList<TileEdge> edges, TileEdge edge, int idPlayer) {
         ArrayList<TileEdge> edgesNext = new ArrayList<>();
-        for (TileEdge edgeNext : board.getEdgeMap().values()) {
+        ArrayList<TileEdge> edgesCopy = (ArrayList<TileEdge>) edges.clone();
+        for (TileEdge edgeNext : edges) {
             if (edgeNext == edge) {
                 continue;
             }
@@ -713,18 +730,23 @@ public class Game implements StateMethods, Serializable {
                 || edgeNext.getStart().distance(edge.getEnd()) == 0) {
                 if (edgeNext.getBuilding() != null && edgeNext.getBuilding().getOwner().getId() == idPlayer) {
                     edgesNext.add(edgeNext);
+                    edgesCopy.remove(edgeNext);
                 }
             }
         }
         if (edgesNext.size() == 0) {
+            System.out.println("c'est zero");
             return edge;
         } else if (edgesNext.size() == 1) {
-            return getRoadMax(edgesNext.get(0), idPlayer);
+            System.out.println("1");
+            return getRoadMax(edgesCopy, edgesNext.get(0), idPlayer);
         } else {
-            if (getNumberRoads(edgesNext.get(0), idPlayer) > getNumberRoads(edgesNext.get(1), idPlayer)) {
-                return getRoadMax(edgesNext.get(0), idPlayer);
+            System.out.println("2");
+            if (getNumberRoads(edgesCopy, edgesNext.get(0), idPlayer)
+                > getNumberRoads(edgesCopy, edgesNext.get(1), idPlayer)) {
+                return getRoadMax(edgesCopy, edgesNext.get(0), idPlayer);
             } else {
-                return getRoadMax(edgesNext.get(1), idPlayer);
+                return getRoadMax(edgesCopy, edgesNext.get(1), idPlayer);
             }
         }
     }

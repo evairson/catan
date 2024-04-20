@@ -155,12 +155,12 @@ public class Bot extends Player {
                 }
                 if (edge.getNumberEdgesBefore(game) == 0) {
                     System.out.println("y'en a pas avant");
-                    int numberRoads = game.getNumberRoads(edge, id);
+                    /*int numberRoads = game.getNumberRoads(edge, id);
                     TileEdge edgeLast = game.getRoadMax(edge, id);
                     if (numberRoads > numbersRoadsMax) {
                         numbersRoadsMax = numberRoads;
                         edgeLastMax = edgeLast;
-                    }
+                    }*/
                 }
             }
         }
