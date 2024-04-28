@@ -60,11 +60,13 @@ public class LogPanel extends JPanel {
             case 9: addMessageColor("Les chevaliers ont bien travaillé! "
                     + "Chaque joueur pioche son nombre de "
                     + "chevaliers en carte ressources !\n", Color.GREEN); break;
-            case 10: addMessageColor("Tout est chamboulé! L'ordre de jeu est inversé !\n", Color.BLACK); break;
+            case 10: addMessageColor("Tout est chamboulé! "
+                    + "L'ordre de jeu est inversé !\n", Color.BLACK); break;
             case 11: addMessageColor("Un terrible brouillard tombe sur la carte et fait "
                     + "disparaitre le contenu des tuiles pendant 2 tours.\n", Color.RED); break;
             case 12: addMessageColor("Un accord est tombé entre les puissances de la carte : un trade ne "
-                    + "peut être effectué que s'il est accepté par chacun des joueurs.\n", Color.BLACK); break;
+                    + "peut être effectué que s'il est "
+                    + "accepté par chacun des joueurs.\n", Color.BLACK); break;
             case 13: addMessageColor("Le capitalisme a encore frappé! Les joueurs en dessous du "
                     + "seuil du voleur doivent abandonner la moitié de leurs cartes !\n", Color.RED); break;
             case 14: addMessageColor("C'est le jour de chance du joueur avec le moins de "
