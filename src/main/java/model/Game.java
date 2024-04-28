@@ -285,6 +285,7 @@ public class Game implements StateMethods, Serializable {
                 case 15: wildfire(); break;
                 case 16: taxCollector(); break;
                 case 17: happyBirthday(); break;
+                case 20: diceSecondRound(); break;
                 default:
                     System.out.println("caca" + getCurrentPlayer().getD20());
             }
@@ -798,5 +799,11 @@ public class Game implements StateMethods, Serializable {
         for (Player p : pChecks) {
             p.giftOneRandomResource(getCurrentPlayer());
         }
+    }
+
+    //event 20
+    public void diceSecondRound() {
+        resourcesGiven = false;
+        lootResources();
     }
 }
