@@ -44,6 +44,7 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel cardsPanel;
     private JPanel cardPanel;
     private JPanel chat;
+    private LogPanel logChat;
     private PlayersPanel playersPanel;
     private RollingDice dice;
     private boolean harboursDisabled = false;
@@ -65,6 +66,7 @@ public class ActionPlayerPanel extends JPanel {
         initializeShopPanel(game);
         initializeDeckPanel();
         initializeChat();
+        initializeLogChat();
         //createPlayerPanel();
         createButton();
         setVisible(true);
@@ -174,7 +176,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeChat() {
-        int xCoord = Resolution.calculateResolution(750, 200)[0];
+        int xCoord = Resolution.calculateResolution(650, 200)[0];
         int yCoord = Resolution.calculateResolution(750, 200)[1];
 
         chat = new ChatPanel(this);
@@ -182,6 +184,17 @@ public class ActionPlayerPanel extends JPanel {
         chat.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
                 (int) (400 / Resolution.divider()));
         add(chat);
+    }
+
+    private void initializeLogChat() {
+        int xCoord = Resolution.calculateResolution(850, 200)[0];
+        int yCoord = Resolution.calculateResolution(750, 200)[1];
+
+        logChat = new LogPanel(this);
+        logChat.setVisible(true);
+        logChat.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
+                (int) (400 / Resolution.divider()));
+        add(logChat);
     }
 
     private JFrame getMainFrame() {
@@ -524,6 +537,10 @@ public class ActionPlayerPanel extends JPanel {
 
     public App getApp() {
         return app;
+    }
+
+    public LogPanel getLogChat() {
+        return (LogPanel) logChat;
     }
 
     public boolean isHarboursDisabled() {

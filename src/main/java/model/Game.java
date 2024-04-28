@@ -18,8 +18,6 @@ import network.NetworkObject.TypeObject;
 import others.Constants;
 import others.ListPlayers;
 import start.Main;
-//import view.utilities.Resolution;
-import view.ChatPanel;
 import view.TileType;
 
 import java.io.Serializable;
@@ -289,6 +287,7 @@ public class Game implements StateMethods, Serializable {
                 default:
                     System.out.println("caca" + getCurrentPlayer().getD20());
             }
+            App.getActionPlayerPanel().getLogChat().addEventLog(getCurrentPlayer().getD20());
         }
     }
 
@@ -653,7 +652,7 @@ public class Game implements StateMethods, Serializable {
         for (Player player : players) {
             for (DevelopmentCard card : player.getCardsDev()) {
                 String message = player.getName() + " a " + card.getName();
-                ((ChatPanel) App.getActionPlayer().getChat()).addMessageColor(message, player.getColorAwt());
+                (App.getActionPlayer().getLogChat()).addMessageColor(message, player.getColorAwt());
             }
         }
     }
@@ -702,7 +701,7 @@ public class Game implements StateMethods, Serializable {
                 worstPlayer = p;
             }
         }
-        if (bestPlayer != worstPlayer) {
+        if (bestPlayer != worstPlayer && bestPlayer.getPoints() != worstPlayer.getPoints()) {
             bestPlayer.swapResources(worstPlayer);
         }
     }

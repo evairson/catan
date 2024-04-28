@@ -110,7 +110,7 @@ public class App {
     }
 
     public void addMessageColor(String message, Color color) {
-        ((ChatPanel) actionPlayer.getChat()).addMessageColor(message, color);
+        (actionPlayer.getLogChat()).addMessageColor(message, color);
     }
 
     public void addPanels() {

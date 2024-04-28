@@ -141,7 +141,7 @@ public class PlayerClient extends Player {
                 break;
             case "changeTurn":
                 app.getGame().endTurn();
-                app.addMessageColor("C'est au tour de ", java.awt.Color.RED);
+                app.addMessageColor("C'est au tour de ", java.awt.Color.BLACK);
                 app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
                     app.getGame().getCurrentPlayer().getColorAwt());
                 break;
@@ -169,7 +169,7 @@ public class PlayerClient extends Player {
                     }
                     app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
                         app.getGame().getCurrentPlayer().getColorAwt());
-                    app.addMessageColor(" vient de placer une ville \n", java.awt.Color.RED);
+                    app.addMessageColor(" vient de placer une ville \n", java.awt.Color.BLACK);
                     break;
                 case "buildColony":
                     int idColony = (int) networkObject.getObject();
@@ -179,7 +179,7 @@ public class PlayerClient extends Player {
                     }
                     app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
                         app.getGame().getCurrentPlayer().getColorAwt());
-                    app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.RED);
+                    app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.BLACK);
                     break;
                 case "buildRoad":
                     int idRoad = (int) networkObject.getObject();
@@ -189,7 +189,7 @@ public class PlayerClient extends Player {
                     }
                     app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
                         app.getGame().getCurrentPlayer().getColorAwt());
-                    app.addMessageColor(" vient de placer une route \n", java.awt.Color.RED);
+                    app.addMessageColor(" vient de placer une route \n", java.awt.Color.BLACK);
                     break;
                 default:
                     break;
