@@ -714,7 +714,7 @@ public class Game implements StateMethods, Serializable {
     }
 
     /**
-     * @param edges : Edge de départ
+     * @param edges : Edges de départ
      * @param edge : Edge de départ
      * @param idPlayer : L'id du player voulu
      * @return edge d'arrivé du plus long chemin

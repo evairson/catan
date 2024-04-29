@@ -41,11 +41,6 @@ public class ThreadBot extends Thread {
                     si endTurn s'execute avant la fin du thread */
                 App.getActionPlayerPanel().getRollingDice().roll();
                 Thread.sleep(5000);
-                if (game.canBuildRoad()) {
-                    System.out.println("ok je peux");
-                    bot.buildBestRoad(game);
-                    Thread.sleep(2000);
-                }
                 if (game.canBuildColony()) {
                     TileVertex vertex = Bot.getBetterVertex(game);
                     try {
@@ -53,6 +48,17 @@ public class ThreadBot extends Thread {
                     } catch (ConstructBuildingException e) {
                         System.out.println("erreur lors du placement de la colony");
                     }
+                }
+                if (game.canBuildRoad()) {
+                    bot.buildBestRoad(game);
+                    Thread.sleep(2000);
+                }
+                if (game.canDraw()) {
+                    bot.drawCard(game.getStack());
+                }
+                if (bot.needResources() != null) {
+                    System.out.println("");
+                    // TODO : faire l'échange
                 }
                 Thread.sleep(3000);
                 game.endTurn();

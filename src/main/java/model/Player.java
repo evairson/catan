@@ -398,6 +398,8 @@ public class Player implements Serializable {
             }
             cardsDev.add(card);
             App.getActionPlayerPanel().update();
+            App.addMessageColor(name, getColorAwt());
+            App.addMessageColor(" a pioché une carte \n", java.awt.Color.RED);
         } else {
             System.out.println("0 cartes dans le deck");
         }

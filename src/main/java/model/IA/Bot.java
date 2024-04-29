@@ -173,4 +173,34 @@ public class Bot extends Player {
         return numberColonies;
     }
 
+    public TileType[] needResources() {
+        TileType[] typeGetGive = new TileType[2];
+        if (resourcesToOne(TileType.CLAY) + resourcesToOne(TileType.WOOD) + resourcesToOne(TileType.WHEAT)
+            + resourcesToOne(TileType.WOOL) > 3 && resourcesToOne(TileType.ORE) == 1) {
+            typeGetGive[1] = TileType.ORE;
+            if (resourcesToOne(TileType.CLAY) == 0) {
+                typeGetGive[0] = TileType.CLAY;
+            }
+            if (resourcesToOne(TileType.WOOD) == 0) {
+                typeGetGive[0] = TileType.WOOD;
+            }
+            if (resourcesToOne(TileType.WHEAT) == 0) {
+                typeGetGive[0] = TileType.WHEAT;
+            }
+            if (resourcesToOne(TileType.WOOL) == 0) {
+                typeGetGive[0] = TileType.WOOL;
+            }
+            return typeGetGive;
+        }
+        return null;
+    }
+
+    public int resourcesToOne(TileType type) {
+        if (resources.get(type) > 1) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
 }
