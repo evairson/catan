@@ -471,14 +471,14 @@ public class GameBoard implements Serializable {
     }
 
     public boolean canPlaceColony(TileVertex vertex, Player player) {
-        if (game.getCurrentPlayer().getFreeColony()) {
-            return true;
+        if (!isVertexTwoRoadsAwayFromCities(vertex)) {
+            return false;
         }
         if (vertex.getBuilding() != null) {
             return false;
         }
-        if (!isVertexTwoRoadsAwayFromCities(vertex)) {
-            return false;
+        if (game.getCurrentPlayer().getFreeColony()) {
+            return true;
         }
         if (!isVertexNextToRoad(vertex, player)) {
             return false;

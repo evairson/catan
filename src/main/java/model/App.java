@@ -136,9 +136,6 @@ public class App {
             checkWin();
         }
         Music.update();
-        IA ia = new IA();
-        System.out.println(
-            ia.getBetterVertex(game.getBoard().getBoard(), game.getBoard().getVertices()).getCoordinates());
     }
     public static void checkWin() {
         if (game.getCurrentPlayer().hasWon()) {
