@@ -11,6 +11,7 @@ import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
 import view.TileType;
+import view.gamepanels.TradePanel;
 
 public class Bot extends Player {
     private static double proportionWood;
@@ -89,13 +90,16 @@ public class Bot extends Player {
         proportionWool = diceValueWool / 126;
     }
 
-    public static TileVertex getBetterVertex(Game game) {
+    public TileVertex getBetterVertex(Game game) {
         ArrayList<Tile> board = new ArrayList<>(game.getBoard().getBoard().values());
         boardStats(board);
         double maxValue = 0;
         TileVertex maxVertex = null;
         for (TileVertex vertex : game.getBoard().getVertices()) {
             if (vertex.getBuilding() != null) {
+                continue;
+            }
+            if (!game.getBoard().canPlaceColony(vertex, this)) {
                 continue;
             }
             for (Tile t : vertex.getTiles()) {
@@ -143,6 +147,18 @@ public class Bot extends Player {
                 }
             }
         }
+        for (TileEdge edgePossible : game.getBoard().getEdgeMap().values()) {
+            if (edgePossible.getBuilding() != null || edgePossible == edge) {
+                continue;
+            }
+            try {
+                game.buildRoad(edgePossible.getId());
+                return;
+            } catch (ConstructBuildingException e) {
+                continue;
+            }
+        }
+        System.out.println("Impossible de construire une route");
     }
 
 
@@ -173,6 +189,30 @@ public class Bot extends Player {
         return numberColonies;
     }
 
+    public int getNumberColonies(Game game) {
+        int numberColonies = 0;
+        for (TileVertex vertex : game.getBoard().getVertices()) {
+            if (vertex.getBuilding() != null) {
+                if (vertex.getBuilding().getOwner().getId() == getId()) {
+                    numberColonies++;
+                }
+            }
+        }
+        return numberColonies;
+    }
+
+    public int getNumberRoads(Game game) {
+        int numberRoads = 0;
+        for (TileEdge edge : game.getBoard().getEdgeMap().values()) {
+            if (edge.getBuilding() != null) {
+                if (edge.getBuilding().getOwner().getId() == getId()) {
+                    numberRoads++;
+                }
+            }
+        }
+        return numberRoads;
+    }
+
     public TileType[] needResources() {
         TileType[] typeGetGive = new TileType[2];
         if (resourcesToOne(TileType.CLAY) + resourcesToOne(TileType.WOOD) + resourcesToOne(TileType.WHEAT)
@@ -200,6 +240,199 @@ public class Bot extends Player {
             return 1;
         } else {
             return 0;
+        }
+    }
+
+    public boolean needToWaitForColonies(Game game) {
+        if (getNumberRoads(game)
+            > 2 * getNumberColonies(game)) {
+            return true;
+        }
+        return false;
+    }
+
+    public void askForTradeColonies(Game game) {
+        Player playerToAsk = whichPlayerToAskForColonies(game);
+        HashMap<TileType, Integer> listToGet = new HashMap<>();
+        HashMap<TileType, Integer> listToGive = new HashMap<>();
+        if (resources.get(TileType.WOOD) < 1) {
+            if (playerToAsk.getResource(TileType.WOOD) >= 1) {
+                listToGet.put(TileType.WOOD, 1);
+            }
+        } else {
+            if (resources.get(TileType.WOOD) > 1) {
+                listToGive.put(TileType.WOOD, 1);
+            }
+        }
+        if (resources.get(TileType.CLAY) < 1) {
+            if (playerToAsk.getResource(TileType.CLAY) >= 1) {
+                listToGet.put(TileType.CLAY, 1);
+            }
+        } else {
+            if (resources.get(TileType.CLAY) > 1) {
+                listToGive.put(TileType.CLAY, 1);
+            }
+        }
+        if (resources.get(TileType.WHEAT) < 1) {
+            if (playerToAsk.getResource(TileType.WHEAT) >= 1) {
+                listToGet.put(TileType.WHEAT, 1);
+            }
+        } else {
+            if (resources.get(TileType.WHEAT) > 1) {
+                listToGive.put(TileType.WHEAT, 1);
+            }
+        }
+        if (resources.get(TileType.WOOL) < 1) {
+            if (playerToAsk.getResource(TileType.WOOL) >= 1) {
+                listToGet.put(TileType.WOOL, 1);
+            }
+        } else {
+            if (resources.get(TileType.WOOL) > 1) {
+                listToGive.put(TileType.WOOL, 1);
+            }
+        }
+
+        if (resources.get(TileType.ORE) >= 1) {
+            listToGive.put(TileType.ORE, 1);
+        }
+
+        System.out.println("Je cherche à faire un trade avec" + playerToAsk.getName());
+        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk);
+
+    }
+
+    public int playerToAskForColonies(Game game, Player player) {
+        int canGive = 0;
+        if (resources.get(TileType.WOOD) < 1) {
+            if (player.getResource(TileType.WOOD) >= 1) {
+                canGive++;
+            }
+        }
+        if (resources.get(TileType.CLAY) < 1) {
+            if (player.getResource(TileType.CLAY) >= 1) {
+                canGive++;
+            }
+        }
+        if (resources.get(TileType.WHEAT) < 1) {
+            if (player.getResource(TileType.WHEAT) >= 1) {
+                canGive++;
+            }
+        }
+        if (resources.get(TileType.WOOL) < 1) {
+            if (player.getResource(TileType.WOOL) >= 1) {
+                canGive++;
+            }
+        }
+        return canGive;
+    }
+
+    public Player whichPlayerToAskForColonies(Game game) {
+        Player playerToAsk = null;
+        for (Player player : game.getPlayers()) {
+            if (player.getId() != id) {
+                if (playerToAsk == null) {
+                    playerToAsk = player;
+                }
+                if (playerToAskForColonies(game, player) > playerToAskForColonies(game, playerToAsk)) {
+                    playerToAsk = player;
+                }
+            }
+        }
+        return playerToAsk;
+    }
+
+    public int playerToAskForRoads(Game game, Player player) {
+        int canGive = 0;
+        if (resources.get(TileType.WOOD) < 1) {
+            if (player.getResource(TileType.WOOD) >= 1) {
+                canGive++;
+            }
+        }
+        if (resources.get(TileType.CLAY) < 1) {
+            if (player.getResource(TileType.CLAY) >= 1) {
+                canGive++;
+            }
+        }
+        return canGive;
+    }
+
+    public Player whichPlayerToAskForRoads(Game game) {
+        Player playerToAsk = null;
+        for (Player player : game.getPlayers()) {
+            if (player.getId() != id) {
+                if (playerToAsk == null) {
+                    playerToAsk = player;
+                }
+                if (playerToAskForRoads(game, player) > playerToAskForColonies(game, playerToAsk)) {
+                    playerToAsk = player;
+                }
+            }
+        }
+        return playerToAsk;
+    }
+
+
+    public void askForTradeRoads(Game game) {
+        Player playerToAsk = whichPlayerToAskForRoads(game);
+        HashMap<TileType, Integer> listToGet = new HashMap<>();
+        HashMap<TileType, Integer> listToGive = new HashMap<>();
+        if (resources.get(TileType.WOOD) < 1) {
+            if (playerToAsk.getResource(TileType.WOOD) >= 1) {
+                listToGet.put(TileType.WOOD, 1);
+            }
+        } else {
+            if (resources.get(TileType.WOOD) > 1) {
+                listToGive.put(TileType.WOOD, 1);
+            }
+        }
+        if (resources.get(TileType.CLAY) < 1) {
+            if (playerToAsk.getResource(TileType.CLAY) >= 1) {
+                listToGet.put(TileType.CLAY, 1);
+            }
+        } else {
+            if (resources.get(TileType.CLAY) > 1) {
+                listToGive.put(TileType.CLAY, 1);
+            }
+        }
+        if (resources.get(TileType.WHEAT) < 1) {
+            if (playerToAsk.getResource(TileType.WHEAT) >= 1) {
+                listToGet.put(TileType.WHEAT, 1);
+            }
+        } else {
+            if (resources.get(TileType.WHEAT) > 1) {
+                listToGive.put(TileType.WHEAT, 1);
+            }
+        }
+        if (resources.get(TileType.WOOL) < 1) {
+            if (playerToAsk.getResource(TileType.WOOL) >= 1) {
+                listToGet.put(TileType.WOOL, 1);
+            }
+        } else {
+            if (resources.get(TileType.WOOL) > 1) {
+                listToGive.put(TileType.WOOL, 1);
+            }
+        }
+
+        if (resources.get(TileType.ORE) >= 1) {
+            listToGive.put(TileType.ORE, 1);
+        }
+
+        System.out.println("Je cherche à faire un trade avec" + playerToAsk.getName());
+        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk);
+
+    }
+
+    public void buildCity(Game game) {
+        for (TileVertex vertex : game.getBoard().getVertices()) {
+            if (vertex.getBuilding() != null) {
+                if (vertex.getBuilding().getOwner().getId() == getId()) {
+                    try {
+                        game.buildCity(vertex.getId());
+                    } catch (ConstructBuildingException e) {
+                        ConstructBuildingException.messageError();
+                    }
+                }
+            }
         }
     }
 

@@ -11,6 +11,8 @@ import model.IA.ThreadBot;
 import model.buildings.Building;
 import model.buildings.Colony;
 import model.cards.CardStack;
+import model.cards.DevelopmentCard;
+import model.cards.KnightCard;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
@@ -199,6 +201,7 @@ public class Game implements StateMethods, Serializable {
             getCurrentPlayer().setFreeColony(true);
         }
 
+
         App.getActionPlayerPanel().update();
         App.addMessageColor("C'est au tour de ", java.awt.Color.RED);
         App.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
@@ -208,6 +211,7 @@ public class Game implements StateMethods, Serializable {
         if (!Main.hasServer()) {
             startTurnBot();
         }
+        app.update();
     }
 
     public boolean canDraw() {
@@ -494,7 +498,8 @@ public class Game implements StateMethods, Serializable {
     public boolean buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
-                if (board.canPlaceColony(vertex, playerClient)) {
+                if (board.canPlaceColony(vertex, getCurrentPlayer())) {
+                    System.out.println("Je peux placer la colony");
                     board.setLookingForVertex(false);
                     board.setPlacingCity(false);
                     if (getCurrentPlayer().buildColony(vertex)) {
@@ -781,5 +786,44 @@ public class Game implements StateMethods, Serializable {
 
         System.out.println(numbersRoadsMax);
         return edgeFirstMax;
+    }
+
+    public Player getPlayerWhoHasLongestRoad() {
+        Player playerWon = null;
+        int numberRoadsMax = 0;
+        ArrayList<TileEdge> edges = new ArrayList<>();
+        for (TileEdge edge: board.getEdgeMap().values()) {
+            edges.add(edge);
+        }
+        for (Player player : players) {
+            int numberRoads = 0;
+            for (TileEdge edge : edges) {
+                int numberRoadsNew = getNumberRoads(edges, edge, player.getId());
+                if (numberRoadsNew > numberRoads) {
+                    numberRoads = numberRoadsNew;
+                }
+            }
+            if (numberRoadsMax > numberRoads) {
+                playerWon = player;
+            }
+        }
+        return playerWon;
+    }
+
+    public Player getPlayerWhoHasMoreKnights() {
+        Player playerWon = null;
+        int numberKnightsMax = 0;
+        for (Player player : players) {
+            int numberKnights = 0;
+            for (DevelopmentCard card : player.getCardsDev()) {
+                if (card instanceof KnightCard) {
+                    numberKnights++;
+                }
+            }
+            if (numberKnights > numberKnightsMax) {
+                playerWon = player;
+            }
+        }
+        return playerWon;
     }
 }

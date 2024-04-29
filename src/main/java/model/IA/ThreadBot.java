@@ -9,6 +9,7 @@ import model.tiles.TileVertex;
 public class ThreadBot extends Thread {
     private Game game;
     private Bot bot;
+    private boolean otherAction = false;
 
     public ThreadBot(Game game, Bot bot) {
         this.game = game;
@@ -21,7 +22,7 @@ public class ThreadBot extends Thread {
                 Thread.sleep(3000);
             }
             if (game.isStart() || game.isBackwards()) {
-                TileVertex vertex = Bot.getBetterVertex(game);
+                TileVertex vertex = bot.getBetterVertex(game);
                 try {
                     game.buildColony(vertex.getId());
                 } catch (ConstructBuildingException e) {
@@ -43,38 +44,74 @@ public class ThreadBot extends Thread {
                 }
                 game.endTurn();
             } else {
-                /* FIXME : Ceci crée un nouveau thread dans roll ce qui peut causer des problèmes
-                    si endTurn s'execute avant la fin du thread */
+
                 App.getActionPlayerPanel().getRollingDice().roll();
                 if (!App.getBotSoloMode()) {
                     Thread.sleep(5000);
                 } else {
-                    Thread.sleep(300);
+                    Thread.sleep(200);
                 }
-                if (game.canBuildColony()) {
-                    TileVertex vertex = Bot.getBetterVertex(game);
-                    try {
-                        game.buildColony(vertex.getId());
-                    } catch (ConstructBuildingException e) {
-                        System.out.println("erreur lors du placement de la colony");
-                    }
-                }
-                if (game.canBuildRoad()) {
-                    bot.buildBestRoad(game);
+                if (game.canBuildCity()) {
+                    bot.buildCity(game);
                     if (!App.getBotSoloMode()) {
                         Thread.sleep(2000);
+                    }
+                }
+                if (bot.needToWaitForColonies(game)) {
+                    System.out.println("J'ai besoin de ressource pour une colonie!");
+                    bot.askForTradeColonies(game);
+                    if (game.canBuildColony()) {
+                        TileVertex vertex = bot.getBetterVertex(game);
+                        if (vertex != null) {
+                            try {
+                                game.buildColony(vertex.getId());
+                            } catch (ConstructBuildingException e) {
+                                System.out.println("erreur lors du placement de la colony");
+                            }
+                        } else {
+                            otherAction = true;
+                        }
+                    }
+                }
+                if (!bot.needToWaitForColonies(game) || otherAction) {
+                    if (game.canBuildColony()) {
+                        TileVertex vertex = bot.getBetterVertex(game);
+                        if (vertex != null) {
+                            try {
+                                game.buildColony(vertex.getId());
+                            } catch (ConstructBuildingException e) {
+                                System.out.println("erreur lors du placement de la colony");
+                            }
+                        }
+                    }
+                    if (game.canBuildRoad()) {
+                        if ((bot.getNumberRoads(game)
+                            < 2 * bot.getNumberColonies(game) + 1)) {
+                            bot.buildBestRoad(game);
+                            if (!App.getBotSoloMode()) {
+                                Thread.sleep(2000);
+                            }
+                        }
+                    } else {
+                        bot.askForTradeRoads(game);
+                        if (game.canBuildRoad()) {
+                            if ((bot.getNumberRoads(game)
+                                < 2 * bot.getNumberColonies(game) + 1)) {
+                                bot.buildBestRoad(game);
+                                if (!App.getBotSoloMode()) {
+                                    Thread.sleep(2000);
+                                }
+                            }
+                        }
                     }
                 }
                 if (game.canDraw()) {
                     bot.drawCard(game.getStack());
                 }
-                if (bot.needResources() != null) {
-                    System.out.println("");
-                    // TODO : faire l'échange
-                }
                 if (!App.getBotSoloMode()) {
                     Thread.sleep(3000);
                 }
+                otherAction = false;
                 game.endTurn();
             }
         } catch (InterruptedException e) {

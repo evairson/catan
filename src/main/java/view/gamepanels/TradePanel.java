@@ -311,7 +311,7 @@ public class TradePanel extends JPanel {
         selectedPlayerLabel.setText("<html><div style='text-align: center;'>"
                 + "ÉCHANGE AVEC<br/> La Banque</div></html>");
     }
-    private void notifyOfferToPlayer(Player player) {
+    public void notifyOfferToPlayer(Player player) {
         // TODO : Implémentez la notification pour le joueur sélectionné.
         // Cela peut être un changement de couleur, un message pop-up, etc.
 
@@ -369,7 +369,9 @@ public class TradePanel extends JPanel {
         resourcesOffered.clear();
 
         // Mettre à jour l'affichage des ressources pour les joueurs impliqués
-        resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
+        if (resourcesPanel != null) {
+            resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
+        }
         App.getActionPlayerPanel().update();
 
         if (player instanceof PlayerClient) {
@@ -605,6 +607,26 @@ public class TradePanel extends JPanel {
         ButtonImage returnButton = new ButtonImage("src/main/resources/backGame.png",
                 "src/main/resources/backGame.png", 100, 620, 1.2, this::closeTradePanel, null);
         add(returnButton);
+    }
+
+    // -------- TradePanel pour les bots --------- //
+
+    public TradePanel(ListPlayers listPlayers, HashMap<TileType, Integer> resourcesOffered,
+        HashMap<TileType, Integer> resourcesRequested, Player selectedPlayer) {
+
+        this.resourcesOffered = resourcesOffered;
+        this.resourcesRequested = resourcesRequested;
+        this.listPlayers = listPlayers;
+        this.selectedPlayer = selectedPlayer;
+        boolean canFulfillRequest = canSelectedPlayerFulfillRequest();
+        if (canFulfillRequest) {
+            if (((Bot) selectedPlayer).acceptTrade(resourcesRequested, resourcesOffered)) {
+                performTrade(false);
+                App.addMessageColor("Votre trade a été accepté \n", java.awt.Color.GREEN);
+            }
+        } else {
+            App.addMessageColor("Votre trade a été refusé \n", java.awt.Color.ORANGE);
+        }
     }
 
     // -------- Fonctions d'affichage du panel et de son background -------- //

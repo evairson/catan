@@ -259,8 +259,19 @@ public class Player implements Serializable {
     public ArrayList<DevelopmentCard> getCardsDev() {
         return cardsDev;
     }
-    public boolean hasWon() {
-        return points >= 10;
+    public boolean hasWon(Game game) {
+        int pointReal = points;
+        if (game.getPlayerWhoHasLongestRoad() != null) {
+            if (game.getPlayerWhoHasLongestRoad().getId() == id) {
+                pointReal += 2;
+            }
+        }
+        if (game.getPlayerWhoHasMoreKnights() != null) {
+            if (game.getPlayerWhoHasMoreKnights().getId() == id) {
+                pointReal += 2;
+            }
+        }
+        return pointReal >= 10;
     }
     public boolean hasBiggestArmy() {
         return hasBiggestArmy;
