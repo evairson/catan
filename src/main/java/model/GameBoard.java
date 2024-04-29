@@ -64,6 +64,8 @@ public class GameBoard implements Serializable {
 
     private boolean thiefModeEnd;
 
+    private TileVertex lastPlacedColonyVertex;
+
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
 
@@ -428,6 +430,7 @@ public class GameBoard implements Serializable {
         }
         return true;
     }
+
     public boolean isRoadNextToCity(TileEdge edge, Player player) {
         TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
         for (TileVertex v : neighbours) {
@@ -441,6 +444,19 @@ public class GameBoard implements Serializable {
         }
         return false;
     }
+
+    public boolean isRoadNextToVertex(TileEdge edge, TileVertex vertex) {
+        TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
+        for (TileVertex v : neighbours) {
+            if (v != null) {
+                if (v == vertex) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     public boolean isRoadNextToRoad(TileEdge edge, Player player) {
         TileEdge[] neighbours = getNeighbourTileEdgesToEdge(edge);
@@ -478,6 +494,7 @@ public class GameBoard implements Serializable {
             return false;
         }
         if (game.getCurrentPlayer().getFreeColony()) {
+            lastPlacedColonyVertex = vertex;
             return true;
         }
         if (!isVertexNextToRoad(vertex, player)) {
@@ -488,6 +505,13 @@ public class GameBoard implements Serializable {
 
     public boolean canPlaceRoad(TileEdge edge, Player player) {
         if (edge.getBuilding() != null) {
+            return false;
+        }
+        if (lastPlacedColonyVertex != null && game.getCurrentPlayer().getFreeRoad() > 0) {
+            if (isRoadNextToVertex(edge, lastPlacedColonyVertex)) {
+                lastPlacedColonyVertex = null;
+                return true;
+            }
             return false;
         }
         if (isRoadNextToCity(edge, player)) {
