@@ -150,7 +150,7 @@ public class Game implements StateMethods, Serializable {
             return false;
         }
         if (!p.hasThrowDices() && !start && !backwards) {
-            System.out.println("hasthrowdice");
+            System.out.println("Le joueur n'a pas encore lancé les dés");
             return false;
         }
         if (board.getThiefMode()) {
@@ -162,7 +162,7 @@ public class Game implements StateMethods, Serializable {
 
     public void endTurn() {
         if (!canPass()) {
-            System.out.println("mince");
+            System.out.println("Impossible de passer le tour");
             return;
         }
 
@@ -239,7 +239,11 @@ public class Game implements StateMethods, Serializable {
     }
 
     public Player getPlayerClient() {
-        return playerClient;
+        if (playerClient != null) {
+            return playerClient;
+        } else {
+            return players.get(0);
+        }
     }
 
     // Player action : -----------------
@@ -645,7 +649,11 @@ public class Game implements StateMethods, Serializable {
     }
 
     public boolean isMyTurn() {
-        return playerClient.isMyTurn(this);
+        if (playerClient != null) {
+            return playerClient.isMyTurn(this);
+        } else {
+            return false;
+        }
     }
 
     public void updatePlayerColor() {

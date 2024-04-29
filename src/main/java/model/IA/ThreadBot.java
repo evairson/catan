@@ -17,7 +17,9 @@ public class ThreadBot extends Thread {
 
     public void run() {
         try {
-            Thread.sleep(3000);
+            if (!App.getBotSoloMode()) {
+                Thread.sleep(3000);
+            }
             if (game.isStart() || game.isBackwards()) {
                 TileVertex vertex = Bot.getBetterVertex(game);
                 try {
@@ -25,7 +27,9 @@ public class ThreadBot extends Thread {
                 } catch (ConstructBuildingException e) {
                     System.out.println("erreur lors du placement de la colony");
                 }
-                Thread.sleep(3000);
+                if (!App.getBotSoloMode()) {
+                    Thread.sleep(3000);
+                }
                 TileEdge edge = Bot.getRoadNext(game, vertex);
                 try {
                     if (edge != null) {
@@ -34,13 +38,19 @@ public class ThreadBot extends Thread {
                 } catch (ConstructBuildingException e) {
                     ConstructBuildingException.messageError();
                 }
-                Thread.sleep(3000);
+                if (!App.getBotSoloMode()) {
+                    Thread.sleep(3000);
+                }
                 game.endTurn();
             } else {
                 /* FIXME : Ceci crée un nouveau thread dans roll ce qui peut causer des problèmes
                     si endTurn s'execute avant la fin du thread */
                 App.getActionPlayerPanel().getRollingDice().roll();
-                Thread.sleep(5000);
+                if (!App.getBotSoloMode()) {
+                    Thread.sleep(5000);
+                } else {
+                    Thread.sleep(300);
+                }
                 if (game.canBuildColony()) {
                     TileVertex vertex = Bot.getBetterVertex(game);
                     try {
@@ -51,7 +61,9 @@ public class ThreadBot extends Thread {
                 }
                 if (game.canBuildRoad()) {
                     bot.buildBestRoad(game);
-                    Thread.sleep(2000);
+                    if (!App.getBotSoloMode()) {
+                        Thread.sleep(2000);
+                    }
                 }
                 if (game.canDraw()) {
                     bot.drawCard(game.getStack());
@@ -60,7 +72,9 @@ public class ThreadBot extends Thread {
                     System.out.println("");
                     // TODO : faire l'échange
                 }
-                Thread.sleep(3000);
+                if (!App.getBotSoloMode()) {
+                    Thread.sleep(3000);
+                }
                 game.endTurn();
             }
         } catch (InterruptedException e) {

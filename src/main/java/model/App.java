@@ -26,6 +26,7 @@ public class App {
     private Player player;
     private static boolean playing;
     private static BackgroundPanel background;
+    private static Boolean botSoloMode = false;
 
     public GameBoard getBoard() {
         return board;
@@ -44,6 +45,14 @@ public class App {
         board.setApp(this);
     }
 
+    public static boolean getBotSoloMode() {
+        return botSoloMode;
+    }
+
+    public static void setBotSoloMode() {
+        botSoloMode = true;
+    }
+
     public App(Player playerClient) {
         player = playerClient;
         if (playerClient instanceof PlayerClient) {
@@ -52,6 +61,12 @@ public class App {
         } else {
             mainMenu = new MainMenu(this, player);
         }
+        App.gameWindow = new GameWindow(mainMenu);
+        mainMenu.requestFocus();
+    }
+
+    public App() {
+        mainMenu = new MainMenu(this, player);
         App.gameWindow = new GameWindow(mainMenu);
         mainMenu.requestFocus();
     }

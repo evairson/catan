@@ -95,24 +95,30 @@ public class RollingDice extends JPanel {
             long endTime = System.currentTimeMillis();
             int refresh = 60;
             try {
-                while ((endTime - startTime) / 1000F < 3) {
-                    //roll dice
+                if (!App.getBotSoloMode()) {
+                    while ((endTime - startTime) / 1000F < 3) {
+                        //roll dice
 
+                        player.throwDices();
+
+                        //update dice images
+                        ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
+                        ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
+
+                        repaint();
+                        revalidate();
+
+                        //Sleep thread
+                        Thread.sleep(refresh);
+                        refresh += 10;
+
+                        endTime = System.currentTimeMillis();
+
+                    }
+                } else {
                     player.throwDices();
-
-                    //update dice images
-                    ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
-                    ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
-
                     repaint();
                     revalidate();
-
-                    //Sleep thread
-                    Thread.sleep(refresh);
-                    refresh += 10;
-
-                    endTime = System.currentTimeMillis();
-
                 }
                 if (player.getDice() == 7) {
                     game.setThiefMode(true);

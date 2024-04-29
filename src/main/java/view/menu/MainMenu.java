@@ -68,7 +68,11 @@ public class MainMenu extends JPanel {
             app.tryStartGame();
         } else {
             HashSet<Player> players = new HashSet<>();
-            players.add(player);
+            if (player != null) {
+                players.add(player);
+            } else {
+                players.add(new Bot(Color.BLUE, "Player1", 1));
+            }
             players.add(new Bot(Color.GREEN, "Player2", 2));
             players.add(new Bot(Color.RED, "Player3", 3));
             players.add(new Bot(Color.YELLOW, "Player4", 4));

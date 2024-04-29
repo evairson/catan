@@ -20,7 +20,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("Quel est votre nom ?");
         String name = sc.nextLine();
-        System.out.println("1 : créer serveur 2 : se connecter à un existant 3 : Jouer en local");
+        System.out.println("1 : créer serveur 2 : se connecter à un existant 3 : Jouer en local 4 : Bots");
         int nextLine = Integer.parseInt(sc.nextLine());
         if (nextLine == 1) {
             new Thread(() -> {
@@ -54,12 +54,19 @@ public class Main {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
+        } else if (nextLine == 2) {
             server = false;
             SwingUtilities.invokeLater(() -> {
                 System.out.println("launching game");
                 Player player = new Player(Color.BLUE, name, 0);
                 App game = new App(player);
+            });
+        } else {
+            server = false;
+            App.setBotSoloMode();
+            SwingUtilities.invokeLater(() -> {
+                System.out.println("launching game");
+                App game = new App();
             });
         }
     }
