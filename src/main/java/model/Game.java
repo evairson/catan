@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 
 import exceptionclass.ConstructBuildingException;
+import view.gamepanels.TradePanel;
 
 public class Game implements StateMethods, Serializable {
     private GameBoard board;
@@ -42,6 +43,7 @@ public class Game implements StateMethods, Serializable {
     private int yearOfPlentyWaiting = 0;
     private Player first;
     private int turnsBeforeHarbourActivated = 0;
+    private int tradeEventTurn = 0;
 
     public Game(HashSet<Player> playersSet) {
         for (Player player : playersSet) {
@@ -278,6 +280,7 @@ public class Game implements StateMethods, Serializable {
                 case 8: eventChangeDiceValues(); break;
                 case 9: knightLoots(); break;
                 case 10: eventChangeOrder(); break;
+                case 12: tradeAlea(); break;
                 case 13: capitalismPoorGetsPoorer(); break;
                 case 14: worstWinVP(); break;
                 case 15: wildfire(); break;
@@ -638,6 +641,14 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    public void checkIfTradeEventActive() {
+        if (tradeEventTurn > 0) {
+            tradeEventTurn--;
+        } else {
+            TradePanel.setTradeAlea(false);
+        }
+    }
+
     // EVENTS DE JEU POUR LE D20
 
     //event 1
@@ -739,6 +750,14 @@ public class Game implements StateMethods, Serializable {
         changeOrder = !changeOrder;
         eventOrderJustChanged = true;
     }
+
+    //event 12
+    public void tradeAlea() {
+        TradePanel.setTradeAlea(true);
+        tradeEventTurn = 2 * players.size();
+    }
+
+
     //event 13
     public void capitalismPoorGetsPoorer() {
         ListPlayers pChecks = (ListPlayers) players.clone();
@@ -754,7 +773,7 @@ public class Game implements StateMethods, Serializable {
 
     /**
      * Event 14
-     * Fais en sorte que le joueur de la partie avec le moins de points gagne 1PV.
+     * Fait en sorte que le joueur de la partie avec le moins de points gagne 1PV.
      */
     public void worstWinVP() {
         Player min = getCurrentPlayer();

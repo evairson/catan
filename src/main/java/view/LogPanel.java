@@ -38,7 +38,6 @@ public class LogPanel extends JPanel {
 
     public void addEventLog(int eventNo) {
         String pName = actionPlayerPanel.getApp().getGame().getCurrentPlayer().getName();
-        System.out.println("caca");
         switch (eventNo) {
             case 1: addMessageColor("Terrible! Tous les moutons viennent d'être tués "
                     + "par une mystérieuse maladie...\n", Color.RED); break;
@@ -64,9 +63,9 @@ public class LogPanel extends JPanel {
                     + "L'ordre de jeu est inversé !\n", Color.BLACK); break;
             case 11: addMessageColor("Un terrible brouillard tombe sur la carte et fait "
                     + "disparaitre le contenu des tuiles pendant 2 tours.\n", Color.RED); break;
-            case 12: addMessageColor("Un accord est tombé entre les puissances de la carte : un trade ne "
-                    + "peut être effectué que s'il est "
-                    + "accepté par chacun des joueurs.\n", Color.BLACK); break;
+            case 12: addMessageColor("Un arnaqueur est dans la place du marché : un trade "
+                    + " peut vous faire gagner le double"
+                    + "ou vous faire tout perdre.\n", Color.BLACK); break;
             case 13: addMessageColor("Le capitalisme a encore frappé! Les joueurs en dessous du "
                     + "seuil du voleur doivent abandonner la moitié de leurs cartes !\n", Color.RED); break;
             case 14: addMessageColor("C'est le jour de chance du joueur avec le moins de "
