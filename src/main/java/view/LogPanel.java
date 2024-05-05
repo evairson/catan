@@ -54,7 +54,7 @@ public class LogPanel extends JPanel {
                     + "ports : ils sont tous désactivés pendant 2 tours !\n", Color.BLUE); break;
             case 8: addMessageColor("La chance est chamboulée! "
                     + "Toutes les cases prennent les valeurs inverses de celles actuelles ! (Les numéros "
-                    + "les moins probables deviennent"
+                    + "les moins probables deviennent "
                     + "les plus probables et inversement)\n", Color.BLACK); break;
             case 9: addMessageColor("Les chevaliers ont bien travaillé! "
                     + "Chaque joueur pioche son nombre de "
