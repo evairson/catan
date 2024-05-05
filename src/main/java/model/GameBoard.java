@@ -40,8 +40,8 @@ public class GameBoard implements Serializable {
     private final Map<TileVertex, Harbor> harborMap = new HashMap<>();
     private Layout layout;
     private int gridSize = 2;
-    private LinkedHashMap<Point, TileVertex> verticesMap;
-    private LinkedHashMap<Point, TileEdge> edgesMap;
+    private ArrayList<TileVertex> vertices;
+    private HashMap<Point, TileEdge> edgesMap;
     // sert à stocker les coordonnées du sommet le plus proche de la souris
     // peut aller dans une autre classe...
     private Point closestVertex = new Point(0, 0);
@@ -63,6 +63,8 @@ public class GameBoard implements Serializable {
     private App app;
 
     private boolean thiefModeEnd;
+
+    private TileVertex lastPlacedColonyVertex;
 
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
@@ -165,7 +167,7 @@ public class GameBoard implements Serializable {
     }
 
     private TileVertex findTileVertexByPoint(Point point) {
-        for (TileVertex vertex : verticesMap.values()) {
+        for (TileVertex vertex : vertices) {
             if (vertex.getCoordinates().equals(point)) {
                 return vertex;
             }
@@ -293,8 +295,8 @@ public class GameBoard implements Serializable {
         return edgesMap;
     }
 
-    public HashMap<Point, TileVertex> getVerticesMap() {
-        return verticesMap;
+    public ArrayList<TileVertex> getVertices() {
+        return vertices;
     }
 
     public void addTile(Tile t) {
@@ -319,32 +321,24 @@ public class GameBoard implements Serializable {
         int index = 0;
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getStart().equals(vertex.getCoordinates())) {
-                for (TileVertex v : verticesMap.values()) {
-                    if (v.getCoordinates().equals(edge.getEnd())) {
-                        TileVertex neighbour = v;
-                        if (neighbour != null) {
-                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
-                                continue;
-                            }
-                            neighbours[index] = neighbour;
-                            index++;
+                for (TileVertex neighbour : vertices) {
+                    if (neighbour.getCoordinates().equals(edge.getEnd())) {
+                        if (checkIfNeighbourInArray(neighbours, neighbour)) {
+                            continue;
                         }
+                        neighbours[index] = neighbour;
+                        index++;
                     }
                 }
             }
             if (edge.getEnd().equals(vertex.getCoordinates())) {
-                for (TileVertex v : verticesMap.values()) {
-                    if (v.getCoordinates().equals(edge.getStart())) {
-                        TileVertex neighbour = v;
-                        if (neighbour != null) {
-                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
-                                continue;
-
-                            }
-                            neighbours[index] = neighbour;
-
-                            index++;
+                for (TileVertex neighbour : vertices) {
+                    if (neighbour.getCoordinates().equals(edge.getStart())) {
+                        if (checkIfNeighbourInArray(neighbours, neighbour)) {
+                            continue;
                         }
+                        neighbours[index] = neighbour;
+                        index++;
                     }
                 }
             }
@@ -377,7 +371,7 @@ public class GameBoard implements Serializable {
     public TileVertex[] getNeighbourTileVerticesToEdge(TileEdge edge) {
         TileVertex[] neighbours = new TileVertex[2];
         int i = 0;
-        for (TileVertex vertex : verticesMap.values()) {
+        for (TileVertex vertex : vertices) {
             if (vertex.getCoordinates().equals(edge.getStart())) {
                 neighbours[i] = vertex;
                 i++;
@@ -436,6 +430,7 @@ public class GameBoard implements Serializable {
         }
         return true;
     }
+
     public boolean isRoadNextToCity(TileEdge edge, Player player) {
         TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
         for (TileVertex v : neighbours) {
@@ -449,6 +444,19 @@ public class GameBoard implements Serializable {
         }
         return false;
     }
+
+    public boolean isRoadNextToVertex(TileEdge edge, TileVertex vertex) {
+        TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
+        for (TileVertex v : neighbours) {
+            if (v != null) {
+                if (v == vertex) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     public boolean isRoadNextToRoad(TileEdge edge, Player player) {
         TileEdge[] neighbours = getNeighbourTileEdgesToEdge(edge);
@@ -479,14 +487,15 @@ public class GameBoard implements Serializable {
     }
 
     public boolean canPlaceColony(TileVertex vertex, Player player) {
-        if (game.getCurrentPlayer().getFreeColony()) {
-            return true;
+        if (!isVertexTwoRoadsAwayFromCities(vertex)) {
+            return false;
         }
         if (vertex.getBuilding() != null) {
             return false;
         }
-        if (!isVertexTwoRoadsAwayFromCities(vertex)) {
-            return false;
+        if (game.getCurrentPlayer().getFreeColony()) {
+            lastPlacedColonyVertex = vertex;
+            return true;
         }
         if (!isVertexNextToRoad(vertex, player)) {
             return false;
@@ -496,6 +505,13 @@ public class GameBoard implements Serializable {
 
     public boolean canPlaceRoad(TileEdge edge, Player player) {
         if (edge.getBuilding() != null) {
+            return false;
+        }
+        if (lastPlacedColonyVertex != null && game.getCurrentPlayer().getFreeRoad() > 0) {
+            if (isRoadNextToVertex(edge, lastPlacedColonyVertex)) {
+                lastPlacedColonyVertex = null;
+                return true;
+            }
             return false;
         }
         if (isRoadNextToCity(edge, player)) {
@@ -521,7 +537,7 @@ public class GameBoard implements Serializable {
         return board.get(new CubeCoordinates(q, r, s));
     }
 
-    public HashMap<CubeCoordinates, Tile> getBoard() {
+    public LinkedHashMap<CubeCoordinates, Tile> getBoard() {
         return board;
     }
 
@@ -637,7 +653,7 @@ public class GameBoard implements Serializable {
     }
 
     private void initialiseVertices() {
-        verticesMap = new LinkedHashMap<>();
+        vertices = new ArrayList<>();
 
         // Parcourir toutes les tuiles du plateau
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
@@ -650,11 +666,13 @@ public class GameBoard implements Serializable {
             for (Point vertex : hexagonVertices) {
                 // Vérifier si ce sommet est déjà dans la map
                 boolean found = false;
-                for (Point storedVertex : verticesMap.keySet()) {
+
+                for (TileVertex v : vertices) {
+                    Point storedVertex = v.getCoordinates();
                     if (arePointsEqual(vertex, storedVertex)) {
+                        v.addTile(tile);
                         // Si oui, ajouter la tuile actuelle à la liste des tuiles
                         // associées à ce sommet
-                        verticesMap.get(storedVertex).addTile(tile);
                         found = true;
                         break;
                     }
@@ -670,8 +688,9 @@ public class GameBoard implements Serializable {
                     // Mettre ce sommet dans la map avec comme valeur l'objet TileVertex
                     vertex = new Point((Math.round(vertex.getX())), (Math.round(vertex.getY())));
                     tileVertex.setCoordinates(vertex);
+                    tileVertex.setCoordinates(vertex);
                     // Arrondir les coordonnées pour éviter les erreurs d'arrondi
-                    verticesMap.put(vertex, tileVertex);
+                    vertices.add(tileVertex);
                 }
             }
         }
@@ -746,10 +765,11 @@ public class GameBoard implements Serializable {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK); // Color for the vertices
         // Draw the vertices
-        for (Point vertex : verticesMap.keySet()) {
-            Building building = verticesMap.get(vertex).getBuilding();
+
+        for (TileVertex v : vertices) {
+            Building building = v.getBuilding();
             if (building != null) {
-                drawBuildingImage(g2d, building, vertex);
+                drawBuildingImage(g2d, building, v.getCoordinates());
             }
         }
     }
@@ -923,16 +943,17 @@ public class GameBoard implements Serializable {
     }
 
     public TileVertex findClosestVertex() {
-        for (Point vertex : this.verticesMap.keySet()) {
+        closestTileVertex = new TileVertex();
+        for (TileVertex v : vertices) {
+            Point vertex = v.getCoordinates();
             double distance = vertex.distance(mousePosition);
-            if (distance < minDistanceToVertex) {
+            if  (closestTileVertex == null || distance < minDistanceToVertex) {
+                closestTileVertex = v;
                 minDistanceToVertex = distance;
-                closestVertex = vertex;
-                closestTileVertex = this.verticesMap.get(vertex);
-                App.getGamePanel().repaint();
+                closestVertex = v.getCoordinates();
             }
         }
-        return this.verticesMap.get(this.closestVertex);
+        return closestTileVertex;
     }
 
     public void initialiseBoardAfterTransfer() {
