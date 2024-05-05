@@ -175,7 +175,6 @@ public class RollingDice extends JPanel {
         } else {
             System.out.println("Problème de downCast");
         }
-
     }
 
     public void networkThrowDices(int[] dices) {
