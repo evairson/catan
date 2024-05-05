@@ -42,6 +42,7 @@ public class Game implements StateMethods, Serializable {
     private int yearOfPlentyWaiting = 0;
     private Player first;
     private int turnsBeforeHarbourActivated = 0;
+    private int turnsBeforeTilesRespawn = 0;
 
     public Game(HashSet<Player> playersSet) {
         for (Player player : playersSet) {
@@ -81,6 +82,7 @@ public class Game implements StateMethods, Serializable {
             endTurn();
         }
         checkForHarboursDisabled();
+        checkForHexesRespawn();
     }
 
     public boolean getBlankTurn() {
@@ -278,6 +280,7 @@ public class Game implements StateMethods, Serializable {
                 case 8: eventChangeDiceValues(); break;
                 case 9: knightLoots(); break;
                 case 10: eventChangeOrder(); break;
+                case 11: tilesDispawn();
                 case 13: capitalismPoorGetsPoorer(); break;
                 case 14: worstWinVP(); break;
                 case 15: wildfire(); break;
@@ -739,6 +742,21 @@ public class Game implements StateMethods, Serializable {
         changeOrder = !changeOrder;
         eventOrderJustChanged = true;
     }
+    //event 11
+    public void tilesDispawn() {
+        app.getBoard().setShadowHexes(true);
+        turnsBeforeTilesRespawn = 8;
+    }
+
+    //Fonction auxiliaire pour gérer la désactivation des ports
+    public void checkForHexesRespawn() {
+        if (turnsBeforeHarbourActivated == 0) {
+            app.getBoard().setShadowHexes(false);
+        } else if (turnsBeforeHarbourActivated > 0) {
+            turnsBeforeHarbourActivated--;
+        }
+    }
+
     //event 13
     public void capitalismPoorGetsPoorer() {
         ListPlayers pChecks = (ListPlayers) players.clone();
@@ -754,7 +772,7 @@ public class Game implements StateMethods, Serializable {
 
     /**
      * Event 14
-     * Fais en sorte que le joueur de la partie avec le moins de points gagne 1PV.
+     * Fait en sorte que le joueur de la partie avec le moins de points gagne 1PV.
      */
     public void worstWinVP() {
         Player min = getCurrentPlayer();

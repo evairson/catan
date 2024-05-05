@@ -63,6 +63,7 @@ public class GameBoard implements Serializable {
     private App app;
 
     private boolean thiefModeEnd;
+    private boolean shadowHexes = false;
 
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
@@ -175,6 +176,9 @@ public class GameBoard implements Serializable {
 
     public void setThiefModeEnd(boolean b) {
         thiefModeEnd = b;
+    }
+    public void setShadowHexes(boolean b) {
+        shadowHexes = b;
     }
 
     private void loadImages() {
@@ -844,7 +848,10 @@ public class GameBoard implements Serializable {
     }
 
     public void drawBoard(Graphics g) {
-        drawImagesInHexes(g);
+
+        if (!shadowHexes) {
+            drawImagesInHexes(g);
+        }
         drawEdges(g);
         drawVertices(g);
         drawPorts(g);
