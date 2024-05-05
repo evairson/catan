@@ -444,7 +444,7 @@ public class Player implements Serializable {
         }
         return true;
     }
-    public void removeOneRandom() {
+    public TileType removeOneRandom() {
         if (getResourcesSum() > 0) {
             Random rd = new Random();
             TileType[] resTList = {TileType.CLAY, TileType.ORE, TileType.WHEAT, TileType.WOOD, TileType.WOOL};
@@ -452,10 +452,11 @@ public class Player implements Serializable {
                 int k = rd.nextInt(0, 5);
                 if (resources.get(resTList[k]) > 0) {
                     addResource(resTList[k], -1);
-                    break;
+                    return resTList[k];
                 }
             }
         }
+        return null;
     }
     public void addOneRandom() {
         Random rd = new Random();

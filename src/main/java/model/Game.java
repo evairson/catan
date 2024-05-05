@@ -43,6 +43,7 @@ public class Game implements StateMethods, Serializable {
     private Player first;
     private int turnsBeforeHarbourActivated = 0;
     private int turnsBeforeTilesRespawn = 0;
+    private ArrayList<TileType> betPot = new ArrayList<>();
 
     public Game(HashSet<Player> playersSet) {
         for (Player player : playersSet) {
@@ -272,25 +273,29 @@ public class Game implements StateMethods, Serializable {
         if (getCurrentPlayer().hasThrowDices()) {
             switch (getCurrentPlayer().getD20()) {
                 case 1: killAllSheep(); break;
-                case 2 : showDevCards();
+                case 2 : showDevCards(); break;
                 case 3: christmas(); break;
                 case 4: lootThiefResources(); break;
                 case 5: swapHands(); break;
-                case 7: disableHarbour();
+                case 6 : everyoneThrowsOne(); break;
+                case 7: disableHarbour(); break;
                 case 8: eventChangeDiceValues(); break;
                 case 9: knightLoots(); break;
                 case 10: eventChangeOrder(); break;
-                case 11: tilesDispawn();
+                case 11: tilesDispawn(); break;
                 case 13: capitalismPoorGetsPoorer(); break;
                 case 14: worstWinVP(); break;
                 case 15: wildfire(); break;
                 case 16: taxCollector(); break;
                 case 17: happyBirthday(); break;
+                case 18 : everyoneBetsOne(); break;
+                case 19 : lootBets(); break;
                 case 20: diceSecondRound(); break;
                 default:
-                    System.out.println("caca" + getCurrentPlayer().getD20());
+                    System.out.println("Event non pris en charge");
             }
             App.getActionPlayerPanel().getLogChat().addEventLog(getCurrentPlayer().getD20());
+            App.getActionPlayer().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
         }
     }
 
@@ -709,6 +714,13 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    //event 6
+    public void everyoneThrowsOne() {
+        for (Player p : players) {
+            p.removeOneRandom();
+        }
+    }
+
     //event 7
     public void disableHarbour() {
         App.getActionPlayer().setHarboursDisabled(true);
@@ -815,6 +827,20 @@ public class Game implements StateMethods, Serializable {
         pChecks.remove(getCurrentPlayer());
         for (Player p : pChecks) {
             p.giftOneRandomResource(getCurrentPlayer());
+        }
+    }
+
+    //event 18
+    public void everyoneBetsOne() {
+        for (Player p : players) {
+            betPot.add(p.removeOneRandom());
+        }
+    }
+
+    //event 19
+    public void lootBets() {
+        for (TileType t : betPot) {
+            getCurrentPlayer().addResource(t, 1);
         }
     }
 
