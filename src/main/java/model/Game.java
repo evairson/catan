@@ -724,7 +724,7 @@ public class Game implements StateMethods, Serializable {
     //event 7
     public void disableHarbour() {
         App.getActionPlayer().setHarboursDisabled(true);
-        turnsBeforeHarbourActivated = 8;
+        turnsBeforeHarbourActivated = 2 * players.size();
     }
     //Fonction auxiliaire pour gérer la désactivation des ports
     public void checkForHarboursDisabled() {
@@ -757,7 +757,7 @@ public class Game implements StateMethods, Serializable {
     //event 11
     public void tilesDispawn() {
         app.getBoard().setShadowHexes(true);
-        turnsBeforeTilesRespawn = 8;
+        turnsBeforeTilesRespawn = 2 * players.size();
     }
 
     //Fonction auxiliaire pour gérer la désactivation des ports
