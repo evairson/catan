@@ -499,7 +499,7 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void buildColony(int idVertex) throws ConstructBuildingException {
-        for (TileVertex vertex : board.getVerticesMap().values()) {
+        for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
                 if (board.canPlaceColony(vertex, getCurrentPlayer())) {
                     board.setLookingForVertex(false);
@@ -600,7 +600,7 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void buildCity(int idVertex) throws ConstructBuildingException {
-        for (TileVertex vertex : board.getVerticesMap().values()) {
+        for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
                 System.out.println("yeah !");
                 board.setLookingForVertex(false);

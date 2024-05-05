@@ -17,6 +17,7 @@ public class App {
     private static GamePanel gamePanel;
     private static ActionPlayerPanel actionPlayer;
     private static EndPanel endPanel;
+    private OptionPanel optionPanel;
     private static GameWindow gameWindow;
     private Thread gameThread;
     private GameBoard board;
@@ -46,8 +47,10 @@ public class App {
 
     public App(Player p) {
         mainMenu = new MainMenu(this, p);
+        optionPanel = new OptionPanel();
         App.gameWindow = new GameWindow(mainMenu);
         mainMenu.requestFocus();
+        gameWindow.getContentPane().add(optionPanel, "optionPanel");
     }
 
     public App(PlayerClient playerClient) {
@@ -132,8 +135,8 @@ public class App {
         if (playing) {
             game.update();
             checkWin();
-            Music.update();
         }
+        Music.update();
     }
     public static void checkWin() {
         if (game.getCurrentPlayer().hasWon()) {
@@ -149,6 +152,7 @@ public class App {
 
     public void render(Graphics g) {
         game.draw(g);
+        gamePanel.repaint();
     }
 
     public PlayerClient getPlayer() {
