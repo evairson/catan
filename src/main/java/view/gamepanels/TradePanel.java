@@ -27,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.Random;
 
 public class TradePanel extends JPanel {
     private ActionPlayerPanel actionPlayerPanel;
@@ -52,8 +53,17 @@ public class TradePanel extends JPanel {
     private HashMap<TileType, Integer> resourcesRequested;
     private HashMap<TileType, Integer> resourcesOffered;
     private ResourcesPanel resourcesPanel;
+
+    private boolean isOfferedDouble;
+    private boolean isRequestedDouble;
     private boolean isBank = false;
     private boolean trader = false;
+
+    private static boolean tradeAlea;
+
+    public static void setTradeAlea(boolean b) {
+        tradeAlea = b;
+    }
 
     public TradePanel(ListPlayers listPlayers, ResourcesPanel resourcesPanel,
                       ActionPlayerPanel actionPlayerPanel) {
@@ -62,6 +72,8 @@ public class TradePanel extends JPanel {
         resourcesRequested = new HashMap<>();
         this.listPlayers = listPlayers;
         this.resourcesPanel = resourcesPanel;
+        isOfferedDouble = false;
+        isRequestedDouble = false;
         initializeSelectedPlayerLabel();
         initializeResourceNameMap();
         setLayout(null);
@@ -84,6 +96,8 @@ public class TradePanel extends JPanel {
         this.resourcesPanel = resourcesPanel;
         this.resourcesOffered = TradeObject.toTileType(tradeObject.getResourcesRequested());
         this.resourcesRequested = TradeObject.toTileType(tradeObject.getResourcesOffered());
+        this.isOfferedDouble = tradeObject.isOfferedDouble();
+        this.isRequestedDouble = tradeObject.isrequestedDouble();
         initializeSelectedPlayerLabel();
         initializeResourceNameMap();
         setLayout(null);
@@ -300,6 +314,10 @@ public class TradePanel extends JPanel {
     }
     private void bankTradeAction() {
         isBank = true;
+        if (tradeAlea) {
+            Random random = new Random();
+            isRequestedDouble = random.nextBoolean();
+        }
         updateAcceptButtonState();
         selectedPlayerLabelIcon = null;
         initializeSelectedPlayerImage();
@@ -314,10 +332,15 @@ public class TradePanel extends JPanel {
             try {
                 PlayerClient playerClient = (PlayerClient) listPlayers.getCurrentPlayer();
                 int id = playerClient.getId();
+                if (tradeAlea) {
+                    Random random = new Random();
+                    isOfferedDouble = random.nextBoolean();
+                    isRequestedDouble = random.nextBoolean();
+                }
                 HashMap<String, Integer> offered = TradeObject.toString(resourcesOffered);
                 HashMap<String, Integer> requested = TradeObject.toString(resourcesRequested);
                 TradeObject tradeObject = new TradeObject(id, player.getId(), offered,
-                    requested);
+                    requested, isOfferedDouble, isRequestedDouble);
                 NetworkObject object = new NetworkObject(TypeObject.Game, "trade", id, tradeObject);
                 playerClient.getOut().writeUnshared(object);
                 playerClient.getOut().flush();
@@ -342,8 +365,9 @@ public class TradePanel extends JPanel {
 
         if (isBank) {
             // Mise à jour des ressources pour une transaction avec la banque
-            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true);
-            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested, false);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true, false);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested,
+                    false, isRequestedDouble);
         } else {
             // Transaction avec un autre joueur
             HashMap<TileType, Integer> selectedPlayerResources;
@@ -353,11 +377,12 @@ public class TradePanel extends JPanel {
                 selectedPlayerResources = selectedPlayer.getResources();
             }
             // Mise à jour des ressources pour une transaction entre deux joueurs
-            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true);
-            updateResources(selectedPlayerResources, resourcesOffered, false);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true, false);
+            updateResources(selectedPlayerResources, resourcesOffered, false, isOfferedDouble);
 
-            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested, false);
-            updateResources(selectedPlayerResources, resourcesRequested, true);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested,
+                    false, isRequestedDouble);
+            updateResources(selectedPlayerResources, resourcesRequested, true, false);
         }
         // Effacer les ressources demandées et offertes après la transaction
         resourcesRequested.clear();
@@ -389,12 +414,21 @@ public class TradePanel extends JPanel {
      * @param changes Les changements à appliquer (offertes/demandées).
      * @param subtract Si vrai, les ressources seront soustraites (offertes),
      *                 sinon elles seront ajoutées (demandées).
+     * @param isDouble Est ce que les ressources doivent être doublés.
      */
     private void updateResources(HashMap<TileType, Integer> playerResources,
-                                 HashMap<TileType, Integer> changes, boolean subtract) {
+                                 HashMap<TileType, Integer> changes, boolean subtract, boolean isDouble) {
+
         changes.forEach((resource, amount) -> {
             int currentAmount = playerResources.getOrDefault(resource, 0);
-            playerResources.put(resource, subtract ? currentAmount - amount : currentAmount + amount);
+            if (tradeAlea && !subtract) {
+//                System.out.println("Mode trade event");
+                if (isDouble) {
+                    playerResources.put(resource, currentAmount + 2 * amount);
+                }
+            } else {
+                playerResources.put(resource, subtract ? currentAmount - amount : currentAmount + amount);
+            }
         });
     }
 

@@ -286,6 +286,7 @@ public class ActionPlayerPanel extends JPanel {
 
     private void changeTurn() {
         game.serverEndTurn();
+        game.checkIfTradeEventActive();
         update();
     }
 

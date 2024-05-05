@@ -38,7 +38,6 @@ public class LogPanel extends JPanel {
 
     public void addEventLog(int eventNo) {
         String pName = actionPlayerPanel.getApp().getGame().getCurrentPlayer().getName();
-        System.out.println("caca");
         switch (eventNo) {
             case 1: addMessageColor("Terrible! Tous les moutons viennent d'être tués "
                     + "par une mystérieuse maladie...\n", Color.RED); break;
@@ -64,8 +63,9 @@ public class LogPanel extends JPanel {
                     + "L'ordre de jeu est inversé !\n", Color.BLACK); break;
             case 11: addMessageColor("Un terrible brouillard tombe sur la carte et fait "
                     + "disparaitre le contenu des tuiles pendant 2 tours.\n", Color.RED); break;
-            case 12: addMessageColor("Les trades sont chamboulés! il est possible de gagner le double "
-                    + "lors d'un trade, ou pire, rien du tout...\n", Color.BLACK); break;
+            case 12: addMessageColor("Un arnaqueur est dans la place du marché : un trade "
+                    + " peut vous faire gagner le double"
+                    + "ou vous faire tout perdre.\n", Color.BLACK); break;
             case 13: addMessageColor("Le capitalisme a encore frappé! Les joueurs en dessous du "
                     + "seuil du voleur doivent abandonner la moitié de leurs cartes !\n", Color.RED); break;
             case 14: addMessageColor("C'est le jour de chance du joueur avec le moins de "
@@ -75,7 +75,7 @@ public class LogPanel extends JPanel {
             case 16: addMessageColor("Les contrôleurs fiscaux arrivent!"
                     + "Perdez une ressource aléatoire par bâtiment sur la carte !\n", Color.RED); break;
             case 17: addMessageColor("C'est l'anniversaire de " + pName
-                    + "Chaque autre joueur lui donne une ressource aléatoire !\n", Color.GREEN); break;
+                    + "! Chaque autre joueur lui donne une ressource aléatoire !\n", Color.GREEN); break;
             case 18: addMessageColor("Chaque joueur mise une ressource dans un pot commun! "
                     + "Lorsque le dé à 20 faces tombera sur 19, le contenu du pot "
                     + "sera récupéré par le joueur ayant lancé le dé !\n", Color.BLACK); break;
