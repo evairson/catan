@@ -31,11 +31,6 @@ public class GamePanel extends JPanel {
         setPreferredSize(size);
     }
 
-    private void updateGame() {
-        game.update();
-    }
-
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
