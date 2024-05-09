@@ -11,13 +11,17 @@ public class TradeObject implements Serializable {
     private HashMap<String, Integer> resourcesRequested;
     private HashMap<String, Integer> resourcesOffered;
 
+    private boolean isOfferedDouble;
+    private boolean isrequestedDouble;
 
     public TradeObject(int idTrader, int idPlayer, HashMap<String, Integer> resourcesRequested,
-        HashMap<String, Integer> resourcesOffered) {
+        HashMap<String, Integer> resourcesOffered, boolean isOfferedDouble, boolean isrequestedDouble) {
         this.idTrader = idTrader;
         this.idPlayer = idPlayer;
         this.resourcesOffered = resourcesOffered;
         this.resourcesRequested = resourcesRequested;
+        this.isrequestedDouble = isrequestedDouble;
+        this.isOfferedDouble = isOfferedDouble;
     }
 
     public int getIdPlayer() {
@@ -37,6 +41,14 @@ public class TradeObject implements Serializable {
     }
     public void setResourcesOffered(HashMap<String, Integer> resourcesOffered) {
         this.resourcesOffered = resourcesOffered;
+    }
+
+    public boolean isOfferedDouble() {
+        return isOfferedDouble;
+    }
+
+    public boolean isrequestedDouble() {
+        return isrequestedDouble;
     }
 
     public static HashMap<String, Integer> toString(HashMap<TileType, Integer> typeMap) {

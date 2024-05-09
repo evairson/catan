@@ -63,6 +63,7 @@ public class GameBoard implements Serializable {
     private App app;
 
     private boolean thiefModeEnd;
+    private boolean shadowHexes = false;
 
     private TileVertex lastPlacedColonyVertex;
 
@@ -177,6 +178,9 @@ public class GameBoard implements Serializable {
 
     public void setThiefModeEnd(boolean b) {
         thiefModeEnd = b;
+    }
+    public void setShadowHexes(boolean b) {
+        shadowHexes = b;
     }
 
     private void loadImages() {
@@ -566,6 +570,42 @@ public class GameBoard implements Serializable {
         }
     }
 
+    public void modifyDiceValue(int q, int r, int diceValue) {
+        int s = -q - r;
+        board.get(new CubeCoordinates(q, r, s)).setDiceValue(diceValue);
+    }
+
+    public void exchangeTwelveTwoToEightSix() {
+        for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
+            Tile tile = entry.getValue();
+            if (tile.getDiceValue() == 12) {
+                tile.setDiceValue(8);
+            } else if (tile.getDiceValue() == 2) {
+                tile.setDiceValue(6);
+            } else if (tile.getDiceValue() == 8) {
+                tile.setDiceValue(12);
+            } else if (tile.getDiceValue() == 6) {
+                tile.setDiceValue(2);
+            } else if (tile.getDiceValue() == 3) {
+                tile.setDiceValue(9);
+            } else if (tile.getDiceValue() == 9) {
+                tile.setDiceValue(3);
+            } else if (tile.getDiceValue() == 4) {
+                tile.setDiceValue(10);
+            } else if (tile.getDiceValue() == 10) {
+                tile.setDiceValue(4);
+            } else if (tile.getDiceValue() == 5) {
+                tile.setDiceValue(11);
+            } else if (tile.getDiceValue() == 11) {
+                tile.setDiceValue(5);
+            }
+        }
+    }
+    public void eventChangeDiceValues() {
+        exchangeTwelveTwoToEightSix();
+    }
+
+
     public void initialiseBoardImage() {
         Graphics2D g2dBoard = boardImage.createGraphics();
         double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
@@ -634,7 +674,6 @@ public class GameBoard implements Serializable {
             diceValueImages.put(value, image);
         }
     }
-
     private TileType getTileType(int resourceType) {
         switch (resourceType) {
             case 1:
@@ -829,7 +868,10 @@ public class GameBoard implements Serializable {
     }
 
     public void drawBoard(Graphics g) {
-        drawImagesInHexes(g);
+
+        if (!shadowHexes) {
+            drawImagesInHexes(g);
+        }
         drawEdges(g);
         drawVertices(g);
         drawPorts(g);
@@ -905,6 +947,10 @@ public class GameBoard implements Serializable {
     }
 
     public void changeThiefNetwork() {
+        if (highlightedTile.getId() == thief.getTile().getId()) {
+            return;
+        }
+
         if (Main.hasServer()) {
             try {
                 PlayerClient player = game.getPlayerClient();

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import model.buildings.Building;
 import model.buildings.Colony;
 import model.cards.CardStack;
+import model.cards.DevelopmentCard;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
@@ -17,13 +18,13 @@ import network.NetworkObject.TypeObject;
 import others.Constants;
 import others.ListPlayers;
 import start.Main;
-//import view.utilities.Resolution;
 import view.TileType;
 
 import java.io.Serializable;
 import java.util.HashSet;
 
 import exceptionclass.ConstructBuildingException;
+import view.gamepanels.TradePanel;
 
 public class Game implements StateMethods, Serializable {
     private GameBoard board;
@@ -34,11 +35,17 @@ public class Game implements StateMethods, Serializable {
     private PlayerClient playerClient;
     private boolean start = true;
     private boolean backwards = false;
+    private boolean changeOrder = false;
+    private boolean eventOrderJustChanged = false;
     private App app;
     private boolean blankTurn = false;
     private boolean monoWaiting = false;
     private int yearOfPlentyWaiting = 0;
     private Player first;
+    private int turnsBeforeHarbourActivated = 0;
+    private int turnsBeforeTilesRespawn = 0;
+    private ArrayList<TileType> betPot = new ArrayList<>();
+    private int tradeEventTurn = 0;
 
     public Game(HashSet<Player> playersSet) {
         for (Player player : playersSet) {
@@ -77,6 +84,8 @@ public class Game implements StateMethods, Serializable {
         } else {
             endTurn();
         }
+        checkForHarboursDisabled();
+        checkForHexesRespawn();
     }
 
     public boolean getBlankTurn() {
@@ -158,7 +167,9 @@ public class Game implements StateMethods, Serializable {
             backwards = true;
         } else if (backwards && getCurrentPlayer().first(this)) {
             backwards = false;
-        } else if (backwards) {
+        } else if (eventOrderJustChanged) {
+            eventOrderJustChanged = false;
+        } else if (backwards || changeOrder) {
             players.prev();
         } else {
             players.next();
@@ -199,7 +210,9 @@ public class Game implements StateMethods, Serializable {
 
     public void setThiefMode(boolean b) {
         board.setThiefMode(b);
-        divideRessourcesByTwo();
+        if (b) {
+            divideRessourcesByTwo();
+        }
     }
 
     public void draw(Graphics g) {
@@ -219,11 +232,13 @@ public class Game implements StateMethods, Serializable {
     @Override
     public void update() {
         lootResources();
+        if (app.hasD20()) {
+            activateD20Event();
+        }
     }
 
     public void divideRessourcesByTwo() {
         ListPlayers pChecks = (ListPlayers) players.clone();
-        pChecks.remove(getCurrentPlayer());
         for (Player p : pChecks) {
             if (p.getResourcesSum() > p.getResourceCap()) {
                 for (int i = 0; i < p.getResourcesSum() / 2; i++) {
@@ -256,6 +271,37 @@ public class Game implements StateMethods, Serializable {
             resourcesGiven = true;
         }
         App.getActionPlayerPanel().update();
+    }
+
+    public void activateD20Event() {
+        if (getCurrentPlayer().hasThrowDices()) {
+            switch (getCurrentPlayer().getD20()) {
+                case 1: killAllSheep(); break;
+                case 2 : showDevCards(); break;
+                case 3: christmas(); break;
+                case 4: lootThiefResources(); break;
+                case 5: swapHands(); break;
+                case 6: everyoneThrowsOne(); break;
+                case 7: disableHarbour(); break;
+                case 8: eventChangeDiceValues(); break;
+                case 9: knightLoots(); break;
+                case 10: eventChangeOrder(); break;
+                case 11: tilesDispawn(); break;
+                case 12: tradeAlea(); break;
+                case 13: capitalismPoorGetsPoorer(); break;
+                case 14: worstWinVP(); break;
+                case 15: wildfire(); break;
+                case 16: taxCollector(); break;
+                case 17: happyBirthday(); break;
+                case 18: everyoneBetsOne(); break;
+                case 19: lootBets(); break;
+                case 20: diceSecondRound(); break;
+                default:
+                    System.out.println("Event non pris en charge");
+            }
+            App.getActionPlayerPanel().getLogChat().addEventLog(getCurrentPlayer().getD20());
+            App.getActionPlayer().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
+        }
     }
 
     @Override
@@ -314,10 +360,7 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn) {
             return false;
         }
-        if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
-            return true;
-        }
-        return false;
+        return (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven;
     }
 
     public void buildCityButtonAction() {
@@ -350,11 +393,8 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn) {
             return false;
         }
-        if (((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
-            || getCurrentPlayer().getFreeColony()) {
-            return true;
-        }
-        return false;
+        return ((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
+                || getCurrentPlayer().getFreeColony();
     }
 
 
@@ -387,11 +427,8 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn) {
             return false;
         }
-        if (((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
-            || getCurrentPlayer().getFreeRoad() > 0) {
-            return true;
-        }
-        return false;
+        return ((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
+                || getCurrentPlayer().getFreeRoad() > 0;
     }
 
     public void buildRoadButtonAction() {
@@ -420,39 +457,34 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void networkBuildColony() {
-        TileVertex cVertex = null;
+        TileVertex cVertex;
         if (board.isLookingForVertex()) {
             cVertex = board.getClosestTileVertex();
             if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                 getCurrentPlayer().buildColony(cVertex);
-            }
-        }
-        if (Main.hasServer()) {
-            if (cVertex != null) {
-                try {
-                    int id = playerClient.getId();
-                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildColony",
-                            id, cVertex.getId());
-                    playerClient.getOut().writeUnshared(object);
-                    playerClient.getOut().flush();
-                } catch (Exception e) {
-                    e.getStackTrace();
-                }
-            }
-        } else {
-            if (cVertex != null) {
-                try {
-                    buildColony(cVertex.getId());
-                    App.getActionPlayerPanel().update();
-                    App.getGamePanel().repaint();
-                } catch (ConstructBuildingException e) {
-                    ConstructBuildingException.messageError();
+                if (Main.hasServer()) {
+                    try {
+                        int id = playerClient.getId();
+                        NetworkObject object = new NetworkObject(TypeObject.Board, "buildColony",
+                                id, cVertex.getId());
+                        playerClient.getOut().writeUnshared(object);
+                        playerClient.getOut().flush();
+                    } catch (Exception e) {
+                        e.getStackTrace();
+                    }
+                } else {
+                    try {
+                        buildColony(cVertex.getId());
+                        App.getActionPlayerPanel().update();
+                        App.getGamePanel().repaint();
+                    } catch (ConstructBuildingException e) {
+                        ConstructBuildingException.messageError();
+                    }
                 }
             }
         }
-
-
     }
+
 
     public void buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
@@ -551,8 +583,6 @@ public class Game implements StateMethods, Serializable {
                 }
             }
         }
-        // rajouter un if ça a marché (transformer Player.buildCity en boolean)
-
     }
 
     public void buildCity(int idVertex) throws ConstructBuildingException {
@@ -603,5 +633,222 @@ public class Game implements StateMethods, Serializable {
         for (Player player : players) {
             player.setColor(Player.getColorId(player.getId()));
         }
+    }
+
+    public void checkIfTradeEventActive() {
+        if (tradeEventTurn > 0) {
+            tradeEventTurn--;
+        } else {
+            TradePanel.setTradeAlea(false);
+        }
+    }
+
+    // EVENTS DE JEU POUR LE D20
+
+    //event 1
+    public void killAllSheep() {
+        for (Player player : players) {
+            player.removeAllResource(TileType.WOOL);
+        }
+    }
+
+    //event 2
+    public void showDevCards() {
+        for (Player player : players) {
+            for (DevelopmentCard card : player.getCardsDev()) {
+                String message = player.getName() + " a " + card.getName();
+                (App.getActionPlayer().getLogChat()).addMessageColor(message, player.getColorAwt());
+            }
+        }
+    }
+
+    //event 3
+    public void christmas() {
+        for (Player p : players) {
+            p.addOneRandom();
+            p.addOneRandom();
+        }
+    }
+
+    //event 4
+    public void lootThiefResources() {
+        for (Player player : players) {
+            for (Building b : player.getBuildings()) {
+                if (b instanceof Colony colony) {
+                    for (Tile tile : colony.getVertex().getTiles()) {
+                        if (tile == thief.getTile()) {
+                            if (colony.getIsCity()) {
+                                Integer number = player.getResources().get(tile.getResourceType());
+                                player.getResources().replace(tile.getResourceType(), number + 2);
+                            } else {
+                                Integer number = player.getResources().get(tile.getResourceType());
+                                player.getResources().replace(tile.getResourceType(), number + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        App.getActionPlayerPanel().update();
+    }
+
+    //event 5
+    public void swapHands() {
+        ListPlayers pChecks = (ListPlayers) players.clone();
+        Player bestPlayer = pChecks.getFirst();
+        Player worstPlayer = pChecks.getFirst();
+        for (Player p : pChecks) {
+            if (p.getPoints() > bestPlayer.getPoints()) {
+                bestPlayer = p;
+            }
+            if (p.getPoints() < worstPlayer.getPoints()) {
+                worstPlayer = p;
+            }
+        }
+        if (bestPlayer != worstPlayer && bestPlayer.getPoints() != worstPlayer.getPoints()) {
+            bestPlayer.swapResources(worstPlayer);
+        }
+    }
+
+    //event 6
+    public void everyoneThrowsOne() {
+        for (Player p : players) {
+            p.removeOneRandom();
+        }
+    }
+
+    //event 7
+    public void disableHarbour() {
+        App.getActionPlayer().setHarboursDisabled(true);
+        turnsBeforeHarbourActivated = 2 * players.size();
+    }
+    //Fonction auxiliaire pour gérer la désactivation des ports
+    public void checkForHarboursDisabled() {
+        if (turnsBeforeHarbourActivated == 0) {
+            App.getActionPlayer().setHarboursDisabled(false);
+        } else if (turnsBeforeHarbourActivated > 0) {
+            turnsBeforeHarbourActivated--;
+        }
+    }
+
+    //event 8
+    public void eventChangeDiceValues() {
+        board.eventChangeDiceValues();
+    }
+
+    //event 9
+    public void knightLoots() {
+        for (Player p : players) {
+            for (int i = 0; i < p.getKnights(); ++i) {
+                p.addOneRandom();
+            }
+        }
+    }
+
+    //event 10
+    public void eventChangeOrder() {
+        changeOrder = !changeOrder;
+        eventOrderJustChanged = true;
+    }
+    //event 11
+    public void tilesDispawn() {
+        app.getBoard().setShadowHexes(true);
+        turnsBeforeTilesRespawn = 2 * players.size();
+    }
+
+    //Fonction auxiliaire pour gérer la désactivation des ports
+    public void checkForHexesRespawn() {
+        if (turnsBeforeHarbourActivated == 0) {
+            app.getBoard().setShadowHexes(false);
+        } else if (turnsBeforeHarbourActivated > 0) {
+            turnsBeforeHarbourActivated--;
+        }
+    }
+
+    //event 12
+    public void tradeAlea() {
+        TradePanel.setTradeAlea(true);
+        tradeEventTurn = 2 * players.size();
+    }
+
+    //event 13
+    public void capitalismPoorGetsPoorer() {
+        ListPlayers pChecks = (ListPlayers) players.clone();
+        for (Player p : pChecks) {
+            System.out.println("Ressources sum : " + p.getResourcesSum());
+            if (p.getResourcesSum() <= p.getResourceCap()) {
+                for (int i = 0; i < p.getResourcesSum() / 2; i++) {
+                    p.removeOneRandom();
+                }
+            }
+        }
+    }
+
+    /**
+     * Event 14
+     * Fait en sorte que le joueur de la partie avec le moins de points gagne 1PV.
+     */
+    public void worstWinVP() {
+        Player min = getCurrentPlayer();
+        for (Player p : players) {
+            if (p.getPoints() == min.getPoints() && p != min) {
+                return;
+            } else if (p.getPoints() < min.getPoints()) {
+                min = p;
+            }
+        }
+        min.addOnePoint();
+        App.checkWin();
+    }
+
+    //event 15
+    public void wildfire() {
+        for (Player p : players) {
+            p.removeAllResource(TileType.WOOD);
+            p.removeAllResource(TileType.WHEAT);
+        }
+    }
+
+    //event 16
+    public void taxCollector() {
+        ListPlayers pChecks = (ListPlayers) players.clone();
+        for (Player p : pChecks) {
+            int nbColAndCity = p.getNbCitiesAndColonies();
+            if (nbColAndCity >= p.getResourcesSum()) {
+                p.clearResources();
+            } else {
+                for (int i = 0; i < nbColAndCity; i++) {
+                    p.removeOneRandom();
+                }
+            }
+        }
+    }
+    //event 17
+    public void happyBirthday() {
+        ListPlayers pChecks = (ListPlayers) players.clone();
+        pChecks.remove(getCurrentPlayer());
+        for (Player p : pChecks) {
+            p.giftOneRandomResource(getCurrentPlayer());
+        }
+    }
+
+    //event 18
+    public void everyoneBetsOne() {
+        for (Player p : players) {
+            betPot.add(p.removeOneRandom());
+        }
+    }
+
+    //event 19
+    public void lootBets() {
+        for (TileType t : betPot) {
+            getCurrentPlayer().addResource(t, 1);
+        }
+    }
+
+    //event 20
+    public void diceSecondRound() {
+        resourcesGiven = false;
+        lootResources();
     }
 }
