@@ -6,7 +6,6 @@ import javax.swing.event.ChangeListener;
 
 import java.awt.CardLayout;
 import java.awt.Container;
-import java.awt.Rectangle;
 
 import javax.swing.*;
 

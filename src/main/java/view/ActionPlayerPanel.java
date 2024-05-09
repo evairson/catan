@@ -43,7 +43,7 @@ public class ActionPlayerPanel extends JPanel {
     private Animation animate = new Animation();
     private JPanel cardsPanel;
     private JPanel cardPanel;
-    private JPanel chat;
+    private ChatPanel chat;
     private PlayersPanel playersPanel;
     private RollingDice dice;
 
@@ -81,7 +81,7 @@ public class ActionPlayerPanel extends JPanel {
         return resourcesPanel;
     }
 
-    public JPanel getChat() {
+    public ChatPanel getChat() {
         return chat;
     }
 

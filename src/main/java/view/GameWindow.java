@@ -6,11 +6,7 @@ import view.menu.MainMenu;
 
 import javax.swing.*;
 
-import controler.MouseInputs;
-
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 public class GameWindow extends JFrame {
 
@@ -64,6 +60,8 @@ public class GameWindow extends JFrame {
         this.actionPlayer = actionPlayer;
         this.gamePanel = gamePanel;
         this.background = background;
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
+            new EventDispatcher(actionPlayer));
 
     }
     public void close(int i) {
