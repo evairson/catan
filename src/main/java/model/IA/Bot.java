@@ -428,6 +428,7 @@ public class Bot extends Player {
                 if (vertex.getBuilding().getOwner().getId() == getId()) {
                     try {
                         game.buildCity(vertex.getId());
+                        return;
                     } catch (ConstructBuildingException e) {
                         ConstructBuildingException.messageError();
                     }

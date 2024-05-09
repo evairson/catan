@@ -54,7 +54,7 @@ public class Main {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (nextLine == 2) {
+        } else if (nextLine == 3) {
             server = false;
             SwingUtilities.invokeLater(() -> {
                 System.out.println("launching game");
