@@ -94,7 +94,6 @@ public class MainMenu extends JPanel {
         Container parent = getParent();
         CardLayout parentLayout = (CardLayout) parent.getLayout();
         parentLayout.show(parent, "optionPanel");
-        System.out.println("caca");
         app.update();
     }
 
