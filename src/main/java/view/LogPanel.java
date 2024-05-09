@@ -70,8 +70,9 @@ public class LogPanel extends JPanel {
                     + "seuil du voleur doivent abandonner la moitié de leurs cartes !\n", Color.RED); break;
             case 14: addMessageColor("C'est le jour de chance du joueur avec le moins de "
                     + "points de victoire! Il gagne un point de victoire !\n", Color.GREEN); break;
-            case 15: addMessageColor("Un terrible incendie fait rage dans les fôrets de la carte! "
-                    + "Tout les joueurs perdent leur bois !\n", Color.RED); break;
+            case 15: addMessageColor("Un terrible incendie fait rage dans les fôrets et "
+                    + "les champs de la carte! "
+                    + "Tous les joueurs perdent leur bois et leur blé !\n", Color.RED); break;
             case 16: addMessageColor("Les contrôleurs fiscaux arrivent!"
                     + "Perdez une ressource aléatoire par bâtiment sur la carte !\n", Color.RED); break;
             case 17: addMessageColor("C'est l'anniversaire de " + pName
