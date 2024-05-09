@@ -50,7 +50,7 @@ public class LogPanel extends JPanel {
                     + "génère exceptionnellement ses ressources!\n", Color.GREEN); break;
             case 5: addMessageColor("Le Joueur avec le plus de points de victoire "
                     + "échange sa main avec celui en ayant le moins.\n", Color.BLACK); break;
-            case 6: addMessageColor("Affreux! Tous les joueurs perdent une ressource !\n", Color.RED);
+            case 6: addMessageColor("Affreux! Tous les joueurs perdent une ressource !\n", Color.RED); break;
             case 7: addMessageColor("De terribles inondations se sont produites dans les "
                     + "ports : ils sont tous désactivés pendant 2 tours !\n", Color.BLUE); break;
             case 8: addMessageColor("La chance est chamboulée! "

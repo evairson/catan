@@ -279,7 +279,7 @@ public class Game implements StateMethods, Serializable {
                 case 3: christmas(); break;
                 case 4: lootThiefResources(); break;
                 case 5: swapHands(); break;
-                case 6 : everyoneThrowsOne(); break;
+                case 6: everyoneThrowsOne(); break;
                 case 7: disableHarbour(); break;
                 case 8: eventChangeDiceValues(); break;
                 case 9: knightLoots(); break;
@@ -291,8 +291,8 @@ public class Game implements StateMethods, Serializable {
                 case 15: wildfire(); break;
                 case 16: taxCollector(); break;
                 case 17: happyBirthday(); break;
-                case 18 : everyoneBetsOne(); break;
-                case 19 : lootBets(); break;
+                case 18: everyoneBetsOne(); break;
+                case 19: lootBets(); break;
                 case 20: diceSecondRound(); break;
                 default:
                     System.out.println("Event non pris en charge");
