@@ -358,10 +358,7 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn) {
             return false;
         }
-        if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
-            return true;
-        }
-        return false;
+        return (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven;
     }
 
     public void buildCityButtonAction() {
@@ -394,11 +391,8 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn) {
             return false;
         }
-        if (((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
-            || getCurrentPlayer().getFreeColony()) {
-            return true;
-        }
-        return false;
+        return ((Constants.BuildingCosts.canBuildColony(getCurrentPlayer().getResources())) && resourcesGiven)
+                || getCurrentPlayer().getFreeColony();
     }
 
 
@@ -431,11 +425,8 @@ public class Game implements StateMethods, Serializable {
         if (blankTurn) {
             return false;
         }
-        if (((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
-            || getCurrentPlayer().getFreeRoad() > 0) {
-            return true;
-        }
-        return false;
+        return ((Constants.BuildingCosts.canBuildRoad(getCurrentPlayer().getResources())) && resourcesGiven)
+                || getCurrentPlayer().getFreeRoad() > 0;
     }
 
     public void buildRoadButtonAction() {
@@ -464,39 +455,34 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void networkBuildColony() {
-        TileVertex cVertex = null;
+        TileVertex cVertex;
         if (board.isLookingForVertex()) {
             cVertex = board.getClosestTileVertex();
             if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
                 getCurrentPlayer().buildColony(cVertex);
-            }
-        }
-        if (Main.hasServer()) {
-            if (cVertex != null) {
-                try {
-                    int id = playerClient.getId();
-                    NetworkObject object = new NetworkObject(TypeObject.Board, "buildColony",
-                            id, cVertex.getId());
-                    playerClient.getOut().writeUnshared(object);
-                    playerClient.getOut().flush();
-                } catch (Exception e) {
-                    e.getStackTrace();
-                }
-            }
-        } else {
-            if (cVertex != null) {
-                try {
-                    buildColony(cVertex.getId());
-                    App.getActionPlayerPanel().update();
-                    App.getGamePanel().repaint();
-                } catch (ConstructBuildingException e) {
-                    ConstructBuildingException.messageError();
+                if (Main.hasServer()) {
+                    try {
+                        int id = playerClient.getId();
+                        NetworkObject object = new NetworkObject(TypeObject.Board, "buildColony",
+                                id, cVertex.getId());
+                        playerClient.getOut().writeUnshared(object);
+                        playerClient.getOut().flush();
+                    } catch (Exception e) {
+                        e.getStackTrace();
+                    }
+                } else {
+                    try {
+                        buildColony(cVertex.getId());
+                        App.getActionPlayerPanel().update();
+                        App.getGamePanel().repaint();
+                    } catch (ConstructBuildingException e) {
+                        ConstructBuildingException.messageError();
+                    }
                 }
             }
         }
-
-
     }
+
 
     public void buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
@@ -595,8 +581,6 @@ public class Game implements StateMethods, Serializable {
                 }
             }
         }
-        // rajouter un if ça a marché (transformer Player.buildCity en boolean)
-
     }
 
     public void buildCity(int idVertex) throws ConstructBuildingException {
@@ -688,8 +672,7 @@ public class Game implements StateMethods, Serializable {
     public void lootThiefResources() {
         for (Player player : players) {
             for (Building b : player.getBuildings()) {
-                if (b instanceof Colony) {
-                    Colony colony = (Colony) b;
+                if (b instanceof Colony colony) {
                     for (Tile tile : colony.getVertex().getTiles()) {
                         if (tile == thief.getTile()) {
                             if (colony.getIsCity()) {
@@ -710,8 +693,8 @@ public class Game implements StateMethods, Serializable {
     //event 5
     public void swapHands() {
         ListPlayers pChecks = (ListPlayers) players.clone();
-        Player bestPlayer = pChecks.get(0);
-        Player worstPlayer = pChecks.get(0);
+        Player bestPlayer = pChecks.getFirst();
+        Player worstPlayer = pChecks.getFirst();
         for (Player p : pChecks) {
             if (p.getPoints() > bestPlayer.getPoints()) {
                 bestPlayer = p;
