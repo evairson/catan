@@ -385,8 +385,6 @@ public class TradePanel extends JPanel {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            System.out.println("Problème de downCast");
         }
     }
 
