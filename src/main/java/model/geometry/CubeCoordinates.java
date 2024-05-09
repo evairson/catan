@@ -7,18 +7,18 @@ import others.Constants;
 /**
  * CubeCoordinates
  *This class represents the cube coordinates of a hexagon in a hexagonal grid.
-    *The cube coordinates are a 3D coordinate system where each hexagon is represented by 3 coordinates (q, r, s).
-    *The conventions are q for the x-axis, r for the y-axis, and s for the z-axis.
-    *The sum of the three coordinates must be 0.
-    *The cube coordinates are used to represent the position of a hexagon in a hexagonal grid.
-    *The cube coordinates are used to:
-    *   calculate the distance between two hexagons in a hexagonal grid.
-    *   calculate the direction of a hexagon in a hexagonal grid.
-    *   calculate the neighbor of a hexagon in a hexagonal grid.
-    *   calculate the length of a hexagon in a hexagonal grid.
-    *   calculate the addition, subtraction, and multiplication of two cube coordinates.
-    *   calculate the equality of two cube coordinates.
-    */
+ *The cube coordinates are a 3D coordinate system where each hexagon is represented by 3 coordinates (q, r, s).
+ *The conventions are q for the x-axis, r for the y-axis, and s for the z-axis.
+ *The sum of the three coordinates must be 0.
+ *The cube coordinates are used to represent the position of a hexagon in a hexagonal grid.
+ *The cube coordinates are used to:
+ *   calculate the distance between two hexagons in a hexagonal grid.
+ *   calculate the direction of a hexagon in a hexagonal grid.
+ *   calculate the neighbor of a hexagon in a hexagonal grid.
+ *   calculate the length of a hexagon in a hexagonal grid.
+ *   calculate the addition, subtraction, and multiplication of two cube coordinates.
+ *   calculate the equality of two cube coordinates.
+ */
 public class CubeCoordinates implements Serializable {
     private int q;
     private int r;
