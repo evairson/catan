@@ -947,6 +947,10 @@ public class GameBoard implements Serializable {
     }
 
     public void changeThiefNetwork() {
+        if (highlightedTile.getId() == thief.getTile().getId()) {
+            return;
+        }
+
         if (Main.hasServer()) {
             try {
                 PlayerClient player = game.getPlayerClient();

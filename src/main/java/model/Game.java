@@ -210,7 +210,9 @@ public class Game implements StateMethods, Serializable {
 
     public void setThiefMode(boolean b) {
         board.setThiefMode(b);
-        divideRessourcesByTwo();
+        if (b) {
+            divideRessourcesByTwo();
+        }
     }
 
     public void draw(Graphics g) {
