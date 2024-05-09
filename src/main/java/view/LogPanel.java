@@ -34,6 +34,7 @@ public class LogPanel extends JPanel {
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
+        chatArea.setCaretPosition(chatArea.getDocument().getLength());
     }
 
     public void addEventLog(int eventNo) {
