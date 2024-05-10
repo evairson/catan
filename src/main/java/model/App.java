@@ -48,16 +48,16 @@ public class App {
     public App(Player p) {
         mainMenu = new MainMenu(this, p);
         optionPanel = new OptionPanel();
-        App.gameWindow = new GameWindow(mainMenu);
+        App.gameWindow = new GameWindow(mainMenu, optionPanel);
         mainMenu.requestFocus();
-        gameWindow.getContentPane().add(optionPanel, "optionPanel");
     }
 
     public App(PlayerClient playerClient) {
         player = playerClient;
         player.setApp(this);
         mainMenu = new MainMenu(this, null);
-        App.gameWindow = new GameWindow(mainMenu);
+        optionPanel = new OptionPanel();
+        App.gameWindow = new GameWindow(mainMenu, optionPanel);
         mainMenu.requestFocus();
     }
 

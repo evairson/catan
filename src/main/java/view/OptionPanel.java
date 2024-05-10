@@ -15,11 +15,13 @@ import view.utilities.Resolution;
 
 public class OptionPanel extends JPanel {
     private final String basePath = "src/main/resources/";
+    private JCheckBox tutoCheckBox;
 
     public OptionPanel() {
         setLayout(null);
-        JSlider volumeSlider = new JSlider(-80, 6);
         setVisible(true);
+        JSlider volumeSlider = new JSlider(-80, 6);
+
         volumeSlider.addChangeListener(new ChangeListener() {
 
             @Override
@@ -35,6 +37,12 @@ public class OptionPanel extends JPanel {
         JButton quitBtn = new ButtonImage(basePath + "quitOption.png", basePath + "quitOption.png",
                 558, 450, 1, this::quitoption, null);
         add(quitBtn);
+
+        tutoCheckBox = new JCheckBox("Tutoriel");
+        int[] coords2 = Resolution.calculateResolution(550, 300);
+        tutoCheckBox.setBounds(coords2[0], coords2[1], 200, 100);
+        tutoCheckBox.setLocation(coords2[0], coords2[1]);
+        add(tutoCheckBox);
     }
 
     public void quitoption() {
@@ -42,5 +50,9 @@ public class OptionPanel extends JPanel {
         CardLayout parentLayout = (CardLayout) parent.getLayout();
         parentLayout.show(parent, "mainMenu");
         return;
+    }
+
+    public boolean isTutorialSelected() {
+        return tutoCheckBox.isSelected();
     }
 }

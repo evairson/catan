@@ -21,7 +21,7 @@ public class GameWindow extends JFrame {
     private BackgroundPanel background;
     private CardLayout layout;
 
-    public GameWindow(MainMenu mainMenu) {
+    public GameWindow(MainMenu mainMenu, OptionPanel optionPanel) {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
 
@@ -45,6 +45,7 @@ public class GameWindow extends JFrame {
         this.getContentPane().setLayout(layout);
 
         this.getContentPane().add(mainMenu, "mainMenu");
+        this.getContentPane().add(optionPanel, "optionPanel");
         //add(actionPlayer, BorderLayout.CENTER);
         //GameBoard board = new GameBoard(null);
         //add(board);
