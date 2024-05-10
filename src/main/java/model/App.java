@@ -25,6 +25,7 @@ public class App {
     private static MainMenu mainMenu;
     private PlayerClient player;
     private static boolean playing;
+    private boolean hasD20 = true;
     private static BackgroundPanel background;
 
     public GameBoard getBoard() {
@@ -112,7 +113,7 @@ public class App {
     }
 
     public void addMessageColor(String message, Color color) {
-        ((ChatPanel) actionPlayer.getChat()).addMessageColor(message, color);
+        (actionPlayer.getLogChat()).addMessageColor(message, color);
     }
 
     public void addPanels() {
@@ -156,5 +157,13 @@ public class App {
 
     public PlayerClient getPlayer() {
         return player;
+    }
+
+    public boolean hasD20() {
+        return hasD20;
+    }
+
+    public static ActionPlayerPanel getActionPlayer() {
+        return actionPlayer;
     }
 }

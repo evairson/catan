@@ -28,7 +28,6 @@ import start.Main;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
-import java.util.concurrent.*;
 
 public class ActionPlayerPanel extends JPanel {
     private ButtonImage endTurn;
@@ -44,8 +43,11 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel cardsPanel;
     private JPanel cardPanel;
     private JPanel chat;
+    private LogPanel logChat;
     private PlayersPanel playersPanel;
     private RollingDice dice;
+    private boolean harboursDisabled = false;
+    private boolean firstUpdate = true;
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -64,8 +66,9 @@ public class ActionPlayerPanel extends JPanel {
         initializeShopPanel(game);
         initializeDeckPanel();
         initializeChat();
+        initializeLogChat();
         //createPlayerPanel();
-        createButton();
+        createEndTurnButton();
         setVisible(true);
     }
 
@@ -89,9 +92,9 @@ public class ActionPlayerPanel extends JPanel {
         int xCoord = Resolution.calculateResolution(1108, 440)[0];
         int yCoord = Resolution.calculateResolution(1108, 440)[1];
 
-        dice = new RollingDice(game);
+        dice = new RollingDice(game, app.hasD20());
         dice.setBounds(xCoord, yCoord, (int) (205 / Resolution.divider()),
-                (int) (150 / Resolution.divider()));
+                (int) (300 / Resolution.divider()));
         add(dice);
         dice.setOpaque(false);
     }
@@ -173,7 +176,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeChat() {
-        int xCoord = Resolution.calculateResolution(750, 200)[0];
+        int xCoord = Resolution.calculateResolution(650, 200)[0];
         int yCoord = Resolution.calculateResolution(750, 200)[1];
 
         chat = new ChatPanel(this);
@@ -181,6 +184,17 @@ public class ActionPlayerPanel extends JPanel {
         chat.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
                 (int) (400 / Resolution.divider()));
         add(chat);
+    }
+
+    private void initializeLogChat() {
+        int xCoord = Resolution.calculateResolution(850, 200)[0];
+        int yCoord = Resolution.calculateResolution(750, 200)[1];
+
+        logChat = new LogPanel(this);
+        logChat.setVisible(true);
+        logChat.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
+                (int) (400 / Resolution.divider()));
+        add(logChat);
     }
 
     private JFrame getMainFrame() {
@@ -199,9 +213,10 @@ public class ActionPlayerPanel extends JPanel {
         JLayeredPane layeredPane = mainFrame.getLayeredPane();
         ListPlayers listPlayers = game.getPlayers();
         if (tradeObject == null) {
-            tradePanel = new TradePanel(listPlayers, resourcesPanel);
+            tradePanel = new TradePanel(listPlayers, resourcesPanel, this);
         } else {
-            tradePanel = new TradePanel(tradeObject, listPlayers, resourcesPanel, game.getPlayerClient());
+            tradePanel = new TradePanel(tradeObject, listPlayers, resourcesPanel,
+                    game.getPlayerClient(), this);
         }
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);
@@ -211,7 +226,9 @@ public class ActionPlayerPanel extends JPanel {
 
     public void setComponentsEnabled(boolean enabled) {
         for (Component comp : this.getComponents()) {
-            comp.setEnabled(enabled);
+            if (!(comp.equals(endTurn) || comp.equals(tradeButtonPanel))) {
+                comp.setEnabled(enabled);
+            }
         }
     }
 
@@ -262,7 +279,7 @@ public class ActionPlayerPanel extends JPanel {
         tradeButtonPanel.setOpaque(false);
     }
 
-    private void createButton() {
+    private void createEndTurnButton() {
         String basePath = "src/main/resources/";
         endTurn = new ButtonImage(basePath + "endTurn.png", basePath + "endTurn.png",
                 960, 600, 1.5, this::changeTurn, null);
@@ -271,6 +288,7 @@ public class ActionPlayerPanel extends JPanel {
 
     private void changeTurn() {
         game.serverEndTurn();
+        game.checkIfTradeEventActive();
         update();
     }
 
@@ -319,10 +337,12 @@ public class ActionPlayerPanel extends JPanel {
 
     private void useKnight() {
         removeCardsPanel();
-        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        Player p = game.getCurrentPlayer();
+        ArrayList<DevelopmentCard> cards = p.getCardsDev();
         for (int i = 0; i < cards.size(); i++) {
             if (cards.get(i) instanceof KnightCard) {
                 cards.remove(i);
+                p.incrementKnights();
                 break;
             }
         }
@@ -440,13 +460,13 @@ public class ActionPlayerPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Function in charge of creating the little display of the player's name
+     * and color icon just above the "Fin de Tour" button.
+     * @throws IOException if perhaps the image getting fails
+     */
     private void createNamePlayer() throws IOException {
-        Player player;
-        if (Main.hasServer()) {
-            player = game.getPlayerClient();
-        } else {
-            player = game.getCurrentPlayer();
-        }
+        Player player = getPlayerFromGame();
         String src = "src/main/resources/pion/pion";
         String imagePath = src + player.getColorString() + ".png";
         Image origiImg = ImageIO.read(new File(imagePath));
@@ -478,16 +498,22 @@ public class ActionPlayerPanel extends JPanel {
         } else {
             resourcesPanel.updateResourceLabels(game.getPlayerClient());
         }
-
-        try {
-            String src = "src/main/resources/pion/pion";
-            String imagePath = src + game.getCurrentPlayer().getColorString() + ".png";
-            Image origiImg = ImageIO.read(new File(imagePath));
-            Image buttonImage = origiImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-            namePlayer.setIcon(new ImageIcon(buttonImage));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (firstUpdate) {
+            try {
+                Player player = getPlayerFromGame();
+                String src = "src/main/resources/pion/pion";
+                String imagePath = src + player.getColorString() + ".png";
+                Image origiImg = ImageIO.read(new File(imagePath));
+                Image buttonImage = origiImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+                namePlayer.setIcon(new ImageIcon(buttonImage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (Main.hasServer()) {
+                firstUpdate = false;
+            }
         }
+
         updateTurn();
 
         if (playersPanel != null) {
@@ -495,6 +521,20 @@ public class ActionPlayerPanel extends JPanel {
         }
         revalidate();
         repaint();
+    }
+
+    /**
+     * Gets the player according to the game mode (network or local).
+     * @return The Player object representing the player in front of the screen
+     */
+    public Player getPlayerFromGame() {
+        Player player;
+        if (Main.hasServer()) {
+            player = game.getPlayerClient();
+        } else {
+            player = game.getCurrentPlayer();
+        }
+        return player;
     }
 
     public void updateShopPanel() {
@@ -505,6 +545,8 @@ public class ActionPlayerPanel extends JPanel {
         if (Main.hasServer()) {
             if (game.isMyTurn()) {
                 updateShopPanel();
+                tradeButtonPanel.getButton().setEnabled(!game.isInBeginningPhase()
+                        && game.getCurrentPlayer().hasThrowDices());
                 if (game.canPass()) {
                     endTurn.setEnabled(true);
                 } else {
@@ -514,11 +556,24 @@ public class ActionPlayerPanel extends JPanel {
                 dice.setButtonIsOn(false);
                 shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);
+                tradeButtonPanel.getButton().setEnabled(false);
             }
         }
     }
 
     public App getApp() {
         return app;
+    }
+
+    public LogPanel getLogChat() {
+        return (LogPanel) logChat;
+    }
+
+    public boolean isHarboursDisabled() {
+        return harboursDisabled;
+    }
+
+    public void setHarboursDisabled(boolean harboursDisabled) {
+        this.harboursDisabled = harboursDisabled;
     }
 }

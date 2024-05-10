@@ -13,6 +13,7 @@ import model.tiles.TileVertex;
 import others.Constants;
 import others.ListPlayers;
 import start.Main;
+import view.ActionPlayerPanel;
 import view.GameWindow;
 import view.TileType;
 import view.utilities.ButtonImage;
@@ -26,8 +27,10 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.Random;
 
 public class TradePanel extends JPanel {
+    private ActionPlayerPanel actionPlayerPanel;
     private Image backgroundImage;
     private ButtonImage[] playerOneButtons = new ButtonImage[5];
     private ButtonImage[] playerTwoButtons = new ButtonImage[5];
@@ -50,14 +53,27 @@ public class TradePanel extends JPanel {
     private HashMap<TileType, Integer> resourcesRequested;
     private HashMap<TileType, Integer> resourcesOffered;
     private ResourcesPanel resourcesPanel;
+
+    private boolean isOfferedDouble;
+    private boolean isRequestedDouble;
     private boolean isBank = false;
     private boolean trader = false;
 
-    public TradePanel(ListPlayers listPlayers, ResourcesPanel resourcesPanel) {
+    private static boolean tradeAlea;
+
+    public static void setTradeAlea(boolean b) {
+        tradeAlea = b;
+    }
+
+    public TradePanel(ListPlayers listPlayers, ResourcesPanel resourcesPanel,
+                      ActionPlayerPanel actionPlayerPanel) {
+        this.actionPlayerPanel = actionPlayerPanel;
         resourcesOffered = new HashMap<>();
         resourcesRequested = new HashMap<>();
         this.listPlayers = listPlayers;
         this.resourcesPanel = resourcesPanel;
+        isOfferedDouble = false;
+        isRequestedDouble = false;
         initializeSelectedPlayerLabel();
         initializeResourceNameMap();
         setLayout(null);
@@ -72,13 +88,16 @@ public class TradePanel extends JPanel {
     }
 
     public TradePanel(TradeObject tradeObject, ListPlayers listPlayers,
-        ResourcesPanel resourcesPanel, Player player) {
+        ResourcesPanel resourcesPanel, Player player, ActionPlayerPanel actionPlayerPanel) {
+        this.actionPlayerPanel = actionPlayerPanel;
         trader = true;
         this.player = player;
         this.listPlayers = listPlayers;
         this.resourcesPanel = resourcesPanel;
         this.resourcesOffered = TradeObject.toTileType(tradeObject.getResourcesRequested());
         this.resourcesRequested = TradeObject.toTileType(tradeObject.getResourcesOffered());
+        this.isOfferedDouble = tradeObject.isOfferedDouble();
+        this.isRequestedDouble = tradeObject.isrequestedDouble();
         initializeSelectedPlayerLabel();
         initializeResourceNameMap();
         setLayout(null);
@@ -295,7 +314,12 @@ public class TradePanel extends JPanel {
     }
     private void bankTradeAction() {
         isBank = true;
+        if (tradeAlea) {
+            Random random = new Random();
+            isRequestedDouble = random.nextBoolean();
+        }
         updateAcceptButtonState();
+        selectedPlayerLabelIcon.setVisible(false);
         selectedPlayerLabelIcon = null;
         initializeSelectedPlayerImage();
         selectedPlayerLabel.setText("<html><div style='text-align: center;'>"
@@ -309,10 +333,15 @@ public class TradePanel extends JPanel {
             try {
                 PlayerClient playerClient = (PlayerClient) listPlayers.getCurrentPlayer();
                 int id = playerClient.getId();
+                if (tradeAlea) {
+                    Random random = new Random();
+                    isOfferedDouble = random.nextBoolean();
+                    isRequestedDouble = random.nextBoolean();
+                }
                 HashMap<String, Integer> offered = TradeObject.toString(resourcesOffered);
                 HashMap<String, Integer> requested = TradeObject.toString(resourcesRequested);
                 TradeObject tradeObject = new TradeObject(id, player.getId(), offered,
-                    requested);
+                    requested, isOfferedDouble, isRequestedDouble);
                 NetworkObject object = new NetworkObject(TypeObject.Game, "trade", id, tradeObject);
                 playerClient.getOut().writeUnshared(object);
                 playerClient.getOut().flush();
@@ -328,17 +357,36 @@ public class TradePanel extends JPanel {
         closeTradePanel();
     }
     private void declineAction() {
-        declineButton.setEnabled(false);
-        acceptButton.setEnabled(false);
-        toggleTradeInterface(true);
+        sendTradeExit(false);
+        closeTradePanel();
     }
-    public void performTrade(boolean isBank) {
-        HashMap<TileType, Integer> currentPlayerResources = listPlayers.getCurrentPlayer().getResources();
 
+    /**
+     * Send to the network the result of the trade.
+     * @param b true if the trade succeded, false if not
+     */
+    private void sendTradeExit(boolean b) {
+        if (Main.hasServer()) {
+            try {
+                PlayerClient playerClient = (PlayerClient) player;
+                int id = playerClient.getId();
+                String exit = b ? "Accept" : "Refuse";
+                NetworkObject object = new NetworkObject(TypeObject.Game, "trade" + exit, id,
+                        listPlayers.getCurrentPlayer().getId());
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void performTrade(boolean isBank) {
         if (isBank) {
             // Mise à jour des ressources pour une transaction avec la banque
-            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true);
-            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested, false);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true, false);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested,
+                    false, isRequestedDouble);
         } else {
             // Transaction avec un autre joueur
             HashMap<TileType, Integer> selectedPlayerResources;
@@ -348,34 +396,22 @@ public class TradePanel extends JPanel {
                 selectedPlayerResources = selectedPlayer.getResources();
             }
             // Mise à jour des ressources pour une transaction entre deux joueurs
-            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true);
-            updateResources(selectedPlayerResources, resourcesOffered, false);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true, false);
+            updateResources(selectedPlayerResources, resourcesOffered, false, isOfferedDouble);
 
-            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested, false);
-            updateResources(selectedPlayerResources, resourcesRequested, true);
+            updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesRequested,
+                    false, isRequestedDouble);
+            updateResources(selectedPlayerResources, resourcesRequested, true, false);
         }
         // Effacer les ressources demandées et offertes après la transaction
         resourcesRequested.clear();
         resourcesOffered.clear();
 
         // Mettre à jour l'affichage des ressources pour les joueurs impliqués
-        resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
+        //resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
         App.getActionPlayerPanel().update();
 
-        if (player instanceof PlayerClient) {
-            try {
-                PlayerClient playerClient = (PlayerClient) player;
-                int id = playerClient.getId();
-                NetworkObject object = new NetworkObject(TypeObject.Game, "tradeAccept", id,
-                    listPlayers.getCurrentPlayer().getId());
-                playerClient.getOut().writeUnshared(object);
-                playerClient.getOut().flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Problème de downCast");
-        }
+        sendTradeExit(true);
     }
 
     /**
@@ -384,12 +420,21 @@ public class TradePanel extends JPanel {
      * @param changes Les changements à appliquer (offertes/demandées).
      * @param subtract Si vrai, les ressources seront soustraites (offertes),
      *                 sinon elles seront ajoutées (demandées).
+     * @param isDouble Est ce que les ressources doivent être doublés.
      */
     private void updateResources(HashMap<TileType, Integer> playerResources,
-                                 HashMap<TileType, Integer> changes, boolean subtract) {
+                                 HashMap<TileType, Integer> changes, boolean subtract, boolean isDouble) {
+
         changes.forEach((resource, amount) -> {
             int currentAmount = playerResources.getOrDefault(resource, 0);
-            playerResources.put(resource, subtract ? currentAmount - amount : currentAmount + amount);
+            if (tradeAlea && !subtract) {
+//                System.out.println("Mode trade event");
+                if (isDouble) {
+                    playerResources.put(resource, currentAmount + 2 * amount);
+                }
+            } else {
+                playerResources.put(resource, subtract ? currentAmount - amount : currentAmount + amount);
+            }
         });
     }
 
@@ -468,7 +513,8 @@ public class TradePanel extends JPanel {
             // Vérifier si un port spécialisé ajuste le taux pour cette ressource.
             for (Harbor harbor : currentPlayerPorts) {
                 if (harbor instanceof SpecializedHarbor
-                        && ((SpecializedHarbor) harbor).getResourceType() == offeredResource) {
+                        && ((SpecializedHarbor) harbor).getResourceType() == offeredResource
+                        && !actionPlayerPanel.isHarboursDisabled()) {
                     requiredTradeRate = 2; // Taux spécialisé.
                     break;
                 }
@@ -582,6 +628,7 @@ public class TradePanel extends JPanel {
     public GameWindow getParentFrame() {
         return (GameWindow) SwingUtilities.getWindowAncestor(this);
     }
+
     public void closeTradePanel() {
         GameWindow parentFrame = getParentFrame();
         if (parentFrame != null) {

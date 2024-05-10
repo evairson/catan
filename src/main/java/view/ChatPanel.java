@@ -80,23 +80,7 @@ public class ChatPanel extends JPanel {
         appendToPane(chatArea, message + "\n", null);
     }
 
-    public void addMessageColor(String message, Color color) {
-
-        StyledDocument doc = chatArea.getStyledDocument();
-
-        // Création d'un ensemble d'attributs et définition de la couleur du texte
-        SimpleAttributeSet attrs = new SimpleAttributeSet();
-        StyleConstants.setForeground(attrs, color);
-
-        try {
-            // Ajout du texte au document avec les attributs de couleur
-            doc.insertString(doc.getLength(), message, attrs);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void appendToPane(JTextPane tp, String msg, AttributeSet attr) {
+    private void appendToPane(JTextPane tp, String msg, AttributeSet attr) {
         Document doc = tp.getDocument();
         try {
             // Ajoute le texte à la fin du document
@@ -104,6 +88,7 @@ public class ChatPanel extends JPanel {
         } catch (BadLocationException e) {
             throw new RuntimeException(e);
         }
+        chatArea.setCaretPosition(chatArea.getDocument().getLength());
     }
 
 }
