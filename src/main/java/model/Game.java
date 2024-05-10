@@ -21,6 +21,7 @@ import start.Main;
 import view.TileType;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import exceptionclass.ConstructBuildingException;
@@ -312,13 +313,10 @@ public class Game implements StateMethods, Serializable {
     public void mouseClicked(MouseEvent e) {
         if (board.isPlacingCity()) {
             networkBuildCity();
-            System.out.println("Building city");
         } else if (board.isPlacingColony()) {
             networkBuildColony();
-            System.out.println("Building colony");
         } else if (board.isPlacingRoad()) {
             networkBuildRoad();
-            System.out.println("Building road");
         } else if (board.getThiefMode()) {
             board.changeThiefNetwork();
             board.setThiefModeEnd(true);
@@ -356,6 +354,14 @@ public class Game implements StateMethods, Serializable {
 
     // Build methods ---------------
 
+    /**
+     * canBuildCity
+     * Check if the player can build a city
+     * it checks if the player has enough resources and if the resources have been given
+     * @return true if the player can build a city, false otherwise
+     * @see Constants.BuildingCosts#canBuildCity to see how the cost is calculated
+     * 
+     */
     public boolean canBuildCity() {
         if (blankTurn) {
             return false;
@@ -363,12 +369,23 @@ public class Game implements StateMethods, Serializable {
         return (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven;
     }
 
+    /**
+     * buildCityButtonAction
+     * This method is called when the player clicks on the "build city" button
+     * It checks if the player can build a city and if the player has a colony
+     * If the player can build a city and has a colony, it sets the board to look for a vertex
+     * If the board is already looking for a vertex, it sets the board to not look for a vertex
+     * It also sets the board to not place a city, a road or a colony
+     * If the board is looking for an edge, it sets the board to not look for an edge
+     */
     public void buildCityButtonAction() {
         if (blankTurn) {
             return;
         }
         if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
+            System.out.println("First if");
             if (getCurrentPlayer().hasColony()) {
+                System.out.println("Second if");
                 if (board.isLookingForVertex()) {
                     board.setLookingForVertex(!board.isLookingForVertex());
                     board.setPlacingCity(false);
@@ -389,6 +406,13 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    /**
+     * canBuildColony
+     * Check if the player can build a colony
+     * it checks if the player has enough resources and if the resources have been given
+     * @return true if the player can build a colony, false otherwise
+     * @see Constants.BuildingCosts#canBuildColony to see how the cost is calculated
+     */
     public boolean canBuildColony() {
         if (blankTurn) {
             return false;
@@ -397,7 +421,15 @@ public class Game implements StateMethods, Serializable {
                 || getCurrentPlayer().getFreeColony();
     }
 
-
+    /**
+     * buildColonyButtonAction
+     * This method is called when the player clicks on the "build colony" button
+     * It checks if the player can build a colony and if the resources have been given
+     * If the player can build a colony and the resources have been given, it sets the board to look for a vertex
+     * If the board is already looking for a vertex, it sets the board to not look for a vertex
+     * It also sets the board to not place a city, a road or a colony
+     * If the board is looking for an edge, it sets the board to not look for an edge
+     */
     public void buildColonyButtonAction() {
         if (blankTurn) {
             return;
@@ -423,6 +455,13 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    /**
+     * canBuildRoad
+     * Check if the player can build a road
+     * it checks if the player has enough resources and if the resources have been given
+     * @return true if the player can build a road, false otherwise
+     * @see Constants.BuildingCosts#canBuildRoad to see how the cost is calculated
+     */
     public boolean canBuildRoad() {
         if (blankTurn) {
             return false;
@@ -431,6 +470,15 @@ public class Game implements StateMethods, Serializable {
                 || getCurrentPlayer().getFreeRoad() > 0;
     }
 
+    /**
+     * buildRoadButtonAction
+     * This method is called when the player clicks on the "build road" button
+     * It checks if the player can build a road and if the resources have been given
+     * If the player can build a road and the resources have been given, it sets the board to look for an edge
+     * If the board is already looking for an edge, it sets the board to not look for an edge
+     * It also sets the board to not place a city, a road or a colony
+     * If the board is looking for a vertex, it sets the board to not look for a vertex
+     */
     public void buildRoadButtonAction() {
         if (blankTurn) {
             return;
@@ -485,7 +533,14 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
-
+    /**
+     * buildColony
+     * This method is called when the player clicks on a vertex to build a colony
+     * It checks if the player can build a colony and if the resources have been given
+     * If the player can build a colony and the resources have been given, it builds a colony on the vertex
+     * @param idVertex the id of the vertex where the player wants to build a colony
+     * @throws ConstructBuildingException if the player can't build a colony on the vertex
+     */
     public void buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
@@ -536,6 +591,14 @@ public class Game implements StateMethods, Serializable {
         board.setPlacingRoad(false);
     }
 
+    /**
+     * buildRoad
+     * @param idEdge the id of the edge where the player wants to build a road
+     * @throws ConstructBuildingException if the player can't build a road on the edge
+     * @see ConstructBuildingException
+     * @see Player#buildRoad
+     * @see TileEdge
+     */
     public void buildRoad(int idEdge) throws ConstructBuildingException {
         for (TileEdge edge : board.getEdgeMap().values()) {
             if (edge.getId() == idEdge) {
@@ -555,10 +618,13 @@ public class Game implements StateMethods, Serializable {
         TileVertex cVertex = null;
         if (board.isLookingForVertex()) {
             cVertex = board.getClosestTileVertex();
+            System.out.println("finding closest vertex");
         }
         if (Main.hasServer()) {
             if (cVertex != null) {
-                if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
+                System.out.println("Closest vertex different from null");
+                if (board.canPlaceCity(cVertex, getCurrentPlayer())) {
+                    System.out.println("CanPlace City and placing");
                     try {
                         int id = playerClient.getId();
                         NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity",
@@ -585,6 +651,14 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    /**
+     * buildCity
+     * @param idVertex the id of the vertex where the player wants to build a city
+     * @throws ConstructBuildingException if the player can't build a city on the vertex
+     * @see ConstructBuildingException
+     * @see Player#buildCity
+     * @see TileVertex
+     */
     public void buildCity(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
