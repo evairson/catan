@@ -7,7 +7,8 @@ import others.Constants;
 /**
  * CubeCoordinates
  *This class represents the cube coordinates of a hexagon in a hexagonal grid.
- *The cube coordinates are a 3D coordinate system where each hexagon is represented by 3 coordinates (q, r, s).
+ *The cube coordinates are a 3D coordinate system
+ * where each hexagon is represented by 3 coordinates (q, r, s).
  *The conventions are q for the x-axis, r for the y-axis, and s for the z-axis.
  *The sum of the three coordinates must be 0.
  *The cube coordinates are used to represent the position of a hexagon in a hexagonal grid.
@@ -23,14 +24,12 @@ public class CubeCoordinates implements Serializable {
     private int q;
     private int r;
     private int s;
-    
     /**
-     * Constructor
+     * Creates CubeCoordinates with the given coordinates.
      * @param q
      * @param r
      * @param s
      * @throws IllegalArgumentException if q + r + s != 0
-     * @return CubeCoordinates with the given coordinates
      */
     public CubeCoordinates(int q, int r, int s) {
         if (q + r + s != 0) {
@@ -40,9 +39,7 @@ public class CubeCoordinates implements Serializable {
         this.r = r;
         this.s = s;
     }
-
     /**
-     * @param obj, 
      * @return boolean true if the given object is equal to this cube coordinates, false otherwise
      */
     @Override
@@ -110,11 +107,9 @@ public class CubeCoordinates implements Serializable {
 
     /**
      * @param direction
-     * 
      * The directions represent the 6 directions of a hexagon in a hexagonal grid.
      * The directions are represented by cube coordinates.
      * The directions are used to calculate the neighbor of a hexagon in a hexagonal grid.
-     * 
      * @return CubeCoordinates the direction of this cube coordinates in the given direction
      */
     public CubeCoordinates direction(int direction/* 0 to 5 */) {

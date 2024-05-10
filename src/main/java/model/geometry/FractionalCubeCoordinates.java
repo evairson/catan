@@ -5,7 +5,8 @@ import java.io.Serializable;
 /**
  * FractionalCubeCoordinates
  * This class represents the fractional cube coordinates of a hexagon in a hexagonal grid.
- * The fractional cube coordinates are used to represent relative positions inside a hexagon rather than the center of the hexagon.
+ * The fractional cube coordinates are used to represent relative positions
+ * inside a hexagon rather than the center of the hexagon.
  * The fractional cube coordinates are used to:
  * calculate the distance between two hexagons in a hexagonal grid.
  * calculate the closest neighbour of a hexagon in a hexagonal grid.
@@ -19,11 +20,10 @@ public class FractionalCubeCoordinates implements Serializable {
     private double s;
 
     /**
-     * Constructor
+     * Creates FractionalCubeCoordinates with the given coordinates.
      * @param q
      * @param r
      * @param s
-     * @return FractionalCubeCoordinates with the given coordinates
      */
     public FractionalCubeCoordinates(double q, double r, double s) {
         this.q = q;
@@ -32,7 +32,6 @@ public class FractionalCubeCoordinates implements Serializable {
     }
 
     // Getters and Setters
-     
     /**
      * @return double q
      */
@@ -103,7 +102,8 @@ public class FractionalCubeCoordinates implements Serializable {
     }
 
     /**
-     * @return FractionalCubeCoordinates the distance between this fractional cube coordinates and the given fractional cube coordinates
+     * @return FractionalCubeCoordinates the distance between this
+     * fractional cube coordinates and the given fractional cube coordinates
      */
     public double distance(FractionalCubeCoordinates b) {
         return (Math.abs(this.q - b.q) + Math.abs(this.r - b.r) + Math.abs(this.s - b.s)) / 2;
