@@ -112,12 +112,15 @@ public class PlayerClient extends Player {
                     App.getActionPlayerPanel().showTradePanel(tradeObject);
                 }
                 break;
-            case "tradeAccept" :
+            case "tradeAccept":
                 int idTrader = (int) networkObject.getObject();
                 if (idTrader == id) {
                     App.getActionPlayerPanel().getTradePanel().acceptAction(false);
                     App.getActionPlayerPanel().update();
                 }
+                break;
+            case "tradeRefuse" :
+                App.getActionPlayerPanel().getTradePanel().closeTradePanel();
                 break;
             case "changeThief" :
                 app.getBoard().changehighlitedTile((int) networkObject.getObject());

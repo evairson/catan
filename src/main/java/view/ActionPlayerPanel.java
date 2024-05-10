@@ -226,7 +226,9 @@ public class ActionPlayerPanel extends JPanel {
 
     public void setComponentsEnabled(boolean enabled) {
         for (Component comp : this.getComponents()) {
-            comp.setEnabled(enabled);
+            if (!(comp.equals(endTurn) || comp.equals(tradeButtonPanel))) {
+                comp.setEnabled(enabled);
+            }
         }
     }
 
@@ -543,6 +545,8 @@ public class ActionPlayerPanel extends JPanel {
         if (Main.hasServer()) {
             if (game.isMyTurn()) {
                 updateShopPanel();
+                tradeButtonPanel.getButton().setEnabled(!game.isInBeginningPhase()
+                        && game.getCurrentPlayer().hasThrowDices());
                 if (game.canPass()) {
                     endTurn.setEnabled(true);
                 } else {
@@ -552,6 +556,7 @@ public class ActionPlayerPanel extends JPanel {
                 dice.setButtonIsOn(false);
                 shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);
+                tradeButtonPanel.getButton().setEnabled(false);
             }
         }
     }

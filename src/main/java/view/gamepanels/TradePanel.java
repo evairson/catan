@@ -319,6 +319,7 @@ public class TradePanel extends JPanel {
             isRequestedDouble = random.nextBoolean();
         }
         updateAcceptButtonState();
+        selectedPlayerLabelIcon.setVisible(false);
         selectedPlayerLabelIcon = null;
         initializeSelectedPlayerImage();
         selectedPlayerLabel.setText("<html><div style='text-align: center;'>"
@@ -356,13 +357,31 @@ public class TradePanel extends JPanel {
         closeTradePanel();
     }
     private void declineAction() {
-        declineButton.setEnabled(false);
-        acceptButton.setEnabled(false);
-        toggleTradeInterface(true);
+        sendTradeExit(false);
+        closeTradePanel();
     }
-    public void performTrade(boolean isBank) {
-        HashMap<TileType, Integer> currentPlayerResources = listPlayers.getCurrentPlayer().getResources();
 
+    /**
+     * Send to the network the result of the trade.
+     * @param b true if the trade succeded, false if not
+     */
+    private void sendTradeExit(boolean b) {
+        if (Main.hasServer()) {
+            try {
+                PlayerClient playerClient = (PlayerClient) player;
+                int id = playerClient.getId();
+                String exit = b ? "Accept" : "Refuse";
+                NetworkObject object = new NetworkObject(TypeObject.Game, "trade" + exit, id,
+                        listPlayers.getCurrentPlayer().getId());
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void performTrade(boolean isBank) {
         if (isBank) {
             // Mise à jour des ressources pour une transaction avec la banque
             updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true, false);
@@ -389,23 +408,10 @@ public class TradePanel extends JPanel {
         resourcesOffered.clear();
 
         // Mettre à jour l'affichage des ressources pour les joueurs impliqués
-        resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
+        //resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
         App.getActionPlayerPanel().update();
 
-        if (player instanceof PlayerClient) {
-            try {
-                PlayerClient playerClient = (PlayerClient) player;
-                int id = playerClient.getId();
-                NetworkObject object = new NetworkObject(TypeObject.Game, "tradeAccept", id,
-                    listPlayers.getCurrentPlayer().getId());
-                playerClient.getOut().writeUnshared(object);
-                playerClient.getOut().flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Problème de downCast");
-        }
+        sendTradeExit(true);
     }
 
     /**
@@ -622,6 +628,7 @@ public class TradePanel extends JPanel {
     public GameWindow getParentFrame() {
         return (GameWindow) SwingUtilities.getWindowAncestor(this);
     }
+
     public void closeTradePanel() {
         GameWindow parentFrame = getParentFrame();
         if (parentFrame != null) {

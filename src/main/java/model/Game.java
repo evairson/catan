@@ -151,7 +151,7 @@ public class Game implements StateMethods, Serializable {
             return;
         }
 
-        if (start || backwards) {
+        if (isInBeginningPhase()) {
             ArrayList<Colony> colony = getCurrentPlayer().getColony();
             if (colony.size() >= 2) {
                 for (Colony c: colony) {
@@ -182,7 +182,7 @@ public class Game implements StateMethods, Serializable {
         resourcesGiven = false;
         App.getActionPlayerPanel().getRollingDice().newPlayer(getCurrentPlayer());
 
-        if (start || backwards) {
+        if (isInBeginningPhase()) {
             getCurrentPlayer().setFreeColony(true);
         }
         App.getActionPlayerPanel().update();
@@ -633,6 +633,14 @@ public class Game implements StateMethods, Serializable {
         for (Player player : players) {
             player.setColor(Player.getColorId(player.getId()));
         }
+    }
+
+    /**
+     * Function used to know if the game is still in the beginning phase.
+     * @return true if it is still the beginning phase, false if not
+     */
+    public boolean isInBeginningPhase() {
+        return start || backwards;
     }
 
     public void checkIfTradeEventActive() {
