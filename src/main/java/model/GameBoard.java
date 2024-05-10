@@ -657,6 +657,47 @@ public class GameBoard implements Serializable {
         return true;
     }
 
+    public boolean canPlaceCity(TileVertex vertex, Player player) {
+        if (!(vertex.getBuilding() instanceof Colony)){
+            return false;
+        }else{
+            Building buil= vertex.getBuilding();
+            if(buil instanceof Colony){
+                Colony col = (Colony) buil;
+                if(!col.getIsCity()){
+                    if(col.getOwner()==player){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+/**
+ * canPlaceCity
+ * @param vertex
+ * @param player
+ * it's used to check if we have the conditions to place a city
+ * @return true if we can, false otherwise 
+ * @see Colony to see how we create cities or colonies
+ */
+    public boolean canPlaceCity(TileVertex vertex, Player player) {
+        if (!(vertex.getBuilding() instanceof Colony)){
+            return false;
+        }else{
+            Building buil= vertex.getBuilding();
+            if(buil instanceof Colony){
+                Colony col = (Colony) buil;
+                if(!col.getIsCity()){
+                    if(col.getOwner()==player){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
     /**
      * canPlaceRoad
      * @param edge the edge where the player wants to place a road

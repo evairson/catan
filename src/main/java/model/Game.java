@@ -339,7 +339,9 @@ public class Game implements StateMethods, Serializable {
             return;
         }
         if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
+            System.out.println("First if");
             if (getCurrentPlayer().hasColony()) {
+                System.out.println("Second if");
                 if (board.isLookingForVertex()) {
                     board.setLookingForVertex(!board.isLookingForVertex());
                     board.setPlacingCity(false);
@@ -584,10 +586,13 @@ public class Game implements StateMethods, Serializable {
         TileVertex cVertex = null;
         if (board.isLookingForVertex()) {
             cVertex = board.getClosestTileVertex();
+            System.out.println("finding closest vertex");
         }
         if (Main.hasServer()) {
             if (cVertex != null) {
-                if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
+                System.out.println("Closest vertex different from null");
+                if (board.canPlaceCity(cVertex, getCurrentPlayer())) {
+                    System.out.println("CanPlace City and placing");
                     try {
                         int id = playerClient.getId();
                         NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity",
