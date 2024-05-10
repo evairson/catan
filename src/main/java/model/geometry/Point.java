@@ -2,6 +2,11 @@ package model.geometry;
 
 import java.io.Serializable;
 
+/**
+ * Point
+ * This class represents a point in a 2D plane.
+ * The point is used to determine pixel coordinates on the screen mostly.
+ */
 public class Point implements Serializable {
     private double x;
     private double y;

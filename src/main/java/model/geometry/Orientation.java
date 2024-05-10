@@ -2,6 +2,12 @@ package model.geometry;
 
 import java.io.Serializable;
 
+/**
+ * Orientation
+ * This class represents the orientation of a hexagonal grid.
+ * The orientation is basically whether the hexagons are pointy or flat.
+ * We have two default orientations found in the Constants class.
+ */
 public class Orientation implements Serializable {
 
     private double startAngle; // multiple of 60 degrees
@@ -16,6 +22,24 @@ public class Orientation implements Serializable {
     private double b2;
     private double b3;
 
+    /**
+     * Constructor
+     * @param startAngle
+     * this is a multiple of 60 degrees, to determine where in a circle the hexagon starts
+     * 
+     * The following parameters are used to calculate the next angles of the hexagon
+     * f0, f1, f2, f3 are used to calculate the forward angles of the hexagon
+     * b0, b1, b2, b3 are used to calculate the backward angles of the hexagon
+     * @param f0
+     * @param f1
+     * @param f2
+     * @param f3
+     * @param b0
+     * @param b1
+     * @param b2
+     * @param b3
+     * @return Orientation with the given parameters
+     */
     public Orientation(double startAngle, double f0, double f1, double f2, double f3, double b0,
             double b1, double b2, double b3) {
         this.startAngle = startAngle;

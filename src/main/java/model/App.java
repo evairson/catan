@@ -23,8 +23,9 @@ public class App {
     private GameBoard board;
     private static Game game;
     private static MainMenu mainMenu;
-    private Player player;
+    private PlayerClient player;
     private static boolean playing;
+    private boolean hasD20 = true;
     private static BackgroundPanel background;
     private static Boolean botSoloMode = false;
 
@@ -53,9 +54,9 @@ public class App {
         botSoloMode = true;
     }
 
-    public App(Player playerClient) {
+    public App(PlayerClient playerClient) {
         player = playerClient;
-        if (playerClient instanceof PlayerClient) {
+        if (playerClient != null) {
             ((PlayerClient) player).setApp(this);
             mainMenu = new MainMenu(this, null);
         } else {
@@ -122,8 +123,9 @@ public class App {
         ((ChatPanel) actionPlayer.getChat()).addMessage(message);
     }
 
-    public static void addMessageColor(String message, Color color) {
-        ((ChatPanel) actionPlayer.getChat()).addMessageColor(message, color);
+
+    public void addMessageColor(String message, Color color) {
+        (actionPlayer.getLogChat()).addMessageColor(message, color);
     }
 
     public void addPanels() {
@@ -168,5 +170,13 @@ public class App {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public boolean hasD20() {
+        return hasD20;
+    }
+
+    public static ActionPlayerPanel getActionPlayer() {
+        return actionPlayer;
     }
 }
