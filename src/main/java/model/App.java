@@ -2,6 +2,7 @@ package model;
 
 import others.Constants;
 import others.Music;
+import others.Tutorial;
 import view.*;
 import view.menu.MainMenu;
 
@@ -18,6 +19,7 @@ public class App {
     private static ActionPlayerPanel actionPlayer;
     private static EndPanel endPanel;
     private OptionPanel optionPanel;
+    private Tutorial tutorial;
     private static GameWindow gameWindow;
     private Thread gameThread;
     private GameBoard board;
@@ -40,6 +42,10 @@ public class App {
         return mainMenu;
     }
 
+    public OptionPanel getOptionPanel() {
+        return optionPanel;
+    }
+
     public void setBoard(GameBoard board) {
         this.board = board;
         board.setApp(this);
@@ -48,7 +54,8 @@ public class App {
     public App(Player p) {
         mainMenu = new MainMenu(this, p);
         optionPanel = new OptionPanel();
-        App.gameWindow = new GameWindow(mainMenu, optionPanel);
+        tutorial = new Tutorial();
+        App.gameWindow = new GameWindow(mainMenu, optionPanel, tutorial);
         mainMenu.requestFocus();
     }
 
@@ -57,7 +64,8 @@ public class App {
         player.setApp(this);
         mainMenu = new MainMenu(this, null);
         optionPanel = new OptionPanel();
-        App.gameWindow = new GameWindow(mainMenu, optionPanel);
+        tutorial = new Tutorial();
+        App.gameWindow = new GameWindow(mainMenu, optionPanel, tutorial);
         mainMenu.requestFocus();
     }
 
@@ -124,8 +132,6 @@ public class App {
         panelGame.add(actionPlayer, 0);
         panelGame.add(gamePanel, 1);
         panelGame.add(background, 2);
-
-        gameWindow.getContentPane().add(mainMenu, "mainMenu");
 
         gameWindow.getContentPane().add(panelGame, "actionPlayerPanel");
 
