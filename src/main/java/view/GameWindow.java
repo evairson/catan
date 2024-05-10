@@ -3,14 +3,8 @@ package view;
 import others.Constants;
 import view.gamepanels.TradePanel;
 import view.menu.MainMenu;
-
 import javax.swing.*;
-
-import controler.MouseInputs;
-
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 public class GameWindow extends JFrame {
 

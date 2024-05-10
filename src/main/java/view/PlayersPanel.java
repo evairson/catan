@@ -27,7 +27,7 @@ public class PlayersPanel extends JPanel {
         int y = Resolution.calculateResolution(30, 10)[1];
         setBounds(x, y, (int) (2000 / Resolution.divider()), (int) (100 / Resolution.divider()));
         for (int i = 0; i < game.getPlayers().size(); i++) {
-            JLabel label = new JLabel();
+            JLabel label;
             try {
                 String src = "src/main/resources/pion/pion";
                 String imagePath = src + game.getPlayers().get(i).getColorString() + ".png";
