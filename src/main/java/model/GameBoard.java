@@ -503,6 +503,23 @@ public class GameBoard implements Serializable {
         return true;
     }
 
+    public boolean canPlaceCity(TileVertex vertex, Player player) {
+        if (!(vertex.getBuilding() instanceof Colony)){
+            return false;
+        }else{
+            Building buil= vertex.getBuilding();
+            if(buil instanceof Colony){
+                Colony col = (Colony) buil;
+                if(!col.getIsCity()){
+                    if(col.getOwner()==player){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
     public boolean canPlaceRoad(TileEdge edge, Player player) {
         if (edge.getBuilding() != null) {
             return false;
