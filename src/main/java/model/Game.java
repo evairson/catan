@@ -174,6 +174,9 @@ public class Game implements StateMethods, Serializable {
     public void endTurn() {
         if (!canPass()) {
             System.out.println("Impossible de passer le tour");
+            if(App.getBotSoloMode()) {
+                getCurrentPlayer().throwDices(app.hasD20());
+            }
             return;
         }
 
@@ -212,6 +215,8 @@ public class Game implements StateMethods, Serializable {
             getCurrentPlayer().setFreeColony(true);
         }
 
+        checkForHarboursDisabled();
+        checkForHexesRespawn();
 
         App.getActionPlayerPanel().update();
         App.getGamePanel().repaint();

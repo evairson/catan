@@ -418,7 +418,9 @@ public class TradePanel extends JPanel {
         resourcesOffered.clear();
 
         // Mettre à jour l'affichage des ressources pour les joueurs impliqués
-        resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
+        if (!App.getBotSoloMode()) {
+            resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
+        }
         App.getActionPlayerPanel().update();
 
         sendTradeExit(true);
@@ -667,10 +669,14 @@ public class TradePanel extends JPanel {
         if (canFulfillRequest) {
             if (((Bot) selectedPlayer).acceptTrade(resourcesRequested, resourcesOffered)) {
                 performTrade(false);
-                actionPlayerPanel.getApp().addMessageColor("Votre trade a été accepté \n", java.awt.Color.GREEN);
+                if (!App.getBotSoloMode()) {
+                    actionPlayerPanel.getApp().addMessageColor("Votre trade a été accepté \n", java.awt.Color.GREEN);
+                }
             }
         } else {
-            actionPlayerPanel.getApp().addMessageColor("Votre trade a été refusé \n", java.awt.Color.ORANGE);
+            if(!App.getBotSoloMode()) {
+                actionPlayerPanel.getApp().addMessageColor("Votre trade a été refusé \n", java.awt.Color.ORANGE);
+            }
         }
     }
 

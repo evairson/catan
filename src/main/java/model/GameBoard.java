@@ -1253,7 +1253,6 @@ public class GameBoard implements Serializable {
      * @see #draw to see how the board is drawn.
      */
     public void drawBoard(Graphics g) {
-
         if (!shadowHexes) {
             drawImagesInHexes(g);
         }
