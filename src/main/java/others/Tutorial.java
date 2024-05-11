@@ -21,12 +21,18 @@ public class Tutorial extends JPanel {
         setVisible(true);
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         JButton quitBtn = new ButtonImage(basePath + "backMainMenu.png", basePath + "backMainMenu.png",
-                200, 550, 2, this::backToMenu, null);
+                650, 150, 2, this::backToMenu, null);
         add(quitBtn);
 
         JButton nextBtn = new ButtonImage(basePath + "acceptButton.png", basePath + "acceptButton.png",
-                650, 550, 0.5, this::next, null);
+                850, 120, 0.5, this::next, null);
         add(nextBtn);
+
+
+        JButton prevBtn = new ButtonImage(basePath + "acceptButton.png", basePath + "acceptButton.png",
+                850, 60, 0.5, this::previous, null);
+        add(prevBtn);
+
         ImageIcon icon = new ImageIcon(basePath + "tutoriel/1.png");
         int width = Constants.Game.WIDTH;
         int height = Constants.Game.HEIGHT;
