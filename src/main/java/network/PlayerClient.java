@@ -165,8 +165,9 @@ public class PlayerClient extends Player {
         try {
             switch (networkObject.getMessage()) {
                 case "buildCity":
+                    int playerId = (int) networkObject.getId();
                     int idCity = (int) networkObject.getObject();
-                    app.getGame().buildCity(idCity);
+                    app.getGame().buildCity(idCity, playerId == app.getPlayer().getId());
                     if (networkObject.getId() == id) {
                         App.getActionPlayerPanel().updateShopPanel();
                     }
