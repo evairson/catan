@@ -1,15 +1,18 @@
 package others;
 
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import view.utilities.ButtonImage;
+import view.utilities.Resolution;
 
 public class Tutorial extends JPanel {
     private Image backgroundImage;
@@ -33,10 +36,19 @@ public class Tutorial extends JPanel {
                 850, 60, 0.5, this::previous, null);
         add(prevBtn);
 
+        JLabel texte = new JLabel("bonjour j'adore les fruits");
+        int[] coords = Resolution.calculateResolution(300, 475);
+        texte.setLocation(coords[0], coords[1]);
+        texte.setBounds(coords[0], coords[1], 600, 200);
+        texte.setBackground(Color.GRAY);
+        texte.setOpaque(true);
+
+
         ImageIcon icon = new ImageIcon(basePath + "tutoriel/1.png");
         int width = Constants.Game.WIDTH;
         int height = Constants.Game.HEIGHT;
         backgroundImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        add(texte);
     }
 
     public void backToMenu() {
