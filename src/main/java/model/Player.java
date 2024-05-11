@@ -394,10 +394,16 @@ public class Player implements Serializable {
         return false;
     }
 
-    public boolean buildCity(TileVertex vertex) {
+
+    public boolean buildCity(TileVertex vertex, boolean us) {
+        Colony c = (Colony) vertex.getBuilding();
+        if (!us) {
+            System.out.println("SUUUUU");
+            c.place(this, true, vertex);
+            return true;
+        }
         if (vertex.getBuilding() != null && vertex.getBuilding() instanceof Colony) {
             if (vertex.getBuilding().getOwner().equals(this)) {
-                Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
                     points++;
                     App.checkWin();

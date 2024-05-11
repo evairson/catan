@@ -420,9 +420,7 @@ public class Game implements StateMethods, Serializable {
             return;
         }
         if (((Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven)) {
-            System.out.println("First if");
             if (getCurrentPlayer().hasColony()) {
-                System.out.println("Second if");
                 if (board.isLookingForVertex()) {
                     board.setLookingForVertex(!board.isLookingForVertex());
                     board.setPlacingCity(false);
@@ -659,36 +657,36 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void networkBuildCity() {
-        TileVertex cVertex = null;
+        TileVertex cVertex;
         if (board.isLookingForVertex()) {
             cVertex = board.getClosestTileVertex();
             System.out.println("finding closest vertex");
-        }
-        if (Main.hasServer()) {
-            if (cVertex != null) {
-                System.out.println("Closest vertex different from null");
-                if (board.canPlaceCity(cVertex, getCurrentPlayer())) {
-                    System.out.println("CanPlace City and placing");
-                    try {
-                        int id = playerClient.getId();
-                        NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity",
-                                id, cVertex.getId());
-                        ((PlayerClient) playerClient).getOut().writeUnshared(object);
-                        ((PlayerClient) playerClient).getOut().flush();
-                    } catch (Exception e) {
-                        e.getStackTrace();
+            if (Main.hasServer()) {
+                if (cVertex != null) {
+                    System.out.println("Closest vertex different from null");
+                    if (board.canPlaceCity(cVertex, getCurrentPlayer())) {
+                        System.out.println("CanPlace City and placing");
+                        try {
+                            int id = playerClient.getId();
+                            NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity",
+                                    id, cVertex.getId());
+                            playerClient.getOut().writeUnshared(object);
+                            playerClient.getOut().flush();
+                        } catch (Exception e) {
+                            e.getStackTrace();
+                        }
                     }
                 }
-            }
-        } else {
-            if (cVertex != null) {
-                if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
-                    try {
-                        buildCity(cVertex.getId());
-                        App.getActionPlayerPanel().update();
-                        App.getGamePanel().repaint();
-                    } catch (ConstructBuildingException e) {
-                        ConstructBuildingException.messageError();
+            } else {
+                if (cVertex != null) {
+                    if (board.canPlaceColony(cVertex, getCurrentPlayer())) {
+                        try {
+                            buildCity(cVertex.getId(), true);
+                            App.getActionPlayerPanel().update();
+                            App.getGamePanel().repaint();
+                        } catch (ConstructBuildingException e) {
+                            ConstructBuildingException.messageError();
+                        }
                     }
                 }
             }
@@ -698,18 +696,18 @@ public class Game implements StateMethods, Serializable {
     /**
      * buildCity
      * @param idVertex the id of the vertex where the player wants to build a city
+     * @param us Indicates if we are the player building the city
      * @throws ConstructBuildingException if the player can't build a city on the vertex
      * @see ConstructBuildingException
      * @see Player#buildCity
      * @see TileVertex
      */
-    public boolean buildCity(int idVertex) throws ConstructBuildingException {
+    public boolean buildCity(int idVertex, boolean us) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
-                System.out.println("yeah !");
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
-                if (getCurrentPlayer().buildCity(vertex)) {
+                if (getCurrentPlayer().buildCity(vertex, us)) {
                     App.getActionPlayerPanel().update();
                     App.getGamePanel().repaint();
                     return true;
