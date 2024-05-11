@@ -214,9 +214,6 @@ public class Game implements StateMethods, Serializable {
 
 
         App.getActionPlayerPanel().update();
-        app.addMessageColor("C'est au tour de ", java.awt.Color.RED);
-        app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
-            app.getGame().getCurrentPlayer().getColorAwt());
         App.getGamePanel().repaint();
 
         if (!Main.hasServer()) {
@@ -557,6 +554,9 @@ public class Game implements StateMethods, Serializable {
                                 id, cVertex.getId());
                         playerClient.getOut().writeUnshared(object);
                         playerClient.getOut().flush();
+                        app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                                app.getGame().getCurrentPlayer().getColorAwt());
+                        app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.BLACK);
                     } catch (Exception e) {
                         e.getStackTrace();
                     }
@@ -589,9 +589,6 @@ public class Game implements StateMethods, Serializable {
                     board.setLookingForVertex(false);
                     board.setPlacingCity(false);
                     if (getCurrentPlayer().buildColony(vertex)) {
-                        app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
-                            app.getGame().getCurrentPlayer().getColorAwt());
-                        app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.RED);
                         App.getActionPlayerPanel().update();
                         App.getGamePanel().repaint();
                         return true;
@@ -650,9 +647,6 @@ public class Game implements StateMethods, Serializable {
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
                 if (getCurrentPlayer().buildRoad(edge)) {
-                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
-                        app.getGame().getCurrentPlayer().getColorAwt());
-                    app.addMessageColor(" vient de placer une route \n", java.awt.Color.RED);
                     App.getActionPlayerPanel().update();
                     App.getGamePanel().repaint();
                     return true;
@@ -716,9 +710,6 @@ public class Game implements StateMethods, Serializable {
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
                 if (getCurrentPlayer().buildCity(vertex)) {
-                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
-                        app.getGame().getCurrentPlayer().getColorAwt());
-                    app.addMessageColor(" vient de placer une ville \n", java.awt.Color.RED);
                     App.getActionPlayerPanel().update();
                     App.getGamePanel().repaint();
                     return true;

@@ -553,6 +553,8 @@ public class ActionPlayerPanel extends JPanel {
                 }
             } else {
                 endTurn.setEnabled(false);
+                shopPanel.setEnabledPanel(false);
+                dice.setButtonIsOn(false);
                 tradeButtonPanel.getButton().setEnabled(false);
             }
         } else {
