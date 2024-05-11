@@ -12,6 +12,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
 
@@ -21,27 +25,6 @@ public class Tutorial extends JPanel {
     private String basePath = "src/main/resources/";
     private Image[] images = new Image[2];
     private JLabel texte;
-    private String[] textes =
-        {"<html> Le jeu se présente de cette manière, les noms des joueurs sont en haut de l'écran. </br>"
-            + "Le joueur dont c'est le tour est souligner. </br>"
-            + "Sur la gauche il y a le plateau de jeu et sur la droite un chat avec les autres joueurs"
-            + "Nous verrons le reste du menu plus tard. </br> Appuyer sur suivant pour continuer</html>",
-        "Le jeu commence par le positionnement de deux colonie et d'une route collée à ces colonies.",
-        "Le joueur suivant place sa colinie etc...\n"
-            + "Une fois arrivé au dernier joueur cela recommence mais cette fois en partant de la fin",
-        "C'est donc au tour du joueur 1 de placé sa colonie",
-        "Une fois le placement des colonies de départ la partie peut commencer."
-            + "Il faut lancer les dés",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15"};
 
     public Tutorial() {
         setLayout(null);
@@ -60,7 +43,7 @@ public class Tutorial extends JPanel {
                 850, 60, 0.5, this::previous, null);
         add(prevBtn);
 
-        texte = new JLabel(textes[0]);
+        texte = new JLabel(readLine(0));
         int[] coords = Resolution.calculateResolution(450, 450);
         texte.setLocation(coords[0], coords[1]);
         texte.setBounds(coords[0], coords[1], 600, 200);
@@ -85,6 +68,7 @@ public class Tutorial extends JPanel {
     }
 
     public void backToMenu() {
+        i = 1;
         Container parent = getParent();
         CardLayout parentLayout = (CardLayout) parent.getLayout();
         parentLayout.show(parent, "optionPanel");
@@ -92,7 +76,7 @@ public class Tutorial extends JPanel {
 
     public void next() {
         i++;
-        if (i > 16) {
+        if (i >= 16) {
             i = 1;
             backToMenu();
         }
@@ -111,7 +95,7 @@ public class Tutorial extends JPanel {
     }
 
     public void updateText() {
-        texte.setText(textes[i-1]);
+        texte.setText(readLine(i - 1));
     }
 
     public void updateImage() {
@@ -127,5 +111,15 @@ public class Tutorial extends JPanel {
         g.drawImage(backgroundImage, 0, 0, this);
         g.drawImage(images[0], 185, 700, null);
         //g.drawImage(images[1], 500, 300, null);
+    }
+
+    public String readLine(int n) {
+        try {
+            String line = Files.readAllLines(Paths.get(basePath + "texteTutoriel.txt")).get(n);
+            return "<html>" + line + "</html>";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
