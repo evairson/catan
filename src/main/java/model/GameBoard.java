@@ -156,16 +156,16 @@ public class GameBoard implements Serializable {
 
         // Définir les coordonnées des ports spécialisés et leur type de ressource associé
         Map<Point, TileType> specializedPortsPoints = Map.of(
-            new Point(400, 120), TileType.WOOL,
-            new Point(461, 155), TileType.WOOL,
-            new Point(642, 540), TileType.CLAY,
-            new Point(582, 575), TileType.CLAY,
-            new Point(461, 645), TileType.WOOD,
-            new Point(400, 680), TileType.WOOD,
-            new Point(158, 540), TileType.WHEAT,
-            new Point(158, 470), TileType.WHEAT,
-            new Point(158, 330), TileType.ORE,
-            new Point(158, 260), TileType.ORE
+                new Point(400, 120), TileType.WOOL,
+                new Point(461, 155), TileType.WOOL,
+                new Point(642, 540), TileType.CLAY,
+                new Point(582, 575), TileType.CLAY,
+                new Point(461, 645), TileType.WOOD,
+                new Point(400, 680), TileType.WOOD,
+                new Point(158, 540), TileType.WHEAT,
+                new Point(158, 470), TileType.WHEAT,
+                new Point(158, 330), TileType.ORE,
+                new Point(158, 260), TileType.ORE
         );
 
         // Initialiser les ports classiques
@@ -199,16 +199,18 @@ public class GameBoard implements Serializable {
         return null;
     }
 
+
     public void setThiefModeEnd(boolean b) {
         thiefModeEnd = b;
     }
+
     public void setShadowHexes(boolean b) {
         shadowHexes = b;
     }
 
     private void loadImages() {
         boardImage = new BufferedImage(Constants.Game.WIDTH,
-        Constants.Game.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+                Constants.Game.HEIGHT, BufferedImage.TYPE_INT_ARGB);
         loadedImages = new HashMap<>();
 
         String basePath = "src/main/resources/building/pions/";
@@ -345,9 +347,8 @@ public class GameBoard implements Serializable {
 
     /**
      * getNeighbourTileVerticesToVertex
-     * @param vertex
-     * 
-     * this methods goes through the edges of the board. 
+     *
+     * @param vertex this methods goes through the edges of the board.
      * once it finds the edges that contain the vertex on one of their ends, it adds them to an arraylist.
      * then it goes through the arraylist and adds the other vertex for every edge to another arraylist.
      * it returns the arraylist of vertices.
@@ -387,9 +388,9 @@ public class GameBoard implements Serializable {
 
     /**
      * checkIfNeighbourInArray
+     *
      * @param neighbours
      * @param vertex
-     * 
      * @return true if the vertex is in the array of neighbours, false otherwise
      * this method is to check so that we don't add the same vertex to the array of neighbours multiple times
      */
@@ -406,9 +407,9 @@ public class GameBoard implements Serializable {
 
     /**
      * checkIfNeighbourInArray (overloaded method)
+     *
      * @param neighbours
      * @param edge
-     * 
      * @return true if the edge is in the array of neighbours, false otherwise
      * this method is to check so that we don't add the same edge to the array of neighbours multiple times
      */
@@ -425,8 +426,8 @@ public class GameBoard implements Serializable {
 
     /**
      * getNeighbourTileVerticesToEdge
+     *
      * @param edge
-     * 
      * @return the two tile vertices that are connected to the edge
      * that's basically used to find the two tile vertices that have the same coordinates as the start and end of the edge
      * the two tile vertices are returned in an array
@@ -449,10 +450,10 @@ public class GameBoard implements Serializable {
 
     /**
      * getNeighbourTileEdgesToEdge
-     * @param edge
-     * this method goes through the edges of the board.
-     * once it finds the edges that are connected to the given edge, it adds them to an arraylist.
-     * it returns the arraylist of edges.
+     *
+     * @param edge this method goes through the edges of the board.
+     *             once it finds the edges that are connected to the given edge, it adds them to an arraylist.
+     *             it returns the arraylist of edges.
      * @return the four tile edges that are connected to the given edge
      * the four tile edges are the ones that are connected to the given edge by a vertex
      * the four tile edges are returned in an array
@@ -466,12 +467,12 @@ public class GameBoard implements Serializable {
                 continue;
             }
             if ((e.getStart().equals(edge.getStart()) && !e.getEnd().equals(edge.getEnd()))
-                || (e.getEnd().equals(edge.getStart()) && !e.getStart().equals(edge.getEnd()))) {
+                    || (e.getEnd().equals(edge.getStart()) && !e.getStart().equals(edge.getEnd()))) {
                 neighbours[i] = e;
                 i++;
             }
             if ((e.getStart().equals(edge.getEnd()) && !e.getEnd().equals(edge.getStart()))
-                || (e.getEnd().equals(edge.getEnd()) && !e.getStart().equals(edge.getStart()))) {
+                    || (e.getEnd().equals(edge.getEnd()) && !e.getStart().equals(edge.getStart()))) {
                 neighbours[i] = e;
                 i++;
             }
@@ -482,10 +483,10 @@ public class GameBoard implements Serializable {
 
     /**
      * getNeighbourTileEdgesToVertex
-     * @param vertex
-     * This method goes through the edges of the board.
-     * once it finds the edges that contain the vertex on one of their ends, it adds them to an arraylist.
-     * it returns the arraylist of edges.
+     *
+     * @param vertex This method goes through the edges of the board.
+     *               once it finds the edges that contain the vertex on one of their ends, it adds them to an arraylist.
+     *               it returns the arraylist of edges.
      * @return the three tile edges that are closest to the given vertex
      * the three tile edges are the ones that are connected to the given vertex by a vertex
      * the three tile edges are returned in an array
@@ -495,7 +496,7 @@ public class GameBoard implements Serializable {
         int i = 0;
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getStart().equals(vertex.getCoordinates())
-                || edge.getEnd().equals(vertex.getCoordinates())) {
+                    || edge.getEnd().equals(vertex.getCoordinates())) {
                 neighbours[i] = edge;
                 i++;
             }
@@ -506,15 +507,15 @@ public class GameBoard implements Serializable {
 
     /**
      * isVertexTwoRoadsAwayFromCities
-     * @param vertex
-     * this method goes through the edges of the board.
-     * once it finds the edges that contain the vertex on one of their ends, it adds them to an arraylist.
-     * then it goes through the arraylist and checks if the vertex is two roads away from cities.
-     * basically, if a vertex one road away from a city contains a building, then the vertex is not two roads away from cities.
-     * @see #getNeighbourTileVerticesToVertex to see how the vertices are found.
+     *
+     * @param vertex this method goes through the edges of the board.
+     *               once it finds the edges that contain the vertex on one of their ends, it adds them to an arraylist.
+     *               then it goes through the arraylist and checks if the vertex is two roads away from cities.
+     *               basically, if a vertex one road away from a city contains a building, then the vertex is not two roads away from cities.
      * @return true if the vertex is two roads away from cities, false otherwise
-     * that's used to check if a player can place a colony on a vertex. 
+     * that's used to check if a player can place a colony on a vertex.
      * In the game, a player can only place a colony on a vertex if it is two roads away from cities.
+     * @see #getNeighbourTileVerticesToVertex to see how the vertices are found.
      */
     public boolean isVertexTwoRoadsAwayFromCities(TileVertex vertex) {
         TileVertex[] neighbours = getNeighbourTileVerticesToVertex(vertex);
@@ -530,17 +531,17 @@ public class GameBoard implements Serializable {
 
     /**
      * isRoadNextToCity
+     *
      * @param edge
-     * @param player
-     * this method goes through the vertices of the board.
-     * once it finds the vertices that are connected to the edge, it checks if the vertex contains a building.
-     * if the vertex contains a building, then it checks if the building belongs to the player.
-     * @see #getNeighbourTileVerticesToEdge to see how the vertices are found.
+     * @param player this method goes through the vertices of the board.
+     *               once it finds the vertices that are connected to the edge, it checks if the vertex contains a building.
+     *               if the vertex contains a building, then it checks if the building belongs to the player.
      * @return true if the road is next to a city that belongs to the player, false otherwise
      * that's used to check if a player can place a road on an edge.
      * In the game, a player can only place a road on an edge if it is next to a city that belongs to the player.
      * that's also used to check if a player can place a road on an edge if it is next to a road that belongs to the player.
      * That rule is always true except for the first two roads that the player places.
+     * @see #getNeighbourTileVerticesToEdge to see how the vertices are found.
      */
     public boolean isRoadNextToCity(TileEdge edge, Player player) {
         TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
@@ -558,15 +559,15 @@ public class GameBoard implements Serializable {
 
     /**
      * isRoadNextToVertex
+     *
      * @param edge
-     * @param vertex
-     * this method goes through the vertices of the board.
-     * once it finds the vertices that are connected to the edge, it checks if the vertex is the same as the given vertex.
-     * @see #getNeighbourTileVerticesToEdge to see how the vertices are found.
+     * @param vertex this method goes through the vertices of the board.
+     *               once it finds the vertices that are connected to the edge, it checks if the vertex is the same as the given vertex.
      * @return true if the road is next to the given vertex, false otherwise
      * that's used to check if a player can place a city on a vertex.
      * In the game, a player can only place a city or colony on a vertex if it is next to a road that belongs to the player.
      * The only exception is when the player places the first two roads and colonies.
+     * @see #getNeighbourTileVerticesToEdge to see how the vertices are found.
      */
     public boolean isRoadNextToVertex(TileEdge edge, TileVertex vertex) {
         TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
@@ -582,16 +583,17 @@ public class GameBoard implements Serializable {
 
     /**
      * isRoadNextToRoad
-     * @param edge the edge that is checked if it is next to a road
+     *
+     * @param edge   the edge that is checked if it is next to a road
      * @param player the player that is checked if the road belongs to him
-     * this method goes through the edges of the board.
-     * it then checks if the edge contains a building.
-     * if the edge contains a building, then it checks if the building belongs to the player.
-     * @see #getNeighbourTileEdgesToEdge to see how the edges are found.
+     *               this method goes through the edges of the board.
+     *               it then checks if the edge contains a building.
+     *               if the edge contains a building, then it checks if the building belongs to the player.
      * @return true if the road is next to a road that belongs to the player, false otherwise
      * that's used to check if a player can place a road on an edge.
      * In the game, a player can only place a road on an edge if it is next to a road or a colony that belongs to the player.
-     * this method in particular is used to check if a player can place a road on an edge if it is next to a road that belongs to the player. 
+     * this method in particular is used to check if a player can place a road on an edge if it is next to a road that belongs to the player.
+     * @see #getNeighbourTileEdgesToEdge to see how the edges are found.
      */
     public boolean isRoadNextToRoad(TileEdge edge, Player player) {
         TileEdge[] neighbours = getNeighbourTileEdgesToEdge(edge);
@@ -610,16 +612,17 @@ public class GameBoard implements Serializable {
 
     /**
      * isVertexNextToRoad
+     *
      * @param vertex the vertex that is checked if it is next to a road
      * @param player the player that is checked if the road belongs to him
-     * this method goes through the edges of the board.
-     * once it finds the edges that are connected to the vertex, it checks if the edge contains a building.
-     * if the edge contains a building, then it checks if the building belongs to the player.
-     * @see #getNeighbourTileEdgesToVertex to see how the edges are found.
+     *               this method goes through the edges of the board.
+     *               once it finds the edges that are connected to the vertex, it checks if the edge contains a building.
+     *               if the edge contains a building, then it checks if the building belongs to the player.
      * @return true if the vertex is next to a road that belongs to the player, false otherwise
      * that's used to check if a player can place a colony on a vertex.
      * In the game, a player can only place a colony on a vertex if it is next to a road that belongs to the player.
      * that's also used to check if a player can place a colony on a vertex if it is next to a city that belongs to the player.
+     * @see #getNeighbourTileEdgesToVertex to see how the edges are found.
      */
     public boolean isVertexNextToRoad(TileVertex vertex, Player player) {
         TileEdge[] neighbours = getNeighbourTileEdgesToVertex(vertex);
@@ -637,6 +640,7 @@ public class GameBoard implements Serializable {
 
     /**
      * canPlaceColony
+     *
      * @param vertex the vertex where the player wants to place a colony
      * @param player the player that wants to place a colony
      * @return true if the player can place a colony on the vertex, false otherwise
@@ -665,23 +669,23 @@ public class GameBoard implements Serializable {
         return true;
     }
 
-/**
- * canPlaceCity
- * @param vertex
- * @param player
- * it's used to check if we have the conditions to place a city
- * @return true if we can, false otherwise 
- * @see Colony to see how we create cities or colonies
- */
+    /**
+     * canPlaceCity
+     *
+     * @param vertex
+     * @param player it's used to check if we have the conditions to place a city
+     * @return true if we can, false otherwise
+     * @see Colony to see how we create cities or colonies
+     */
     public boolean canPlaceCity(TileVertex vertex, Player player) {
-        if (!(vertex.getBuilding() instanceof Colony)){
+        if (!(vertex.getBuilding() instanceof Colony)) {
             return false;
-        }else{
-            Building buil= vertex.getBuilding();
-            if(buil instanceof Colony){
+        } else {
+            Building buil = vertex.getBuilding();
+            if (buil instanceof Colony) {
                 Colony col = (Colony) buil;
-                if(!col.getIsCity()){
-                    if(col.getOwner()==player){
+                if (!col.getIsCity()) {
+                    if (col.getOwner() == player) {
                         return true;
                     }
                 }
@@ -692,7 +696,8 @@ public class GameBoard implements Serializable {
 
     /**
      * canPlaceRoad
-     * @param edge the edge where the player wants to place a road
+     *
+     * @param edge   the edge where the player wants to place a road
      * @param player the player that wants to place a road
      * @return true if the player can place a road on the edge, false otherwise
      * that's used to check if a player can place a road on an edge.
@@ -724,15 +729,16 @@ public class GameBoard implements Serializable {
     }
 
     /**
-     * addTile 
-     * @param q the first coordinate of the tile
-     * @param r the second coordinate of the tile
-     * @param diceValue the dice value of the tile
+     * addTile
+     *
+     * @param q            the first coordinate of the tile
+     * @param r            the second coordinate of the tile
+     * @param diceValue    the dice value of the tile
      * @param resourceType the resource type of the tile
-     * this method adds a tile to the board.
-     * it creates a tile with the given q, r, dice value, and resource type.
-     * it then adds the tile to the board.
-     * if the resource type is desert, then the thief is set to the tile.
+     *                     this method adds a tile to the board.
+     *                     it creates a tile with the given q, r, dice value, and resource type.
+     *                     it then adds the tile to the board.
+     *                     if the resource type is desert, then the thief is set to the tile.
      * @see #getTileType to see how the resource type is converted to a tile type.
      * @see Thief to see how the thief is set to the tile.
      * @see Tile to see how the tile is created.
@@ -749,6 +755,7 @@ public class GameBoard implements Serializable {
 
     /**
      * getTile
+     *
      * @param q
      * @param r
      * @return the tile at the given q, r coordinates
@@ -773,6 +780,7 @@ public class GameBoard implements Serializable {
      * it also sets the dice value and resource type for each tile.
      * the dice value and resource type are set based on the preset tile dice values and tile resource types.
      * the preset tile dice values and tile resource types are constants.
+     *
      * @see Constants.BoardConstants#TILE_DICE_VALUES to see the preset tile dice values.
      * @see Constants.BoardConstants#TILE_TYPES to see the preset tile resource types.
      * @see #addTile to see how the tiles are added to the board.
@@ -805,15 +813,6 @@ public class GameBoard implements Serializable {
         }
     }
 
-    /**
-     * initialiseBoardImage
-     * this method initialises the board image.
-     * it creates a graphics object for the board image.
-     * it then scales the image based on the game width and height.
-     * it then goes through the tiles of the board and draws the tile images on the board image.
-     * if the game is in thief mode, then the tile image of the selected tile is highlighted.
-     * @see Constants.Game to see how the game width and height are used to scale the image.
-     */
     public void modifyDiceValue(int q, int r, int diceValue) {
         int s = -q - r;
         board.get(new CubeCoordinates(q, r, s)).setDiceValue(diceValue);
@@ -845,6 +844,7 @@ public class GameBoard implements Serializable {
             }
         }
     }
+
     public void eventChangeDiceValues() {
         exchangeTwelveTwoToEightSix();
     }
@@ -893,6 +893,7 @@ public class GameBoard implements Serializable {
      * it then draws the dice value on the image.
      * the dice value is drawn in the center of the image.
      * the color of the dice value is red if the dice value is 6 or 8, and black otherwise.
+     *
      * @see Constants.Game#DIVIDER to see how the font size is divided.
      * @see #baseFont to see the font used to draw the dice value.
      * @see #diceValueImages to see how the dice value images are stored.
@@ -936,6 +937,7 @@ public class GameBoard implements Serializable {
 
     /**
      * getTileType
+     *
      * @param resourceType the type of resource that the tile contains
      * @return the tile type based on the resource type
      * this method converts the resource type to a tile type.
@@ -970,6 +972,7 @@ public class GameBoard implements Serializable {
      * if the vertex is not in the map, then a new tile vertex object is created for the vertex.
      * the tile is then added to the list of tiles associated with the vertex.
      * the vertex is then added to the map with the tile vertex object as the value.
+     *
      * @see TileVertex to see the class that represents the vertex.
      * @see Tile to see the class that represents the tile.
      * @see CubeCoordinates to see how the coordinates of the vertices are obtained.
@@ -1028,6 +1031,7 @@ public class GameBoard implements Serializable {
      * if the edge is not in the map, then a new tile edge object is created for the edge.
      * the tile is then added to the list of tiles associated with the edge.
      * the edge is then added to the map with the tile edge object as the value.
+     *
      * @see TileEdge to see the class that represents the edge.
      * @see Tile to see the class that represents the tile.
      * @see CubeCoordinates to see how the coordinates of the edges are obtained.
@@ -1060,6 +1064,7 @@ public class GameBoard implements Serializable {
 
     /**
      * edgesMapContainsEdge
+     *
      * @param edge the edge we want to check if it is in the map
      * @return true if the edge is already in the map, false otherwise
      * this method checks if the given edge is already in the map.
@@ -1088,6 +1093,7 @@ public class GameBoard implements Serializable {
 
     /**
      * buildingIsCity
+     *
      * @param building the building
      * @return true if the building is a city, false otherwise (it can be a colony or null)
      */
@@ -1097,30 +1103,31 @@ public class GameBoard implements Serializable {
         }
         return false;
     }
-    
+
     /**
      * drawBuildingImage
-     * @param g2d the graphics object
+     *
+     * @param g2d      the graphics object
      * @param building the building
-     * @param vertex the vertex we want to draw the building on
-     * this method draws the building image on the vertex.
-     * it checks if the building is a city or a colony.
-     * if the building is a city, then the city image is drawn on the vertex.
-     * if the building is a colony, then the colony image is drawn on the vertex.
+     * @param vertex   the vertex we want to draw the building on
+     *                 this method draws the building image on the vertex.
+     *                 it checks if the building is a city or a colony.
+     *                 if the building is a city, then the city image is drawn on the vertex.
+     *                 if the building is a colony, then the colony image is drawn on the vertex.
      * @see #buildingIsCity to see how the building is checked if it is a city.
      * @see #getImageForBuilding to see how the image for the building is obtained.
      * @see #scaledBuildingImages to see how the image for the building is scaled.
      * @see Resolution#divider to see how the image is scaled based on the resolution.
      * @see Point to see how the building image is drawn on the vertex.
      * @see Graphics2D to see how the building image is drawn on the vertex.
-     */    
+     */
     private void drawBuildingImage(Graphics2D g2d, Building building, Point vertex) {
         boolean isCity = buildingIsCity(building);
         if (scaledBuildingImages.get(building) == null) {
             BufferedImage img = getImageForBuilding(building);
             int size = (isCity ? 90 : 60);
             scaledBuildingImages.put(building, img.getScaledInstance((int) (size / Resolution.divider()),
-                (int) (size / Resolution.divider()), Image.SCALE_SMOOTH));
+                    (int) (size / Resolution.divider()), Image.SCALE_SMOOTH));
         }
         int placement = (isCity ? 40 : 30);
         g2d.drawImage(scaledBuildingImages.get(building),
@@ -1130,11 +1137,12 @@ public class GameBoard implements Serializable {
 
     /**
      * drawVertices
+     *
      * @param g the graphics object
-     * this method draws the vertices on the board.
-     * it goes through the vertices of the board.
-     * for each vertex, it checks if the vertex contains a building.
-     * if the vertex contains a building, then the building image is drawn on the vertex.
+     *          this method draws the vertices on the board.
+     *          it goes through the vertices of the board.
+     *          for each vertex, it checks if the vertex contains a building.
+     *          if the vertex contains a building, then the building image is drawn on the vertex.
      * @see #drawBuildingImage to see how the building image is drawn on the vertex.
      */
     private void drawVertices(Graphics g) {
@@ -1149,15 +1157,16 @@ public class GameBoard implements Serializable {
             }
         }
     }
-    
+
     /**
      * drawImagesInHexes
+     *
      * @param g the graphics object
-     * this method draws the images in the hexes.
-     * it goes through the tiles of the board.
-     * for each tile, it gets the pixel coordinates of the tile.
-     * it then draws the image of the tile on the pixel coordinates.
-     * if the game is in thief mode, then the image of the selected tile is highlighted. 
+     *          this method draws the images in the hexes.
+     *          it goes through the tiles of the board.
+     *          for each tile, it gets the pixel coordinates of the tile.
+     *          it then draws the image of the tile on the pixel coordinates.
+     *          if the game is in thief mode, then the image of the selected tile is highlighted.
      */
     public void drawImagesInHexes(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -1174,14 +1183,15 @@ public class GameBoard implements Serializable {
 
     /**
      * drawEdgeWithImage
-     * @param g2d the graphics object
-     * @param start the start point of the edge
-     * @param end the end point of the edge
+     *
+     * @param g2d       the graphics object
+     * @param start     the start point of the edge
+     * @param end       the end point of the edge
      * @param edgeImage the image of the edge
-     * this method draws the edge with the image.
-     * it calculates the middle of the edge and the rotation angle.
-     * it scales the image of the edge.
-     * it then applies the transformation and draws the image.
+     *                  this method draws the edge with the image.
+     *                  it calculates the middle of the edge and the rotation angle.
+     *                  it scales the image of the edge.
+     *                  it then applies the transformation and draws the image.
      * @see AffineTransform to see how the transformation is applied.
      * @see #drawImagesInHexes to see how the images are drawn in the hexes.
      * @see #drawVertices to see how the vertices are drawn.
@@ -1218,11 +1228,12 @@ public class GameBoard implements Serializable {
 
     /**
      * drawEdges
+     *
      * @param g the graphics object
-     * this method draws the edges on the board.
-     * it goes through the edges of the board.
-     * for each edge, it checks if the edge contains a building.
-     * if the edge contains a building, then the edge image is drawn on the edge.
+     *          this method draws the edges on the board.
+     *          it goes through the edges of the board.
+     *          for each edge, it checks if the edge contains a building.
+     *          if the edge contains a building, then the edge image is drawn on the edge.
      * @see #drawEdgeWithImage to see how the edge image is drawn on the edge.
      */
     private void drawEdges(Graphics g) {
@@ -1238,11 +1249,12 @@ public class GameBoard implements Serializable {
 
     /**
      * drawPorts
+     *
      * @param g the graphics object
-     * this method draws the ports on the board.
-     * it goes through the ports of the board.
-     * for each port, it gets the pixel coordinates of the port.
-     * it then draws the port image on the pixel coordinates.
+     *          this method draws the ports on the board.
+     *          it goes through the ports of the board.
+     *          for each port, it gets the pixel coordinates of the port.
+     *          it then draws the port image on the pixel coordinates.
      * @see #drawBuildingImage to see how the building image is drawn on the vertex.
      * @see #drawEdgeWithImage to see how the edge image is drawn on the edge.
      * @see #drawImagesInHexes to see how the images are drawn in the hexes.
@@ -1278,9 +1290,10 @@ public class GameBoard implements Serializable {
 
     /**
      * draw
+     *
      * @param g the graphics object
-     * this method draws the board.
-     * it draws the images in the hexes, the edges, the vertices, the ports, and the thief.
+     *          this method draws the board.
+     *          it draws the images in the hexes, the edges, the vertices, the ports, and the thief.
      * @see #drawImagesInHexes to see how the images are drawn in the hexes.
      * @see #drawVertices to see how the vertices are drawn.
      * @see #drawPorts to see how the ports are drawn.
@@ -1312,6 +1325,7 @@ public class GameBoard implements Serializable {
 
         drawThief(g);
     }
+
 
     /**
      * drawThief

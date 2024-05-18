@@ -2,6 +2,7 @@ package view;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.awt.*;
 import javax.swing.*;
@@ -28,6 +29,8 @@ import start.Main;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
+import java.util.HashMap;
+import java.util.concurrent.*;
 
 public class ActionPlayerPanel extends JPanel {
     private ButtonImage endTurn;
@@ -46,6 +49,7 @@ public class ActionPlayerPanel extends JPanel {
     private LogPanel logChat;
     private PlayersPanel playersPanel;
     private RollingDice dice;
+    private HashMap<TileType, BufferedImage> resourceImages = new HashMap<>();
     private boolean harboursDisabled = false;
     private boolean firstUpdate = true;
 
@@ -59,6 +63,7 @@ public class ActionPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        preloadResourceImages();
         setOpaque(false);
         initializeRollingDicePanel();
         initializeTradeButtonPanel();
@@ -70,6 +75,31 @@ public class ActionPlayerPanel extends JPanel {
         //createPlayerPanel();
         createEndTurnButton();
         setVisible(true);
+    }
+
+    public void preloadResourceImages() {
+        for (TileType type : TileType.values()) {
+            try {
+                BufferedImage originalImage = ImageIO.read(new File(type.getImagePath()));
+                // Calculer les nouvelles dimensions
+                int newWidth = originalImage.getWidth() / 5;
+                int newHeight = originalImage.getHeight() / 5;
+
+                // Créer une nouvelle image réduite
+                BufferedImage resizedImage = new BufferedImage(newWidth,
+                        newHeight, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2d = resizedImage.createGraphics();
+
+                // Redessiner l'image originale dans la nouvelle image avec les nouvelles dimensions
+                g2d.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
+                g2d.dispose();
+
+                // Stocker l'image redimensionnée
+                resourceImages.put(type, resizedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public TradePanel getTradePanel() {
@@ -270,7 +300,7 @@ public class ActionPlayerPanel extends JPanel {
 
     private void initializeTradeButtonPanel() {
         int xCoord = Resolution.calculateResolution(50, 560)[0];
-        int yCoord = Resolution.calculateResolution(50, 560)[1];
+        int yCoord = Resolution.calculateResolution(50, 560)[1]; // - 175 x
         tradeButtonPanel = new TradeButtonPanel(this::initializeTradePanel);
         tradeButtonPanel.setVisible(true);
         tradeButtonPanel.setBounds(xCoord, yCoord, (int) (185 / Resolution.divider()),
@@ -488,6 +518,8 @@ public class ActionPlayerPanel extends JPanel {
     public void createPlayerPanel() {
         playersPanel = new PlayersPanel(game);
         add(playersPanel);
+//        playersPanel.setBackground(Color.CYAN);
+//        playersPanel.setOpaque(true);
     }
 
     public void update() {
@@ -523,10 +555,74 @@ public class ActionPlayerPanel extends JPanel {
         repaint();
     }
 
+    public void endTurnPanels(Player currentPlayer, boolean toAnimate) {
+        if (!toAnimate || !currentPlayer.equals(game.getPlayerClient())) {
+            return;
+        }
+        int yCoordEndTurnButton = endTurn.getY();
+        int yCoordNamePlayerLabel = namePlayer.getY();
+        int xCoordDicePanel = dice.getX();
+        int xCoordTradeButton = tradeButtonPanel.getX();
+        animate.jLabelYDown(yCoordNamePlayerLabel, yCoordNamePlayerLabel + 100, 2, 1, namePlayer);
+        animate.jPanelXLeft(xCoordTradeButton, xCoordTradeButton - 300, 2, 1, tradeButtonPanel);
+        animate.jPanelXRight(xCoordDicePanel, xCoordDicePanel + 300, 2, 1, dice);
+        animate.buttonImageYDown(yCoordEndTurnButton, yCoordEndTurnButton + 300, 2, 1, endTurn);
+    }
+
+    public void newTurnPanels(Player currentPlayer, boolean toAnimate) {
+        if (!toAnimate || !currentPlayer.equals(game.getPlayerClient())) {
+            return;
+        }
+        int yCoordNamePlayerLabel = namePlayer.getY();
+        int yCoordEndTurnButton = endTurn.getY();
+        int xCoordDicePanel = dice.getX();
+        int xCoordTradeButton = tradeButtonPanel.getX();
+        animate.jLabelYUp(yCoordNamePlayerLabel, yCoordNamePlayerLabel - 100, 2, 1, namePlayer);
+        animate.jPanelXRight(xCoordTradeButton, xCoordTradeButton + 300, 2, 1, tradeButtonPanel);
+        animate.jPanelXLeft(xCoordDicePanel, xCoordDicePanel - 300, 2, 1, dice);
+        animate.buttonImageYUp(yCoordEndTurnButton, yCoordEndTurnButton - 300, 2, 1, endTurn);
+    }
+
+    public void animateResourceGain(TileType resourceType,
+                                    model.geometry.Point startLocation, Player player) {
+        BufferedImage resourceImage = resourceImages.get(resourceType);
+        JPanel resourcePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(resourceImage, 0, 0, null);
+            }
+        };
+        resourcePanel.setOpaque(false);
+
+        resourcePanel.setSize(resourceImage.getWidth(), resourceImage.getHeight());
+        resourcePanel.setLocation((int) startLocation.getX(), (int) startLocation.getY());
+        add(resourcePanel);
+
+        model.geometry.Point endLocation;
+        // Si le joueur client est le joueur gagnant, animez vers l'inventaire du joueur.
+        if (player.equals(game.getPlayerClient())) {
+            endLocation = new model.geometry.Point(600, 900); // TODO Adapter taille d'écran
+        } else {
+            // Si le joueur client n'est pas le joueur gagnant, animez vers le pseudo du joueur
+            model.geometry.Point labelPosition = playersPanel.getPlayerLabelPosition(player);
+            endLocation = labelPosition != null ? labelPosition : new model.geometry.Point(0, 0);
+        }
+
+        model.geometry.Point controlPoint = new model.geometry.Point(700, 200);
+        Animation animation = new Animation();
+        animation.animateAlongBezierCurve(startLocation, controlPoint, endLocation, 2,
+                1000, resourcePanel, () -> {
+                    remove(resourcePanel);
+                    repaint();
+                });
+    }
+
     /**
      * Gets the player according to the game mode (network or local).
      * @return The Player object representing the player in front of the screen
      */
+
     public Player getPlayerFromGame() {
         Player player;
         if (Main.hasServer()) {

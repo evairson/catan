@@ -169,10 +169,19 @@ public class Game implements StateMethods, Serializable {
         return true;
     }
 
+//    public Player getFirstPlayer() {
+//        // Assurez-vous que la liste des joueurs n'est pas vide
+//        if (!players.isEmpty()) {
+//            return players.get(0); // Retourne le premier joueur de la liste
+//        }
+//        return null; // Si la liste est vide, retourne null
+//    }
+//
+
     public void endTurn() {
         if (!canPass()) {
             System.out.println("Impossible de passer le tour");
-            if(App.getBotSoloMode()) {
+            if (App.getBotSoloMode()) {
                 getCurrentPlayer().throwDices(app.hasD20());
             }
             return;
@@ -189,6 +198,8 @@ public class Game implements StateMethods, Serializable {
             }
         }
 
+//        App.getActionPlayerPanel().endTurnPanels(getCurrentPlayer(), isEndOfTurnAnimationNeeded);
+
         if (start && getCurrentPlayer().last(this)) {
             start = false;
             backwards = true;
@@ -200,8 +211,10 @@ public class Game implements StateMethods, Serializable {
             players.prev();
         } else {
             players.next();
+//            if (getCurrentPlayer().equals(getFirstPlayer()) && !start && !backwards) {
+//                isNewTurnAnimationNeeded = false;
+//            }
         }
-
         if (!start && !backwards && !blankTurn) {
             App.getActionPlayerPanel().getRollingDice().setButtonIsOn(true);
         }
@@ -217,6 +230,11 @@ public class Game implements StateMethods, Serializable {
         checkForHexesRespawn();
 
         App.getActionPlayerPanel().update();
+
+        app.addMessageColor("C'est au tour de ", java.awt.Color.RED);
+        app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
+                app.getGame().getCurrentPlayer().getColorAwt());
+
         App.getGamePanel().repaint();
 
         if (!Main.hasServer()) {
@@ -272,7 +290,7 @@ public class Game implements StateMethods, Serializable {
     @Override
     public void update() {
         lootResources();
-        if (app.hasD20()) {
+        if (app.isHasD20()) {
             activateD20Event();
         }
     }
@@ -296,13 +314,12 @@ public class Game implements StateMethods, Serializable {
                         Colony colony = (Colony) b;
                         for (Tile tile : colony.getVertex().getTiles()) {
                             if (tile.getDiceValue() == getCurrentPlayer().getDice()) {
-                                if (colony.getIsCity()) {
-                                    Integer number = player.getResources().get(tile.getResourceType());
-                                    player.getResources().replace(tile.getResourceType(), number + 2);
-                                } else {
-                                    Integer number = player.getResources().get(tile.getResourceType());
-                                    player.getResources().replace(tile.getResourceType(), number + 1);
-                                }
+                                int amount = colony.getIsCity() ? 2 : 1;
+                                Integer number = player.getResources().get(tile.getResourceType());
+                                player.getResources().replace(tile.getResourceType(), number + amount);
+                                //animation pour la resource
+                                App.getActionPlayerPanel().animateResourceGain(tile.getResourceType(),
+                                        colony.getVertex().getCoordinates(), player);
                             }
                         }
                     }
@@ -774,8 +791,8 @@ public class Game implements StateMethods, Serializable {
     public void placeRoadAndColonyBot(boolean road) {
         boolean hasPlaced = false;
         while (!hasPlaced) {
-            int nbAlea = (int) (Math.random() * (road ? board.getEdgeMap().size()
-                : board.getVertices().size()));
+            int nbAlea = (int) (Math.random() *
+                    (road ? board.getEdgeMap().size() : board.getVertices().size()));
             try {
                 if (!road) {
                     if (buildColony(nbAlea)) {
@@ -927,6 +944,7 @@ public class Game implements StateMethods, Serializable {
     public boolean isInBeginningPhase() {
         return start || backwards;
     }
+
 
     public void checkIfTradeEventActive() {
         if (tradeEventTurn > 0) {

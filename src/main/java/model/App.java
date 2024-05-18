@@ -29,6 +29,10 @@ public class App {
     private static BackgroundPanel background;
     private static Boolean botSoloMode = false;
 
+    public boolean isHasD20() {
+        return hasD20;
+    }
+
     public GameBoard getBoard() {
         return board;
     }
@@ -122,7 +126,6 @@ public class App {
     public static void addMessage(String message) {
         ((ChatPanel) actionPlayer.getChat()).addMessage(message);
     }
-
 
     public void addMessageColor(String message, Color color) {
         (actionPlayer.getLogChat()).addMessageColor(message, color);
