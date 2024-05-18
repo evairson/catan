@@ -5,10 +5,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import model.geometry.*;
+import model.IA.Bot;
+import model.IA.ThreadBot;
 import model.buildings.Building;
 import model.buildings.Colony;
 import model.cards.CardStack;
 import model.cards.DevelopmentCard;
+import model.cards.KnightCard;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;
@@ -23,6 +27,7 @@ import view.TileType;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.HashMap;
 
 import exceptionclass.ConstructBuildingException;
 import view.gamepanels.TradePanel;
@@ -48,6 +53,12 @@ public class Game implements StateMethods, Serializable {
     private ArrayList<TileType> betPot = new ArrayList<>();
     private int tradeEventTurn = 0;
 
+    public Game(HashMap<Point, TileEdge> edge) { // Pour les tests
+        thief = new Thief();
+        board = new GameBoard(edge, this);
+        stack = new CardStack();
+    }
+
     public Game(HashSet<Player> playersSet) {
         for (Player player : playersSet) {
             playersSet.add(player);
@@ -58,6 +69,14 @@ public class Game implements StateMethods, Serializable {
         thief = new Thief();
         board = new GameBoard(thief, this);
         stack = new CardStack();
+    }
+
+    public boolean isStart() {
+        return start;
+    }
+
+    public boolean isBackwards() {
+        return backwards;
     }
 
     public App getApp() {
@@ -77,8 +96,8 @@ public class Game implements StateMethods, Serializable {
             try {
                 int id = playerClient.getId();
                 NetworkObject object = new NetworkObject(TypeObject.Message, "changeTurn", id, null);
-                playerClient.getOut().writeUnshared(object);
-                playerClient.getOut().flush();
+                ((PlayerClient) playerClient).getOut().writeUnshared(object);
+                ((PlayerClient) playerClient).getOut().flush();
             } catch (Exception e) {
                 e.getStackTrace();
             }
@@ -123,25 +142,30 @@ public class Game implements StateMethods, Serializable {
             }
         }
         getCurrentPlayer().addResource(t, amount);
-        app.getActionPlayerPanel().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
+        App.getActionPlayerPanel().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
         System.out.println("monopoly de " + amount + " " + t);
     }
 
     public boolean canPass() {
         Player p = getCurrentPlayer();
         if (p.getFreeRoad() > 0) {
+            System.out.println("freeRoad");
             return false;
         }
         if (monoWaiting || yearOfPlentyWaiting > 0) {
+            System.out.println("monoWaiting");
             return false;
         }
         if (p.getFreeColony()) {
+            System.out.println("freeColony");
             return false;
         }
         if (!p.hasThrowDices() && !start && !backwards) {
+            System.out.println("Le joueur n'a pas encore lancé les dés");
             return false;
         }
         if (board.getThiefMode()) {
+            System.out.println("thief");
             return false;
         }
         return true;
@@ -149,6 +173,10 @@ public class Game implements StateMethods, Serializable {
 
     public void endTurn() {
         if (!canPass()) {
+            System.out.println("Impossible de passer le tour");
+            if(App.getBotSoloMode()) {
+                getCurrentPlayer().throwDices(app.hasD20());
+            }
             return;
         }
 
@@ -186,8 +214,17 @@ public class Game implements StateMethods, Serializable {
         if (isInBeginningPhase()) {
             getCurrentPlayer().setFreeColony(true);
         }
+
+        checkForHarboursDisabled();
+        checkForHexesRespawn();
+
         App.getActionPlayerPanel().update();
         App.getGamePanel().repaint();
+
+        if (!Main.hasServer()) {
+            startTurnBot();
+        }
+        app.update();
     }
 
     public boolean canDraw() {
@@ -220,8 +257,12 @@ public class Game implements StateMethods, Serializable {
         board.draw(g);
     }
 
-    public PlayerClient getPlayerClient() {
-        return playerClient;
+    public Player getPlayerClient() {
+        if (playerClient != null) {
+            return playerClient;
+        } else {
+            return players.get(0);
+        }
     }
 
     // Player action : -----------------
@@ -322,6 +363,7 @@ public class Game implements StateMethods, Serializable {
             board.setThiefModeEnd(true);
         }
         App.getGamePanel().repaint();
+        App.getActionPlayerPanel().update();
     }
 
     @Override
@@ -515,6 +557,9 @@ public class Game implements StateMethods, Serializable {
                                 id, cVertex.getId());
                         playerClient.getOut().writeUnshared(object);
                         playerClient.getOut().flush();
+                        app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                                app.getGame().getCurrentPlayer().getColorAwt());
+                        app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.BLACK);
                     } catch (Exception e) {
                         e.getStackTrace();
                     }
@@ -539,16 +584,20 @@ public class Game implements StateMethods, Serializable {
      * @param idVertex the id of the vertex where the player wants to build a colony
      * @throws ConstructBuildingException if the player can't build a colony on the vertex
      */
-    public void buildColony(int idVertex) throws ConstructBuildingException {
+    public boolean buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
                 if (board.canPlaceColony(vertex, getCurrentPlayer())) {
+                    System.out.println("Je peux placer la colony");
                     board.setLookingForVertex(false);
                     board.setPlacingCity(false);
-                    getCurrentPlayer().buildColony(vertex);
-                    App.getGamePanel().repaint();
+                    if (getCurrentPlayer().buildColony(vertex)) {
+                        App.getActionPlayerPanel().update();
+                        App.getGamePanel().repaint();
+                        return true;
+                    }
+                    return false;
                 }
-                return;
             }
         }
         throw new ConstructBuildingException();
@@ -566,8 +615,8 @@ public class Game implements StateMethods, Serializable {
                         int id = playerClient.getId();
                         NetworkObject object = new NetworkObject(TypeObject.Board, "buildRoad",
                                 id, cEdge.getId());
-                        playerClient.getOut().writeUnshared(object);
-                        playerClient.getOut().flush();
+                        ((PlayerClient) playerClient).getOut().writeUnshared(object);
+                        ((PlayerClient) playerClient).getOut().flush();
                     } catch (Exception e) {
                         e.getStackTrace();
                     }
@@ -575,13 +624,11 @@ public class Game implements StateMethods, Serializable {
             }
         } else {
             if (cEdge != null) {
-                //try {
-                if (board.canPlaceRoad(cEdge, getCurrentPlayer())) {
-                    getCurrentPlayer().buildRoad(cEdge);
-                }
-                /* } catch (ConstructBuildingException e) {
+                try {
+                    buildRoad(cEdge.getId());
+                } catch (ConstructBuildingException e) {
                     ConstructBuildingException.messageError();
-                }*/
+                }
             }
         }
         // rajouter un if ça a marché (transformer Player.buildRoad en boolean)
@@ -597,16 +644,18 @@ public class Game implements StateMethods, Serializable {
      * @see Player#buildRoad
      * @see TileEdge
      */
-    public void buildRoad(int idEdge) throws ConstructBuildingException {
+    public boolean buildRoad(int idEdge) throws ConstructBuildingException {
         for (TileEdge edge : board.getEdgeMap().values()) {
             if (edge.getId() == idEdge) {
-                System.out.println("yeah !");
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
-                getCurrentPlayer().buildRoad(edge);
-                App.getActionPlayerPanel().update();
-                App.getGamePanel().repaint();
-                return;
+                if (getCurrentPlayer().buildRoad(edge)) {
+                    App.getActionPlayerPanel().update();
+                    App.getGamePanel().repaint();
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
         throw new ConstructBuildingException();
@@ -658,14 +707,17 @@ public class Game implements StateMethods, Serializable {
      * @see Player#buildCity
      * @see TileVertex
      */
-    public void buildCity(int idVertex, boolean us) throws ConstructBuildingException {
+    public boolean buildCity(int idVertex, boolean us) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
                 board.setLookingForVertex(false);
                 board.setPlacingCity(false);
-                getCurrentPlayer().buildCity(vertex, us);
-                App.getGamePanel().repaint();
-                return;
+                if (getCurrentPlayer().buildCity(vertex, us)) {
+                    App.getActionPlayerPanel().update();
+                    App.getGamePanel().repaint();
+                    return true;
+                }
+                return false;
             }
         }
         throw new ConstructBuildingException();
@@ -699,13 +751,175 @@ public class Game implements StateMethods, Serializable {
     }
 
     public boolean isMyTurn() {
-        return playerClient.isMyTurn(this);
+        if (playerClient != null) {
+            return playerClient.isMyTurn(this);
+        } else {
+            return false;
+        }
     }
 
     public void updatePlayerColor() {
         for (Player player : players) {
             player.setColor(Player.getColorId(player.getId()));
         }
+    }
+
+    // Fonction lié aux Bots :
+
+    public void startTurnBot() {
+        if (getCurrentPlayer() instanceof Bot) {
+            ThreadBot threadBot = new ThreadBot(this, (Bot) getCurrentPlayer());
+            threadBot.start();
+        }
+    }
+
+    public void placeRoadAndColonyBot(boolean road) {
+        boolean hasPlaced = false;
+        while (!hasPlaced) {
+            int nbAlea = (int) (Math.random() * (road ? board.getEdgeMap().size()
+                : board.getVertices().size()));
+            try {
+                if (!road) {
+                    if (buildColony(nbAlea)) {
+                        hasPlaced = true;
+                    }
+                } else {
+                    if (buildRoad(nbAlea)) {
+                        hasPlaced = true;
+                    }
+                }
+            } catch (ConstructBuildingException e) {
+                ConstructBuildingException.messageError();
+            }
+        }
+        App.getGamePanel().repaint();
+    }
+
+    // Route la plus longue
+
+    public static int getNumberRoads(ArrayList<TileEdge> edges, TileEdge edge, int idPlayer) {
+        ArrayList<TileEdge> edgesNext = new ArrayList<>();
+        ArrayList<TileEdge> edgesCopy = (ArrayList<TileEdge>) edges.clone();
+        for (TileEdge edgeNext : edges) {
+            if (edgeNext == edge) {
+                continue;
+            }
+            if (edgeNext.getEnd().distance(edge.getEnd()) == 0
+                    || edgeNext.getStart().distance(edge.getEnd()) == 0) {
+                if (edgeNext.getBuilding() != null && edgeNext.getBuilding().getOwner().getId() == idPlayer) {
+                    edgesNext.add(edgeNext);
+                    edgesCopy.remove(edgeNext);
+                }
+            }
+        }
+        if (edgesNext.size() == 0) {
+            return 1;
+        } else if (edgesNext.size() == 1) {
+            return 1 + getNumberRoads(edgesCopy, edgesNext.get(0), idPlayer);
+        } else {
+            return 1 + Math.max(getNumberRoads(edges, edgesNext.get(0), idPlayer),
+                    getNumberRoads(edgesCopy, edgesNext.get(1), idPlayer));
+        }
+    }
+    /**
+     * @param edges : Edges de départ
+     * @param edge : Edge de départ
+     * @param idPlayer : L'id du player voulu
+     * @return edge d'arrivé du plus long chemin
+     */
+    public static TileEdge getRoadMax(ArrayList<TileEdge> edges, TileEdge edge, int idPlayer) {
+        ArrayList<TileEdge> edgesNext = new ArrayList<>();
+        ArrayList<TileEdge> edgesCopy = (ArrayList<TileEdge>) edges.clone();
+        for (TileEdge edgeNext : edges) {
+            if (edgeNext == edge) {
+                continue;
+            }
+            if (edgeNext.getEnd().distance(edge.getEnd()) == 0
+                    || edgeNext.getStart().distance(edge.getEnd()) == 0) {
+                if (edgeNext.getBuilding() != null && edgeNext.getBuilding().getOwner().getId() == idPlayer) {
+                    edgesNext.add(edgeNext);
+                    edgesCopy.remove(edgeNext);
+                }
+            }
+        }
+        if (edgesNext.size() == 0) {
+            System.out.println("c'est zero");
+            return edge;
+        } else if (edgesNext.size() == 1) {
+            System.out.println("1");
+            return getRoadMax(edgesCopy, edgesNext.get(0), idPlayer);
+        } else {
+            System.out.println("2");
+            if (getNumberRoads(edgesCopy, edgesNext.get(0), idPlayer)
+                    > getNumberRoads(edgesCopy, edgesNext.get(1), idPlayer)) {
+                return getRoadMax(edgesCopy, edgesNext.get(0), idPlayer);
+            } else {
+                return getRoadMax(edgesCopy, edgesNext.get(1), idPlayer);
+            }
+        }
+    }
+
+    public TileEdge getBestBeforeRoad(int id) {
+        int numbersRoadsMax = 0;
+        TileEdge edgeFirstMax = null;
+        ArrayList<TileEdge> edges = new ArrayList<>();
+        for (TileEdge edge: board.getEdgeMap().values()) {
+            edges.add(edge);
+        }
+        for (TileEdge edge: board.getEdgeMap().values()) {
+            if (edge.getBuilding() != null && edge.getBuilding().getOwner().getId() == id) {
+                if (edgeFirstMax == null) {
+                    edgeFirstMax = edge;
+                }
+                int numberRoads = Game.getNumberRoads(edges, edge, id);
+                if (numberRoads > numbersRoadsMax) {
+                    numbersRoadsMax = numberRoads;
+                    edgeFirstMax = edge;
+                }
+            }
+        }
+
+        System.out.println(numbersRoadsMax);
+        return edgeFirstMax;
+    }
+
+    public Player getPlayerWhoHasLongestRoad() {
+        Player playerWon = null;
+        int numberRoadsMax = 0;
+        ArrayList<TileEdge> edges = new ArrayList<>();
+        for (TileEdge edge: board.getEdgeMap().values()) {
+            edges.add(edge);
+        }
+        for (Player player : players) {
+            int numberRoads = 0;
+            for (TileEdge edge : edges) {
+                int numberRoadsNew = getNumberRoads(edges, edge, player.getId());
+                if (numberRoadsNew > numberRoads) {
+                    numberRoads = numberRoadsNew;
+                }
+            }
+            if (numberRoadsMax > numberRoads) {
+                playerWon = player;
+            }
+        }
+        return playerWon;
+    }
+
+    public Player getPlayerWhoHasMoreKnights() {
+        Player playerWon = null;
+        int numberKnightsMax = 0;
+        for (Player player : players) {
+            int numberKnights = 0;
+            for (DevelopmentCard card : player.getCardsDev()) {
+                if (card instanceof KnightCard) {
+                    numberKnights++;
+                }
+            }
+            if (numberKnights > numberKnightsMax) {
+                playerWon = player;
+            }
+        }
+        return playerWon;
     }
 
     /**
@@ -864,7 +1078,6 @@ public class Game implements StateMethods, Serializable {
             }
         }
     }
-
     /**
      * Event 14
      * Fait en sorte que le joueur de la partie avec le moins de points gagne 1PV.

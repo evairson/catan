@@ -1,5 +1,6 @@
 package model;
 
+import model.IA.Bot;
 import model.buildings.*;
 import model.geometry.*;
 import model.tiles.*;
@@ -109,9 +110,12 @@ public class GameBoard implements Serializable {
         this.initialiseBoard();
     }
 
-    // Méthodes pour s'occuper des ports 
+    public GameBoard(HashMap<Point, TileEdge> edge, Game game) {
+        edgesMap = edge;
+        this.game = game;
+    }
 
-
+    // Méthodes pour s'occuper des ports
     private void loadHarborImage() {
         try {
             BufferedImage originalImage = ImageIO.read(new File("src/main/resources/harbor.png"));
@@ -1007,7 +1011,6 @@ public class GameBoard implements Serializable {
                     // Mettre ce sommet dans la map avec comme valeur l'objet TileVertex
                     vertex = new Point((Math.round(vertex.getX())), (Math.round(vertex.getY())));
                     tileVertex.setCoordinates(vertex);
-                    tileVertex.setCoordinates(vertex);
                     // Arrondir les coordonnées pour éviter les erreurs d'arrondi
                     vertices.add(tileVertex);
                 }
@@ -1250,7 +1253,6 @@ public class GameBoard implements Serializable {
      * @see #draw to see how the board is drawn.
      */
     public void drawBoard(Graphics g) {
-
         if (!shadowHexes) {
             drawImagesInHexes(g);
         }
@@ -1373,7 +1375,7 @@ public class GameBoard implements Serializable {
 
         if (Main.hasServer()) {
             try {
-                PlayerClient player = game.getPlayerClient();
+                PlayerClient player = ((PlayerClient) game.getPlayerClient());
                 NetworkObject gameObject;
                 gameObject = new NetworkObject(TypeObject.Game, "changeThief", player.getId(),
                     highlightedTile.getId());
@@ -1387,12 +1389,17 @@ public class GameBoard implements Serializable {
         }
     }
 
+    public void changeThiefBot() {
+        highlightedTile = ((Bot) game.getCurrentPlayer()).getThiefTile(game);
+        changeThief();
+    }
+
     public void changeThief() {
         thief.setTile(highlightedTile);
         game.setThiefMode(false);
         thiefMode = false;
-        App.getActionPlayerPanel().update();
         App.getGamePanel().repaint();
+        App.getActionPlayerPanel().update();
     }
 
     /**

@@ -5,6 +5,8 @@ import model.geometry.Point;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
+import model.Game;
 import model.buildings.Building;
 
 /**
@@ -100,6 +102,7 @@ public class TileEdge implements Serializable {
 
     public void addTile(Tile tile) {
         tiles.add(tile);
+        tile.addEdge(this);
     }
 
     public void setBuilding(Building building) {
@@ -107,6 +110,21 @@ public class TileEdge implements Serializable {
         System.out.println("Building set for TileEdge");
     }
 
+    public int getNumberEdgesBefore(Game game) {
+        int number = 0;
+        for (TileEdge edge : game.getBoard().getEdgeMap().values()) {
+            if (edge == this) {
+                continue;
+            }
+            if (edge.getStart().getX() == end.getX() && edge.getStart().getY() == end.getY()
+                || edge.getEnd().getX() == end.getX() && edge.getEnd().getY() == end.getY()) {
+                if (edge.getBuilding() != null) {
+                    number++;
+                }
+            }
+        }
+        return number;
+    }
 
     public static void resetIdClass() {
         idClass = 0;
