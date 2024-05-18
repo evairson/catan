@@ -149,8 +149,12 @@ public class PlayerClient extends Player {
                     app.getGame().getCurrentPlayer().getColorAwt());
                 break;
             case "shadowHexes":
-                boolean value = (boolean) networkObjet.getObject();
-                app.getBoard().setShadowHexes(value);
+                boolean shadowValue = (boolean) networkObjet.getObject();
+                app.getBoard().setShadowHexes(shadowValue);
+                break;
+            case "harbourDisabled":
+                boolean harbourValue = (boolean) networkObjet.getObject();
+                App.getActionPlayer().setHarboursDisabled(harbourValue);
                 break;
             case "DrawCard":
                 if (id != networkObjet.getId()) {

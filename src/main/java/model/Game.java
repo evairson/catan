@@ -21,7 +21,6 @@ import start.Main;
 import view.TileType;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import exceptionclass.ConstructBuildingException;
@@ -744,6 +743,26 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
+    //Fonction auxiliaire pour gérer la désactivation des ports
+    public void checkForHarboursDisabled() {
+        if (turnsBeforeHarbourActivated > 0) {
+            turnsBeforeHarbourActivated--;
+        }
+        else {
+            App.getActionPlayer().setHarboursDisabled(false);
+            if (Main.hasServer()) {
+                try {
+                    int id = playerClient.getId();
+                    NetworkObject object = new NetworkObject(TypeObject.Message, "harbourDisabled", id, false);
+                    playerClient.getOut().writeUnshared(object);
+                    playerClient.getOut().flush();
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+            }
+        }
+    }
+
     // EVENTS DE JEU POUR LE D20
 
     //event 1
@@ -821,15 +840,17 @@ public class Game implements StateMethods, Serializable {
     //event 7
     public void disableHarbour() {
         App.getActionPlayer().setHarboursDisabled(true);
-        turnsBeforeHarbourActivated = 2 * players.size();
-    }
-    //Fonction auxiliaire pour gérer la désactivation des ports
-    public void checkForHarboursDisabled() {
-        if (turnsBeforeHarbourActivated == 0) {
-            App.getActionPlayer().setHarboursDisabled(false);
-        } else if (turnsBeforeHarbourActivated > 0) {
-            turnsBeforeHarbourActivated--;
+        if (Main.hasServer()) {
+            try {
+                int id = playerClient.getId();
+                NetworkObject object = new NetworkObject(TypeObject.Message, "harbourDisabled", id, true);
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
         }
+        turnsBeforeHarbourActivated = players.size();
     }
 
     //event 8
