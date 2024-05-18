@@ -56,7 +56,7 @@ public class Music {
                 AudioInputStream audioInput = AudioSystem.getAudioInputStream(musicPath);
                 currentClip = AudioSystem.getClip();
                 currentClip.open(audioInput);
-                currentClip.start();
+//                currentClip.start();
             }
         } catch (Exception e) {
             e.printStackTrace();

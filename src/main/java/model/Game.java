@@ -6,8 +6,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import model.geometry.*;
-import model.IA.Bot;
-import model.IA.ThreadBot;
+import model.bots.Bot;
+import model.bots.ThreadBot;
 import model.buildings.Building;
 import model.buildings.Colony;
 import model.cards.CardStack;
@@ -324,7 +324,9 @@ public class Game implements StateMethods, Serializable {
     public void activateD20Event() {
         if (getCurrentPlayer().hasThrowDices()) {
             switch (getCurrentPlayer().getD20()) {
-                case 1: killAllSheep(); break;
+//                case 1: killAllSheep(); break;
+                case 1:
+                    System.out.println("et non");
                 case 2 : showDevCards(); break;
                 case 3: christmas(); break;
                 case 4: lootThiefResources(); break;

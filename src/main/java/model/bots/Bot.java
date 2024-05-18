@@ -1,4 +1,4 @@
-package model.IA;
+package model.bots;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,6 @@ import java.util.HashMap;
 import exceptionclass.ConstructBuildingException;
 import model.Game;
 import model.Player;
-import model.Player.Color;
 import model.tiles.Tile;
 import model.tiles.TileEdge;
 import model.tiles.TileVertex;

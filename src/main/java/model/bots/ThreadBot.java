@@ -1,4 +1,4 @@
-package model.IA;
+package model.bots;
 
 import exceptionclass.ConstructBuildingException;
 import model.App;

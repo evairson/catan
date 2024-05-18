@@ -340,8 +340,8 @@ public class ActionPlayerPanel extends JPanel {
         cardsPanel.setLayout(null);
         cardsPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
         String basePath = "src/main/resources/";
-        for (int i = 0; i < game.getCurrentPlayer().getCardsDev().size(); i++) {
-            DevelopmentCard card = game.getCurrentPlayer().getCardsDev().get(i);
+        for (int i = 0; i < player.getCardsDev().size(); i++) {
+            DevelopmentCard card = player.getCardsDev().get(i);
             String stringCard = cardImageUrl(card);
             System.out.println(card.getClass().getSimpleName());
             ButtonImage b = new ButtonImage(basePath + stringCard, basePath + stringCard,
@@ -523,13 +523,12 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     public void update() {
-        Player currentPlayer = game.getCurrentPlayer();
 
         if (!Main.hasServer()) {
-            resourcesPanel.updateResourceLabels(currentPlayer);
-            namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
+            resourcesPanel.updateResourceLabels(getPlayerFromGame());
+            namePlayer.setText(" " + getPlayerFromGame().getName().toUpperCase());
         } else {
-            resourcesPanel.updateResourceLabels(game.getPlayerClient());
+            resourcesPanel.updateResourceLabels(getPlayerFromGame());
         }
         if (firstUpdate) {
             try {
@@ -627,6 +626,7 @@ public class ActionPlayerPanel extends JPanel {
         Player player;
         if (Main.hasServer()) {
             player = game.getPlayerClient();
+            System.out.println("player : " + player.getName());
         } else {
             player = game.getCurrentPlayer();
         }

@@ -2,7 +2,7 @@ package view.gamepanels;
 
 import model.App;
 import model.Player;
-import model.IA.Bot;
+import model.bots.Bot;
 import network.NetworkObject;
 import network.NetworkObject.TypeObject;
 import network.PlayerClient;

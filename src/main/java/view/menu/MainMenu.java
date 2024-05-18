@@ -11,7 +11,7 @@ import model.Game;
 import java.util.HashSet;
 
 import model.Player;
-import model.IA.Bot;
+import model.bots.Bot;
 import model.Player.Color;
 
 import java.awt.*;
