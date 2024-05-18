@@ -61,12 +61,18 @@ public class PlayersPanel extends JPanel {
             // Création et ajout de l'icône de carte et du
             // label de compte, à droite des icônes et labels de resource
             JLabel cardIconLabel = createIconLabel(offsetX,
-                    newBaseY + 25, "src/main/resources/resources/resourceLabel.png");
+                    newBaseY + 25, "src/main/resources/card.png");
             // 60 pixels à droite pour séparer les groupes de ressources et de cartes
             JLabel cardCountLabel = createCountLabel(offsetX + 25,
                     newBaseY + 25);
             // 25 pixels à droite de l'icône de carte pour le label de compte
 
+            JLabel vpIconLabel = createIconLabel(offsetX, newBaseY - 25,
+                    "src/main/resources/vplabel.png");
+            JLabel vpCountLabel = createCountLabel(offsetX + 25, newBaseY - 25);
+            // ff
+            add(vpIconLabel);
+            add(vpCountLabel);
             add(resourceIconLabel);
             add(resourceCountLabel);
             add(cardIconLabel);
@@ -83,7 +89,7 @@ public class PlayersPanel extends JPanel {
 
             // Stockage des informations du joueur
             playerInfos.put(player, new PlayerInfo(playerLabel, resourceIconLabel,
-                    resourceCountLabel, cardIconLabel, cardCountLabel));
+                    resourceCountLabel, cardIconLabel, cardCountLabel, vpCountLabel));
             playerIndex++;
         }
     }
@@ -139,8 +145,9 @@ public class PlayersPanel extends JPanel {
             PlayerInfo info = entry.getValue();
 
             // Mise à jour des textes sous les labels du joueur
-            info.resourceCountLabel.setText(String.valueOf(player.getResources().size()));
+            info.resourceCountLabel.setText(String.valueOf(player.getResourcesSum()));
             info.cardCountLabel.setText(String.valueOf(player.getCardsDev().size()));
+            info.vpCountLabel.setText(String.valueOf(player.getPoints()));
 
             // Marquer le joueur courant
             boolean isCurrentPlayer = player == game.getCurrentPlayer();
@@ -167,14 +174,17 @@ public class PlayersPanel extends JPanel {
         private JLabel resourceCountLabel;
         private JLabel cardIconLabel;
         private JLabel cardCountLabel;
+        private JLabel vpCountLabel;
 
         PlayerInfo(JLabel nameLabel, JLabel resourceIconLabel,
-                   JLabel resourceCountLabel, JLabel cardIconLabel, JLabel cardCountLabel) {
+                   JLabel resourceCountLabel, JLabel cardIconLabel, JLabel cardCountLabel,
+                   JLabel vpCountLabel) {
             this.nameLabel = nameLabel;
             this.resourceIconLabel = resourceIconLabel;
             this.resourceCountLabel = resourceCountLabel;
             this.cardIconLabel = cardIconLabel;
             this.cardCountLabel = cardCountLabel;
+            this.vpCountLabel = vpCountLabel;
         }
 
         public void updateName(String name) {
