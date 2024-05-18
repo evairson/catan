@@ -15,6 +15,7 @@ fi
 
 echo "Starting..."
 find -name "*.java" > files.txt
+sed -i "/\b\(test\|Test\)\b/d" files.txt
 echo "Compiling..."
 javac  -d src/classFiles @files.txt
 
