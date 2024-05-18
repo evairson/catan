@@ -258,6 +258,9 @@ public class Player implements Serializable {
     public int getResourcesSum() {
         int acc = 0;
         for (Integer i : resources.values()) {
+            if (i == null) {
+                continue;
+            }
             acc += i;
         }
         return acc;
