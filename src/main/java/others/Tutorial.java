@@ -142,15 +142,12 @@ public class Tutorial extends JPanel {
         if (i >= 13) {
             g.drawImage(images[2], c1[0], c1[1], null);
             g.drawImage(images[0], c2[0], c2[1], null);
-            g.setColor(Color.BLACK);
-            g.drawRect(c1[0], c1[1], 20, 20);
         } else if (i >= 8 && i <= 10) {
             g.drawImage(images[3], c3[0], c3[1], null);
             g.drawImage(images[0], c5[0], c5[1], null);
         } else {
             g.drawImage(images[1], c3[0], c3[1], null);
             g.drawImage(images[0], c4[0], c4[1], null);
-            g.drawRect(c3[0], c3[1], 20, 20);
         }
     }
 
