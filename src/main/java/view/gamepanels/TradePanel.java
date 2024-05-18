@@ -672,12 +672,14 @@ public class TradePanel extends JPanel {
             if (((Bot) selectedPlayer).acceptTrade(resourcesRequested, resourcesOffered)) {
                 performTrade(false);
                 if (!App.getBotSoloMode()) {
-                    actionPlayerPanel.getApp().addMessageColor("Votre trade a été accepté \n", java.awt.Color.GREEN);
+                    actionPlayerPanel.getApp().addMessageColor("Votre trade a été accepté \n",
+                            java.awt.Color.GREEN);
                 }
             }
         } else {
-            if(!App.getBotSoloMode()) {
-                actionPlayerPanel.getApp().addMessageColor("Votre trade a été refusé \n", java.awt.Color.ORANGE);
+            if (!App.getBotSoloMode()) {
+                actionPlayerPanel.getApp().addMessageColor("Votre trade a été refusé \n",
+                        java.awt.Color.ORANGE);
             }
         }
     }

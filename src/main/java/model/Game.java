@@ -48,7 +48,7 @@ public class Game implements StateMethods, Serializable {
     private int yearOfPlentyWaiting = 0;
     private Player first;
     private int turnsBeforeHarbourActivated = 0;
-    public int turnsBeforeTilesRespawn = 0;
+    private int turnsBeforeTilesRespawn = 0;
     private ArrayList<TileType> betPot = new ArrayList<>();
     private int tradeEventTurn = 0;
 
@@ -168,15 +168,6 @@ public class Game implements StateMethods, Serializable {
         }
         return true;
     }
-
-//    public Player getFirstPlayer() {
-//        // Assurez-vous que la liste des joueurs n'est pas vide
-//        if (!players.isEmpty()) {
-//            return players.get(0); // Retourne le premier joueur de la liste
-//        }
-//        return null; // Si la liste est vide, retourne null
-//    }
-//
 
     public void endTurn() {
         if (!canPass()) {
@@ -411,13 +402,12 @@ public class Game implements StateMethods, Serializable {
 
     // Build methods ---------------
 
-    /**
+    /**.
      * canBuildCity
      * Check if the player can build a city
      * it checks if the player has enough resources and if the resources have been given
      * @return true if the player can build a city, false otherwise
-     * @see Constants.BuildingCosts#canBuildCity to see how the cost is calculated
-     * 
+     * @see Constants.BuildingCosts#canBuildCity to see how the cost is calculated.
      */
     public boolean canBuildCity() {
         if (blankTurn) {
@@ -426,7 +416,7 @@ public class Game implements StateMethods, Serializable {
         return (Constants.BuildingCosts.canBuildCity(getCurrentPlayer().getResources())) && resourcesGiven;
     }
 
-    /**
+    /**.
      * buildCityButtonAction
      * This method is called when the player clicks on the "build city" button
      * It checks if the player can build a city and if the player has a colony
@@ -461,7 +451,7 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
-    /**
+    /**.
      * canBuildColony
      * Check if the player can build a colony
      * it checks if the player has enough resources and if the resources have been given
@@ -476,11 +466,12 @@ public class Game implements StateMethods, Serializable {
                 || getCurrentPlayer().getFreeColony();
     }
 
-    /**
+    /**.
      * buildColonyButtonAction
      * This method is called when the player clicks on the "build colony" button
      * It checks if the player can build a colony and if the resources have been given
-     * If the player can build a colony and the resources have been given, it sets the board to look for a vertex
+     * If the player can build a colony and the resources have been given,
+     * it sets the board to look for a vertex
      * If the board is already looking for a vertex, it sets the board to not look for a vertex
      * It also sets the board to not place a city, a road or a colony
      * If the board is looking for an edge, it sets the board to not look for an edge
@@ -510,7 +501,7 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
-    /**
+    /**.
      * canBuildRoad
      * Check if the player can build a road
      * it checks if the player has enough resources and if the resources have been given
@@ -525,7 +516,7 @@ public class Game implements StateMethods, Serializable {
                 || getCurrentPlayer().getFreeRoad() > 0;
     }
 
-    /**
+    /**.
      * buildRoadButtonAction
      * This method is called when the player clicks on the "build road" button
      * It checks if the player can build a road and if the resources have been given
@@ -591,13 +582,14 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
-    /**
+    /**.
      * buildColony
      * This method is called when the player clicks on a vertex to build a colony
      * It checks if the player can build a colony and if the resources have been given
      * If the player can build a colony and the resources have been given, it builds a colony on the vertex
      * @param idVertex the id of the vertex where the player wants to build a colony
      * @throws ConstructBuildingException if the player can't build a colony on the vertex
+     * @return boolean the colony has been built
      */
     public boolean buildColony(int idVertex) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
@@ -651,14 +643,16 @@ public class Game implements StateMethods, Serializable {
         board.setPlacingRoad(false);
     }
 
-    /**
+    /**.
      * buildRoad
      * @param idEdge the id of the edge where the player wants to build a road
      * @throws ConstructBuildingException if the player can't build a road on the edge
      * @see ConstructBuildingException
      * @see Player#buildRoad
      * @see TileEdge
+     * @return boolean the road has been built
      */
+
     public boolean buildRoad(int idEdge) throws ConstructBuildingException {
         for (TileEdge edge : board.getEdgeMap().values()) {
             if (edge.getId() == idEdge) {
@@ -713,7 +707,7 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
-    /**
+    /**.
      * buildCity
      * @param idVertex the id of the vertex where the player wants to build a city
      * @param us Indicates if we are the player building the city
@@ -721,6 +715,7 @@ public class Game implements StateMethods, Serializable {
      * @see ConstructBuildingException
      * @see Player#buildCity
      * @see TileVertex
+     * @return boolean the city has been built
      */
     public boolean buildCity(int idVertex, boolean us) throws ConstructBuildingException {
         for (TileVertex vertex : board.getVertices()) {
@@ -791,8 +786,8 @@ public class Game implements StateMethods, Serializable {
     public void placeRoadAndColonyBot(boolean road) {
         boolean hasPlaced = false;
         while (!hasPlaced) {
-            int nbAlea = (int) (Math.random() *
-                    (road ? board.getEdgeMap().size() : board.getVertices().size()));
+            int nbAlea = (int) (Math.random()
+                    * (road ? board.getEdgeMap().size() : board.getVertices().size()));
             try {
                 if (!road) {
                     if (buildColony(nbAlea)) {
@@ -836,7 +831,7 @@ public class Game implements StateMethods, Serializable {
                     getNumberRoads(edgesCopy, edgesNext.get(1), idPlayer));
         }
     }
-    /**
+    /**.
      * @param edges : Edges de départ
      * @param edge : Edge de départ
      * @param idPlayer : L'id du player voulu
@@ -959,8 +954,7 @@ public class Game implements StateMethods, Serializable {
     public void checkForHexesRespawn() {
         if (turnsBeforeTilesRespawn > 0) {
             turnsBeforeTilesRespawn--;
-        }
-        else {
+        } else {
             app.getBoard().setShadowHexes(false);
             if (Main.hasServer()) {
                 try {
@@ -979,13 +973,13 @@ public class Game implements StateMethods, Serializable {
     public void checkForHarboursDisabled() {
         if (turnsBeforeHarbourActivated > 0) {
             turnsBeforeHarbourActivated--;
-        }
-        else {
+        } else {
             App.getActionPlayer().setHarboursDisabled(false);
             if (Main.hasServer()) {
                 try {
                     int id = playerClient.getId();
-                    NetworkObject object = new NetworkObject(TypeObject.Message, "harbourDisabled", id, false);
+                    NetworkObject object = new NetworkObject(TypeObject.Message,
+                            "harbourDisabled", id, false);
                     playerClient.getOut().writeUnshared(object);
                     playerClient.getOut().flush();
                 } catch (Exception e) {
