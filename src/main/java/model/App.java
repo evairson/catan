@@ -27,12 +27,17 @@ public class App {
     private static MainMenu mainMenu;
     private PlayerClient player;
     private static boolean playing;
-    private boolean hasD20 = true;
+    private boolean hasD20 = false;
     private static BackgroundPanel background;
     private static Boolean botSoloMode = false;
 
     public boolean isHasD20() {
         return hasD20;
+    }
+
+    public void checkD20() {
+        hasD20 = optionPanel.d20isSelected();
+        System.out.println("AIEAIEUAIUE" + hasD20);
     }
 
     public GameBoard getBoard() {

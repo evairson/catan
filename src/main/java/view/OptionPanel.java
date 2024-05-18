@@ -63,7 +63,7 @@ public class OptionPanel extends JPanel {
         return;
     }
 
-    public boolean d20Selected() {
+    public boolean d20isSelected() {
         return d20CheckBox.isSelected();
     }
 
