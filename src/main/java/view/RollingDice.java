@@ -122,28 +122,35 @@ public class RollingDice extends JPanel {
             long endTime = System.currentTimeMillis();
             int refresh = 60;
             try {
-                while ((endTime - startTime) / 1000F < 3) {
-                    //roll dice
+                if (!App.getBotSoloMode()) {
+                    while ((endTime - startTime) / 1000F < 3) {
+                        //roll dice
 
-                    player.throwDices(d20Activated);
+                        player.throwDices(d20Activated);
 
-                    //update dice images
-                    ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
-                    ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
+                        //update dice images
+                        ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
+                        ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
 
-                    if (d20Activated) {
-                        ImgService.updateImage(d20Img, "/view/d20/d" + getD20() + ".png", 0.75);
+                        if (d20Activated) {
+                            ImgService.updateImage(d20Img, "/view/d20/d" + getD20() + ".png", 0.75);
+                        }
+
+                        repaint();
+                        revalidate();
+
+                        //Sleep thread
+                        Thread.sleep(refresh);
+                        refresh += 10;
+
+                        endTime = System.currentTimeMillis();
+
                     }
+                } else {
+                    player.throwDices(d20Activated);
 
                     repaint();
                     revalidate();
-
-                    //Sleep thread
-                    Thread.sleep(refresh);
-                    refresh += 10;
-
-                    endTime = System.currentTimeMillis();
-
                 }
                 if (player.getDice() == 7) {
                     game.setThiefMode(true);

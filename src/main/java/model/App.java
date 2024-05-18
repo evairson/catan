@@ -17,15 +17,21 @@ public class App {
     private static GamePanel gamePanel;
     private static ActionPlayerPanel actionPlayer;
     private static EndPanel endPanel;
+    private OptionPanel optionPanel;
     private static GameWindow gameWindow;
     private Thread gameThread;
     private GameBoard board;
     private static Game game;
     private static MainMenu mainMenu;
-    private Player player;
+    private PlayerClient player;
     private static boolean playing;
     private boolean hasD20 = true;
     private static BackgroundPanel background;
+    private static Boolean botSoloMode = false;
+
+    public boolean isHasD20() {
+        return hasD20;
+    }
 
     public GameBoard getBoard() {
         return board;
@@ -44,18 +50,28 @@ public class App {
         board.setApp(this);
     }
 
-    public boolean isHasD20() {
-        return hasD20;
+    public static boolean getBotSoloMode() {
+        return botSoloMode;
     }
 
-    public App(Player playerClient) {
+    public static void setBotSoloMode() {
+        botSoloMode = true;
+    }
+
+    public App(PlayerClient playerClient) {
         player = playerClient;
-        if (playerClient instanceof PlayerClient) {
+        if (playerClient != null) {
             ((PlayerClient) player).setApp(this);
             mainMenu = new MainMenu(this, null);
         } else {
             mainMenu = new MainMenu(this, player);
         }
+        App.gameWindow = new GameWindow(mainMenu);
+        mainMenu.requestFocus();
+    }
+
+    public App() {
+        mainMenu = new MainMenu(this, player);
         App.gameWindow = new GameWindow(mainMenu);
         mainMenu.requestFocus();
     }
@@ -134,12 +150,13 @@ public class App {
         if (playing) {
             game.update();
             checkWin();
-            Music.update();
         }
+        Music.update();
     }
+
     public static void checkWin() {
-        if (game.getCurrentPlayer().hasWon()) {
-            endPanel = new EndPanel(true, game.getCurrentPlayer());
+        if (game.getCurrentPlayer().hasWon(game)) {
+            endPanel = new EndPanel(true, game.getCurrentPlayer(), game);
             gameWindow.getContentPane().add(endPanel, "endPanel");
             endPanel.updatePanel();
             Container contentPane = getGameWindow().getContentPane();
@@ -151,6 +168,7 @@ public class App {
 
     public void render(Graphics g) {
         game.draw(g);
+        gamePanel.repaint();
     }
 
     public Player getPlayer() {
@@ -164,4 +182,5 @@ public class App {
     public static ActionPlayerPanel getActionPlayer() {
         return actionPlayer;
     }
+
 }

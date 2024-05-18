@@ -37,7 +37,8 @@ public class PlayersPanel extends JPanel {
         int playerIndex = 0;
         for (Player player : game.getPlayers()) {
             int baseX = Resolution.calculateResolution(300 * playerIndex, 20)[0];
-            int baseY = Resolution.calculateResolution(0, 45)[1]; // Position de base pour les éléments sous le nom du joueur
+            int baseY = Resolution.calculateResolution(0, 45)[1];
+            // Position de base pour les éléments sous le nom du joueur
 
             // Création et positionnement du label du joueur
             JLabel playerLabel = createPlayerLabel(player, playerIndex);
@@ -46,18 +47,25 @@ public class PlayersPanel extends JPanel {
 //            playerLabel.setOpaque(true);
 
             // Calcul de la position X pour les éléments suivants, en se basant sur la fin du nameLabel
-            int offsetX = playerLabel.getBounds().x + playerLabel.getBounds().width - 40; // 10 pixels à droite de la fin du nameLabel
+            int offsetX = playerLabel.getBounds().x + playerLabel.getBounds().width - 40;
+            // 10 pixels à droite de la fin du nameLabel
 
-            // Utilisation de la même hauteur (Y) que nameLabel pour aligner verticalement les icônes et labels
+            // Utilisation de la même hauteur (Y) que nameLabel pour aligner verticalement les icônes et label
             int newBaseY = playerLabel.getBounds().y;
 
             // Création et ajout de l'icône de ressource et du label de compte
-            JLabel resourceIconLabel = createIconLabel(offsetX, newBaseY, "src/main/resources/resources/resourceLabel.png");
-            JLabel resourceCountLabel = createCountLabel(offsetX + 25, newBaseY); // 25 pixels à droite de l'icône de ressource pour le label de compte
-
-            // Création et ajout de l'icône de carte et du label de compte, à droite des icônes et labels de ressource
-            JLabel cardIconLabel = createIconLabel(offsetX, newBaseY + 25, "src/main/resources/resources/resourceLabel.png"); // 60 pixels à droite pour séparer les groupes de ressources et de cartes
-            JLabel cardCountLabel = createCountLabel(offsetX + 25, newBaseY + 25); // 25 pixels à droite de l'icône de carte pour le label de compte
+            JLabel resourceIconLabel = createIconLabel(offsetX, newBaseY,
+                    "src/main/resources/resources/resourceLabel.png");
+            JLabel resourceCountLabel = createCountLabel(offsetX + 25, newBaseY);
+            // 25 pixels à droite de l'icône de ressource pour le label de compte
+            // Création et ajout de l'icône de carte et du
+            // label de compte, à droite des icônes et labels de resource
+            JLabel cardIconLabel = createIconLabel(offsetX,
+                    newBaseY + 25, "src/main/resources/resources/resourceLabel.png");
+            // 60 pixels à droite pour séparer les groupes de ressources et de cartes
+            JLabel cardCountLabel = createCountLabel(offsetX + 25,
+                    newBaseY + 25);
+            // 25 pixels à droite de l'icône de carte pour le label de compte
 
             add(resourceIconLabel);
             add(resourceCountLabel);
@@ -74,7 +82,8 @@ public class PlayersPanel extends JPanel {
 //            cardIconLabel.setOpaque(true);
 
             // Stockage des informations du joueur
-            playerInfos.put(player, new PlayerInfo(playerLabel, resourceIconLabel, resourceCountLabel, cardIconLabel, cardCountLabel));
+            playerInfos.put(player, new PlayerInfo(playerLabel, resourceIconLabel,
+                    resourceCountLabel, cardIconLabel, cardCountLabel));
             playerIndex++;
         }
     }
@@ -108,7 +117,8 @@ public class PlayersPanel extends JPanel {
     private JLabel createIconLabel(int x, int y, String iconPath) {
         try {
             ImageIcon icon = new ImageIcon(ImageIO.read(new File(iconPath)));
-            JLabel label = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH)));
+            JLabel label = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(20,
+                    20, Image.SCALE_SMOOTH)));
             label.setBounds(x, y, 20, 20);
             return label;
         } catch (IOException e) {
@@ -134,7 +144,8 @@ public class PlayersPanel extends JPanel {
 
             // Marquer le joueur courant
             boolean isCurrentPlayer = player == game.getCurrentPlayer();
-            info.nameLabel.setText(isCurrentPlayer ? "<html><u>" + player.getName().toUpperCase() + "</u></html>" : player.getName().toUpperCase());
+            info.nameLabel.setText(isCurrentPlayer ? "<html><u>"
+                    + player.getName().toUpperCase() + "</u></html>" : player.getName().toUpperCase());
         }
         repaint();
     }
@@ -157,7 +168,8 @@ public class PlayersPanel extends JPanel {
         private JLabel cardIconLabel;
         private JLabel cardCountLabel;
 
-        PlayerInfo(JLabel nameLabel, JLabel resourceIconLabel, JLabel resourceCountLabel, JLabel cardIconLabel, JLabel cardCountLabel) {
+        PlayerInfo(JLabel nameLabel, JLabel resourceIconLabel,
+                   JLabel resourceCountLabel, JLabel cardIconLabel, JLabel cardCountLabel) {
             this.nameLabel = nameLabel;
             this.resourceIconLabel = resourceIconLabel;
             this.resourceCountLabel = resourceCountLabel;

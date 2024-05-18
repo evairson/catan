@@ -1,5 +1,6 @@
 package model;
 
+import model.IA.Bot;
 import model.buildings.*;
 import model.geometry.*;
 import model.tiles.*;
@@ -35,13 +36,28 @@ import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * GameBoard
+ * This class represents the game board.
+ * The game board is a hexagonal grid of tiles.
+ * It has a layout, a grid size, a set of tiles, a set of vertices, a set of edges, a thief, and a thief mode.
+ * The layout is the layout of the grid.
+ * The grid size is the size of the grid.
+ * The set of tiles is the set of tiles in the grid.
+ * The set of vertices is the set of vertices in the grid.
+ * The set of edges is the set of edges in the grid.
+ * The thief is the thief that is on the board.
+ * The thief mode is a boolean that indicates if the game is in thief mode.
+ */
+
 public class GameBoard implements Serializable {
+
     private LinkedHashMap<CubeCoordinates, Tile> board;
     private final Map<TileVertex, Harbor> harborMap = new HashMap<>();
     private Layout layout;
     private int gridSize = 2;
-    private LinkedHashMap<Point, TileVertex> verticesMap;
-    private LinkedHashMap<Point, TileEdge> edgesMap;
+    private ArrayList<TileVertex> vertices;
+    private HashMap<Point, TileEdge> edgesMap;
     // sert à stocker les coordonnées du sommet le plus proche de la souris
     // peut aller dans une autre classe...
     private Point closestVertex = new Point(0, 0);
@@ -63,6 +79,9 @@ public class GameBoard implements Serializable {
     private App app;
 
     private boolean thiefModeEnd;
+    private boolean shadowHexes = false;
+
+    private TileVertex lastPlacedColonyVertex;
 
     private TileVertex closestTileVertex = new TileVertex();
     private TileEdge closestTileEdge = new TileEdge();
@@ -91,6 +110,12 @@ public class GameBoard implements Serializable {
         this.initialiseBoard();
     }
 
+    public GameBoard(HashMap<Point, TileEdge> edge, Game game) {
+        edgesMap = edge;
+        this.game = game;
+    }
+
+    // Méthodes pour s'occuper des ports
     private void loadHarborImage() {
         try {
             BufferedImage originalImage = ImageIO.read(new File("src/main/resources/harbor.png"));
@@ -118,25 +143,34 @@ public class GameBoard implements Serializable {
 
     public void initialisePorts() {
         // Définir les coordonnées des ports classiques
-        int[] classicPortsIds = {28, 27, 47, 51, 53, 52, 13, 12};
+        Point[] classicPortsPoints = {
+            new Point(218, 155),
+            new Point(279, 120),
+            new Point(582, 225),
+            new Point(642, 260),
+            new Point(703, 365),
+            new Point(703, 435),
+            new Point(279, 680),
+            new Point(218, 645)
+        };
 
         // Définir les coordonnées des ports spécialisés et leur type de ressource associé
-        Map<Integer, TileType> specializedPortsIds = Map.of(
-                40, TileType.WOOL,
-                39, TileType.WOOL,
-                45, TileType.CLAY,
-                36, TileType.CLAY,
-                22, TileType.WOOD,
-                24, TileType.WOOD,
-                8, TileType.WHEAT,
-                5, TileType.WHEAT,
-                2, TileType.ORE,
-                17, TileType.ORE
+        Map<Point, TileType> specializedPortsPoints = Map.of(
+                new Point(400, 120), TileType.WOOL,
+                new Point(461, 155), TileType.WOOL,
+                new Point(642, 540), TileType.CLAY,
+                new Point(582, 575), TileType.CLAY,
+                new Point(461, 645), TileType.WOOD,
+                new Point(400, 680), TileType.WOOD,
+                new Point(158, 540), TileType.WHEAT,
+                new Point(158, 470), TileType.WHEAT,
+                new Point(158, 330), TileType.ORE,
+                new Point(158, 260), TileType.ORE
         );
 
         // Initialiser les ports classiques
-        for (int id : classicPortsIds) {
-            TileVertex harborVertex = findTileVertexById(id);
+        for (Point point : classicPortsPoints) {
+            TileVertex harborVertex = findTileVertexByPoint(point);
             if (harborVertex != null) {
                 Harbor port = new Harbor(harborVertex);
                 harborVertex.setHarbor(port);
@@ -145,8 +179,8 @@ public class GameBoard implements Serializable {
         }
 
         // Initialiser les ports spécialisés
-        specializedPortsIds.forEach((id, type) -> {
-            TileVertex harborVertex = findTileVertexById(id);
+        specializedPortsPoints.forEach((point, type) -> {
+            TileVertex harborVertex = findTileVertexByPoint(point);
             if (harborVertex != null) {
                 SpecializedHarbor specializedPort = new SpecializedHarbor(harborVertex, type);
                 harborVertex.setHarbor(specializedPort);
@@ -155,22 +189,28 @@ public class GameBoard implements Serializable {
         });
     }
 
-    private TileVertex findTileVertexById(int id) {
-        for (TileVertex vertex : verticesMap.values()) {
-            if (vertex.getId() == id) {
+
+    private TileVertex findTileVertexByPoint(Point point) {
+        for (TileVertex vertex : vertices) {
+            if (vertex.getCoordinates().equals(point)) {
                 return vertex;
             }
         }
         return null;
     }
 
+
     public void setThiefModeEnd(boolean b) {
         thiefModeEnd = b;
     }
 
+    public void setShadowHexes(boolean b) {
+        shadowHexes = b;
+    }
+
     private void loadImages() {
         boardImage = new BufferedImage(Constants.Game.WIDTH,
-        Constants.Game.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+                Constants.Game.HEIGHT, BufferedImage.TYPE_INT_ARGB);
         loadedImages = new HashMap<>();
 
         String basePath = "src/main/resources/building/pions/";
@@ -284,8 +324,8 @@ public class GameBoard implements Serializable {
         return edgesMap;
     }
 
-    public HashMap<Point, TileVertex> getVerticesMap() {
-        return verticesMap;
+    public ArrayList<TileVertex> getVertices() {
+        return vertices;
     }
 
     public void addTile(Tile t) {
@@ -305,37 +345,40 @@ public class GameBoard implements Serializable {
         board.put(new CubeCoordinates(q, r, s), new Tile(q, r, diceValue));
     }
 
+    /**
+     * getNeighbourTileVerticesToVertex
+     *
+     * @param vertex this methods goes through the edges of the board.
+     * once it finds the edges that contain the vertex on one of their ends, it adds them to an arraylist.
+     * then it goes through the arraylist and adds the other vertex for every edge to another arraylist.
+     * it returns the arraylist of vertices.
+     * @return the three tile vertices that are closest to the given vertex
+     * the three tile vertices are the ones that are connected to the given vertex by an edge
+     * the three tile vertices are returned in an array
+     */
     public TileVertex[] getNeighbourTileVerticesToVertex(TileVertex vertex) {
         TileVertex[] neighbours = new TileVertex[3];
         int index = 0;
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getStart().equals(vertex.getCoordinates())) {
-                for (TileVertex v : verticesMap.values()) {
-                    if (v.getCoordinates().equals(edge.getEnd())) {
-                        TileVertex neighbour = v;
-                        if (neighbour != null) {
-                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
-                                continue;
-                            }
-                            neighbours[index] = neighbour;
-                            index++;
+                for (TileVertex neighbour : vertices) {
+                    if (neighbour.getCoordinates().equals(edge.getEnd())) {
+                        if (checkIfNeighbourInArray(neighbours, neighbour)) {
+                            continue;
                         }
+                        neighbours[index] = neighbour;
+                        index++;
                     }
                 }
             }
             if (edge.getEnd().equals(vertex.getCoordinates())) {
-                for (TileVertex v : verticesMap.values()) {
-                    if (v.getCoordinates().equals(edge.getStart())) {
-                        TileVertex neighbour = v;
-                        if (neighbour != null) {
-                            if (checkIfNeighbourInArray(neighbours, neighbour)) {
-                                continue;
-
-                            }
-                            neighbours[index] = neighbour;
-
-                            index++;
+                for (TileVertex neighbour : vertices) {
+                    if (neighbour.getCoordinates().equals(edge.getStart())) {
+                        if (checkIfNeighbourInArray(neighbours, neighbour)) {
+                            continue;
                         }
+                        neighbours[index] = neighbour;
+                        index++;
                     }
                 }
             }
@@ -343,6 +386,14 @@ public class GameBoard implements Serializable {
         return neighbours;
     }
 
+    /**
+     * checkIfNeighbourInArray
+     *
+     * @param neighbours
+     * @param vertex
+     * @return true if the vertex is in the array of neighbours, false otherwise
+     * this method is to check so that we don't add the same vertex to the array of neighbours multiple times
+     */
     public boolean checkIfNeighbourInArray(TileVertex[] neighbours, TileVertex vertex) {
         for (TileVertex v : neighbours) {
             if (v != null) {
@@ -354,6 +405,14 @@ public class GameBoard implements Serializable {
         return false;
     }
 
+    /**
+     * checkIfNeighbourInArray (overloaded method)
+     *
+     * @param neighbours
+     * @param edge
+     * @return true if the edge is in the array of neighbours, false otherwise
+     * this method is to check so that we don't add the same edge to the array of neighbours multiple times
+     */
     public boolean checkIfNeighbourInArray(TileEdge[] neighbours, TileEdge edge) {
         for (TileEdge e : neighbours) {
             if (e != null) {
@@ -365,10 +424,18 @@ public class GameBoard implements Serializable {
         return false;
     }
 
+    /**
+     * getNeighbourTileVerticesToEdge
+     *
+     * @param edge
+     * @return the two tile vertices that are connected to the edge
+     * that's basically used to find the two tile vertices that have the same coordinates as the start and end of the edge
+     * the two tile vertices are returned in an array
+     */
     public TileVertex[] getNeighbourTileVerticesToEdge(TileEdge edge) {
         TileVertex[] neighbours = new TileVertex[2];
         int i = 0;
-        for (TileVertex vertex : verticesMap.values()) {
+        for (TileVertex vertex : vertices) {
             if (vertex.getCoordinates().equals(edge.getStart())) {
                 neighbours[i] = vertex;
                 i++;
@@ -381,6 +448,17 @@ public class GameBoard implements Serializable {
         return neighbours;
     }
 
+    /**
+     * getNeighbourTileEdgesToEdge
+     *
+     * @param edge this method goes through the edges of the board.
+     *             once it finds the edges that are connected to the given edge, it adds them to an arraylist.
+     *             it returns the arraylist of edges.
+     * @return the four tile edges that are connected to the given edge
+     * the four tile edges are the ones that are connected to the given edge by a vertex
+     * the four tile edges are returned in an array
+     */
+
     public TileEdge[] getNeighbourTileEdgesToEdge(TileEdge edge) {
         TileEdge[] neighbours = new TileEdge[4];
         int i = 0;
@@ -389,12 +467,12 @@ public class GameBoard implements Serializable {
                 continue;
             }
             if ((e.getStart().equals(edge.getStart()) && !e.getEnd().equals(edge.getEnd()))
-                || (e.getEnd().equals(edge.getStart()) && !e.getStart().equals(edge.getEnd()))) {
+                    || (e.getEnd().equals(edge.getStart()) && !e.getStart().equals(edge.getEnd()))) {
                 neighbours[i] = e;
                 i++;
             }
             if ((e.getStart().equals(edge.getEnd()) && !e.getEnd().equals(edge.getStart()))
-                || (e.getEnd().equals(edge.getEnd()) && !e.getStart().equals(edge.getStart()))) {
+                    || (e.getEnd().equals(edge.getEnd()) && !e.getStart().equals(edge.getStart()))) {
                 neighbours[i] = e;
                 i++;
             }
@@ -403,12 +481,22 @@ public class GameBoard implements Serializable {
 
     }
 
+    /**
+     * getNeighbourTileEdgesToVertex
+     *
+     * @param vertex This method goes through the edges of the board.
+     *               once it finds the edges that contain the vertex on one of their ends, it adds them to an arraylist.
+     *               it returns the arraylist of edges.
+     * @return the three tile edges that are closest to the given vertex
+     * the three tile edges are the ones that are connected to the given vertex by a vertex
+     * the three tile edges are returned in an array
+     */
     public TileEdge[] getNeighbourTileEdgesToVertex(TileVertex vertex) {
         TileEdge[] neighbours = new TileEdge[3];
         int i = 0;
         for (TileEdge edge : edgesMap.values()) {
             if (edge.getStart().equals(vertex.getCoordinates())
-                || edge.getEnd().equals(vertex.getCoordinates())) {
+                    || edge.getEnd().equals(vertex.getCoordinates())) {
                 neighbours[i] = edge;
                 i++;
             }
@@ -416,6 +504,19 @@ public class GameBoard implements Serializable {
         return neighbours;
     }
 
+
+    /**
+     * isVertexTwoRoadsAwayFromCities
+     *
+     * @param vertex this method goes through the edges of the board.
+     *               once it finds the edges that contain the vertex on one of their ends, it adds them to an arraylist.
+     *               then it goes through the arraylist and checks if the vertex is two roads away from cities.
+     *               basically, if a vertex one road away from a city contains a building, then the vertex is not two roads away from cities.
+     * @return true if the vertex is two roads away from cities, false otherwise
+     * that's used to check if a player can place a colony on a vertex.
+     * In the game, a player can only place a colony on a vertex if it is two roads away from cities.
+     * @see #getNeighbourTileVerticesToVertex to see how the vertices are found.
+     */
     public boolean isVertexTwoRoadsAwayFromCities(TileVertex vertex) {
         TileVertex[] neighbours = getNeighbourTileVerticesToVertex(vertex);
         for (TileVertex v : neighbours) {
@@ -427,6 +528,21 @@ public class GameBoard implements Serializable {
         }
         return true;
     }
+
+    /**
+     * isRoadNextToCity
+     *
+     * @param edge
+     * @param player this method goes through the vertices of the board.
+     *               once it finds the vertices that are connected to the edge, it checks if the vertex contains a building.
+     *               if the vertex contains a building, then it checks if the building belongs to the player.
+     * @return true if the road is next to a city that belongs to the player, false otherwise
+     * that's used to check if a player can place a road on an edge.
+     * In the game, a player can only place a road on an edge if it is next to a city that belongs to the player.
+     * that's also used to check if a player can place a road on an edge if it is next to a road that belongs to the player.
+     * That rule is always true except for the first two roads that the player places.
+     * @see #getNeighbourTileVerticesToEdge to see how the vertices are found.
+     */
     public boolean isRoadNextToCity(TileEdge edge, Player player) {
         TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
         for (TileVertex v : neighbours) {
@@ -441,6 +557,44 @@ public class GameBoard implements Serializable {
         return false;
     }
 
+    /**
+     * isRoadNextToVertex
+     *
+     * @param edge
+     * @param vertex this method goes through the vertices of the board.
+     *               once it finds the vertices that are connected to the edge, it checks if the vertex is the same as the given vertex.
+     * @return true if the road is next to the given vertex, false otherwise
+     * that's used to check if a player can place a city on a vertex.
+     * In the game, a player can only place a city or colony on a vertex if it is next to a road that belongs to the player.
+     * The only exception is when the player places the first two roads and colonies.
+     * @see #getNeighbourTileVerticesToEdge to see how the vertices are found.
+     */
+    public boolean isRoadNextToVertex(TileEdge edge, TileVertex vertex) {
+        TileVertex[] neighbours = getNeighbourTileVerticesToEdge(edge);
+        for (TileVertex v : neighbours) {
+            if (v != null) {
+                if (v == vertex) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * isRoadNextToRoad
+     *
+     * @param edge   the edge that is checked if it is next to a road
+     * @param player the player that is checked if the road belongs to him
+     *               this method goes through the edges of the board.
+     *               it then checks if the edge contains a building.
+     *               if the edge contains a building, then it checks if the building belongs to the player.
+     * @return true if the road is next to a road that belongs to the player, false otherwise
+     * that's used to check if a player can place a road on an edge.
+     * In the game, a player can only place a road on an edge if it is next to a road or a colony that belongs to the player.
+     * this method in particular is used to check if a player can place a road on an edge if it is next to a road that belongs to the player.
+     * @see #getNeighbourTileEdgesToEdge to see how the edges are found.
+     */
     public boolean isRoadNextToRoad(TileEdge edge, Player player) {
         TileEdge[] neighbours = getNeighbourTileEdgesToEdge(edge);
         for (TileEdge e : neighbours) {
@@ -455,6 +609,21 @@ public class GameBoard implements Serializable {
         return false;
     }
 
+
+    /**
+     * isVertexNextToRoad
+     *
+     * @param vertex the vertex that is checked if it is next to a road
+     * @param player the player that is checked if the road belongs to him
+     *               this method goes through the edges of the board.
+     *               once it finds the edges that are connected to the vertex, it checks if the edge contains a building.
+     *               if the edge contains a building, then it checks if the building belongs to the player.
+     * @return true if the vertex is next to a road that belongs to the player, false otherwise
+     * that's used to check if a player can place a colony on a vertex.
+     * In the game, a player can only place a colony on a vertex if it is next to a road that belongs to the player.
+     * that's also used to check if a player can place a colony on a vertex if it is next to a city that belongs to the player.
+     * @see #getNeighbourTileEdgesToVertex to see how the edges are found.
+     */
     public boolean isVertexNextToRoad(TileVertex vertex, Player player) {
         TileEdge[] neighbours = getNeighbourTileEdgesToVertex(vertex);
         for (TileEdge e : neighbours) {
@@ -469,15 +638,30 @@ public class GameBoard implements Serializable {
         return false;
     }
 
+    /**
+     * canPlaceColony
+     *
+     * @param vertex the vertex where the player wants to place a colony
+     * @param player the player that wants to place a colony
+     * @return true if the player can place a colony on the vertex, false otherwise
+     * that's used to check if a player can place a colony on a vertex.
+     * it also checks if the player is allowed to place a colony for free.
+     * it's also checking if the vertex already contains a building.
+     * In the game, a player can only place a colony on a vertex if:
+     * it is two roads away from cities, and next to a road that belongs to the player (except for the first two roads and colonies).
+     * @see #isVertexTwoRoadsAwayFromCities to see how the vertex is checked if it is two roads away from cities.
+     * @see #isVertexNextToRoad to see how the vertex is checked if it is next to a road that belongs to the player.
+     */
     public boolean canPlaceColony(TileVertex vertex, Player player) {
-        if (game.getCurrentPlayer().getFreeColony()) {
-            return true;
+        if (!isVertexTwoRoadsAwayFromCities(vertex)) {
+            return false;
         }
         if (vertex.getBuilding() != null) {
             return false;
         }
-        if (!isVertexTwoRoadsAwayFromCities(vertex)) {
-            return false;
+        if (game.getCurrentPlayer().getFreeColony()) {
+            lastPlacedColonyVertex = vertex;
+            return true;
         }
         if (!isVertexNextToRoad(vertex, player)) {
             return false;
@@ -485,8 +669,54 @@ public class GameBoard implements Serializable {
         return true;
     }
 
+    /**
+     * canPlaceCity
+     *
+     * @param vertex
+     * @param player it's used to check if we have the conditions to place a city
+     * @return true if we can, false otherwise
+     * @see Colony to see how we create cities or colonies
+     */
+    public boolean canPlaceCity(TileVertex vertex, Player player) {
+        if (!(vertex.getBuilding() instanceof Colony)) {
+            return false;
+        } else {
+            Building buil = vertex.getBuilding();
+            if (buil instanceof Colony) {
+                Colony col = (Colony) buil;
+                if (!col.getIsCity()) {
+                    if (col.getOwner() == player) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * canPlaceRoad
+     *
+     * @param edge   the edge where the player wants to place a road
+     * @param player the player that wants to place a road
+     * @return true if the player can place a road on the edge, false otherwise
+     * that's used to check if a player can place a road on an edge.
+     * it also checks if the player is allowed to place a road for free.
+     * it's also checking if the edge already contains a building.
+     * In the game, a player can only place a road on an edge if:
+     * it is next to a city that belongs to the player, or next to a road that belongs to the player (except for the first two roads).
+     * @see #isRoadNextToCity to see how the edge is checked if it is next to a city that belongs to the player.
+     * @see #isRoadNextToRoad to see how the edge is checked if it is next to a road that belongs to the player.
+     */
     public boolean canPlaceRoad(TileEdge edge, Player player) {
         if (edge.getBuilding() != null) {
+            return false;
+        }
+        if (lastPlacedColonyVertex != null && game.getCurrentPlayer().getFreeRoad() > 0) {
+            if (isRoadNextToVertex(edge, lastPlacedColonyVertex)) {
+                lastPlacedColonyVertex = null;
+                return true;
+            }
             return false;
         }
         if (isRoadNextToCity(edge, player)) {
@@ -498,6 +728,22 @@ public class GameBoard implements Serializable {
         return false;
     }
 
+    /**
+     * addTile
+     *
+     * @param q            the first coordinate of the tile
+     * @param r            the second coordinate of the tile
+     * @param diceValue    the dice value of the tile
+     * @param resourceType the resource type of the tile
+     *                     this method adds a tile to the board.
+     *                     it creates a tile with the given q, r, dice value, and resource type.
+     *                     it then adds the tile to the board.
+     *                     if the resource type is desert, then the thief is set to the tile.
+     * @see #getTileType to see how the resource type is converted to a tile type.
+     * @see Thief to see how the thief is set to the tile.
+     * @see Tile to see how the tile is created.
+     * @see CubeCoordinates to see how the tile is added to the board.
+     */
     public void addTile(int q, int r, int diceValue, TileType resourceType) {
         int s = -q - r;
         Tile tile = new Tile(q, r, diceValue, resourceType);
@@ -507,15 +753,41 @@ public class GameBoard implements Serializable {
         board.put(new CubeCoordinates(q, r, s), tile);
     }
 
+    /**
+     * getTile
+     *
+     * @param q
+     * @param r
+     * @return the tile at the given q, r coordinates
+     * this method returns the tile at the given q, r coordinates.
+     * @see CubeCoordinates to see how the tile is found in the board, and how the q, r, s coordinates are used.
+     */
     public Tile getTile(int q, int r) {
         int s = -q - r;
         return board.get(new CubeCoordinates(q, r, s));
     }
 
-    public HashMap<CubeCoordinates, Tile> getBoard() {
+    public LinkedHashMap<CubeCoordinates, Tile> getBoard() {
         return board;
     }
 
+
+    /**
+     * initialiseBoard
+     * this method initialises the board.
+     * it goes through the grid size and creates tiles for each q, r, s coordinates.
+     * it then adds the tiles to the board.
+     * it also sets the dice value and resource type for each tile.
+     * the dice value and resource type are set based on the preset tile dice values and tile resource types.
+     * the preset tile dice values and tile resource types are constants.
+     *
+     * @see Constants.BoardConstants#TILE_DICE_VALUES to see the preset tile dice values.
+     * @see Constants.BoardConstants#TILE_TYPES to see the preset tile resource types.
+     * @see #addTile to see how the tiles are added to the board.
+     * @see #getTileType to see how the resource type is converted to a tile type.
+     * @see Tile to see how the tile is created.
+     * @see CubeCoordinates to see how the tile is added to the board.
+     */
     public void initialiseBoard() {
         int maxDistance = this.gridSize;
         int presetTileDiceValue = 0;
@@ -572,6 +844,7 @@ public class GameBoard implements Serializable {
             }
         }
     }
+
     public void eventChangeDiceValues() {
         exchangeTwelveTwoToEightSix();
     }
@@ -613,6 +886,22 @@ public class GameBoard implements Serializable {
         g2dBoard.dispose();
     }
 
+    /**
+     * initDiceValueImages
+     * this method initialises the dice value images.
+     * it goes through the possible dice values and creates an image for each dice value.
+     * it then draws the dice value on the image.
+     * the dice value is drawn in the center of the image.
+     * the color of the dice value is red if the dice value is 6 or 8, and black otherwise.
+     *
+     * @see Constants.Game#DIVIDER to see how the font size is divided.
+     * @see #baseFont to see the font used to draw the dice value.
+     * @see #diceValueImages to see how the dice value images are stored.
+     * @see BufferedImage to see how the dice value images are created.
+     * @see Graphics2D to see how the dice value images are drawn.
+     * @see FontMetrics to see how the dice value is centered.
+     * @see Color to see how the color of the dice value is set.
+     */
     private void initDiceValueImages() {
         int[] diceValues = {2, 3, 4, 5, 6, 8, 9, 10, 11, 12}; // Les valeurs possibles des dés
         int circleDiameter = (int) (60 / Constants.Game.DIVIDER); // Diamètre de base pour les cercles
@@ -645,6 +934,17 @@ public class GameBoard implements Serializable {
             diceValueImages.put(value, image);
         }
     }
+
+    /**
+     * getTileType
+     *
+     * @param resourceType the type of resource that the tile contains
+     * @return the tile type based on the resource type
+     * this method converts the resource type to a tile type.
+     * the resource type is an integer that represents the type of resource that the tile contains.
+     * the tile type is an enum that represents the type of resource that the tile contains.
+     * @see TileType to see the enum that represents the type of resource that the tile contains.
+     */
     private TileType getTileType(int resourceType) {
         switch (resourceType) {
             case 1:
@@ -662,8 +962,24 @@ public class GameBoard implements Serializable {
         }
     }
 
+    /**
+     * initialiseVertices
+     * this method initialises the vertices.
+     * it goes through the tiles of the board.
+     * for each tile, it gets the coordinates of the vertices of the tile.
+     * for each vertex of the tile, it checks if the vertex is already in the map.
+     * if the vertex is already in the map, then the tile is added to the list of tiles associated with the vertex.
+     * if the vertex is not in the map, then a new tile vertex object is created for the vertex.
+     * the tile is then added to the list of tiles associated with the vertex.
+     * the vertex is then added to the map with the tile vertex object as the value.
+     *
+     * @see TileVertex to see the class that represents the vertex.
+     * @see Tile to see the class that represents the tile.
+     * @see CubeCoordinates to see how the coordinates of the vertices are obtained.
+     * @see #layout to see how the coordinates of the vertices are obtained.
+     */
     private void initialiseVertices() {
-        verticesMap = new LinkedHashMap<>();
+        vertices = new ArrayList<>();
 
         // Parcourir toutes les tuiles du plateau
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
@@ -676,11 +992,13 @@ public class GameBoard implements Serializable {
             for (Point vertex : hexagonVertices) {
                 // Vérifier si ce sommet est déjà dans la map
                 boolean found = false;
-                for (Point storedVertex : verticesMap.keySet()) {
+
+                for (TileVertex v : vertices) {
+                    Point storedVertex = v.getCoordinates();
                     if (arePointsEqual(vertex, storedVertex)) {
+                        v.addTile(tile);
                         // Si oui, ajouter la tuile actuelle à la liste des tuiles
                         // associées à ce sommet
-                        verticesMap.get(storedVertex).addTile(tile);
                         found = true;
                         break;
                     }
@@ -697,12 +1015,28 @@ public class GameBoard implements Serializable {
                     vertex = new Point((Math.round(vertex.getX())), (Math.round(vertex.getY())));
                     tileVertex.setCoordinates(vertex);
                     // Arrondir les coordonnées pour éviter les erreurs d'arrondi
-                    verticesMap.put(vertex, tileVertex);
+                    vertices.add(tileVertex);
                 }
             }
         }
     }
 
+    /**
+     * initialiseEdges
+     * this method initialises the edges.
+     * it goes through the tiles of the board.
+     * for each tile, it gets the coordinates of the edges of the tile.
+     * for each edge of the tile, it checks if the edge is already in the map.
+     * if the edge is already in the map, then the tile is added to the list of tiles associated with the edge.
+     * if the edge is not in the map, then a new tile edge object is created for the edge.
+     * the tile is then added to the list of tiles associated with the edge.
+     * the edge is then added to the map with the tile edge object as the value.
+     *
+     * @see TileEdge to see the class that represents the edge.
+     * @see Tile to see the class that represents the tile.
+     * @see CubeCoordinates to see how the coordinates of the edges are obtained.
+     * @see #layout to see how the coordinates of the edges are obtained.
+     */
     private void initialiseEdges() {
         TileEdge.resetIdClass();
         edgesMap = new LinkedHashMap<>();
@@ -728,6 +1062,14 @@ public class GameBoard implements Serializable {
         }
     }
 
+    /**
+     * edgesMapContainsEdge
+     *
+     * @param edge the edge we want to check if it is in the map
+     * @return true if the edge is already in the map, false otherwise
+     * this method checks if the given edge is already in the map.
+     * that's used to avoid adding the same edge multiple times to the map.
+     */
     public boolean edgesMapContainsEdge(TileEdge edge) {
         for (TileEdge e : edgesMap.values()) {
             if (e.getStart().equals(edge.getStart()) && e.getEnd().equals(edge.getEnd())) {
@@ -749,41 +1091,85 @@ public class GameBoard implements Serializable {
                 && Math.abs(p1.getY() - p2.getY()) < epsilon;
     }
 
+    /**
+     * buildingIsCity
+     *
+     * @param building the building
+     * @return true if the building is a city, false otherwise (it can be a colony or null)
+     */
     private boolean buildingIsCity(Building building) {
         if (building instanceof Colony) {
             return ((Colony) building).getIsCity();
         }
         return false;
     }
+
+    /**
+     * drawBuildingImage
+     *
+     * @param g2d      the graphics object
+     * @param building the building
+     * @param vertex   the vertex we want to draw the building on
+     *                 this method draws the building image on the vertex.
+     *                 it checks if the building is a city or a colony.
+     *                 if the building is a city, then the city image is drawn on the vertex.
+     *                 if the building is a colony, then the colony image is drawn on the vertex.
+     * @see #buildingIsCity to see how the building is checked if it is a city.
+     * @see #getImageForBuilding to see how the image for the building is obtained.
+     * @see #scaledBuildingImages to see how the image for the building is scaled.
+     * @see Resolution#divider to see how the image is scaled based on the resolution.
+     * @see Point to see how the building image is drawn on the vertex.
+     * @see Graphics2D to see how the building image is drawn on the vertex.
+     */
     private void drawBuildingImage(Graphics2D g2d, Building building, Point vertex) {
         boolean isCity = buildingIsCity(building);
         if (scaledBuildingImages.get(building) == null) {
             BufferedImage img = getImageForBuilding(building);
             int size = (isCity ? 90 : 60);
             scaledBuildingImages.put(building, img.getScaledInstance((int) (size / Resolution.divider()),
-                (int) (size / Resolution.divider()), Image.SCALE_SMOOTH));
+                    (int) (size / Resolution.divider()), Image.SCALE_SMOOTH));
         }
         int placement = (isCity ? 40 : 30);
         g2d.drawImage(scaledBuildingImages.get(building),
                 (int) vertex.getX() - (int) (placement / Resolution.divider()),
                 (int) vertex.getY() - (int) (placement / Resolution.divider()), null);
     }
+
+    /**
+     * drawVertices
+     *
+     * @param g the graphics object
+     *          this method draws the vertices on the board.
+     *          it goes through the vertices of the board.
+     *          for each vertex, it checks if the vertex contains a building.
+     *          if the vertex contains a building, then the building image is drawn on the vertex.
+     * @see #drawBuildingImage to see how the building image is drawn on the vertex.
+     */
     private void drawVertices(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK); // Color for the vertices
         // Draw the vertices
-        for (Point vertex : verticesMap.keySet()) {
-            Building building = verticesMap.get(vertex).getBuilding();
+
+        for (TileVertex v : vertices) {
+            Building building = v.getBuilding();
             if (building != null) {
-                drawBuildingImage(g2d, building, vertex);
+                drawBuildingImage(g2d, building, v.getCoordinates());
             }
         }
     }
 
+    /**
+     * drawImagesInHexes
+     *
+     * @param g the graphics object
+     *          this method draws the images in the hexes.
+     *          it goes through the tiles of the board.
+     *          for each tile, it gets the pixel coordinates of the tile.
+     *          it then draws the image of the tile on the pixel coordinates.
+     *          if the game is in thief mode, then the image of the selected tile is highlighted.
+     */
     public void drawImagesInHexes(Graphics g) {
-
         Graphics2D g2d = (Graphics2D) g;
-
         if (boardImage != null) {
             if (thiefMode || thiefModeEnd) {
                 initialiseBoardImage();
@@ -795,6 +1181,23 @@ public class GameBoard implements Serializable {
         }
     }
 
+    /**
+     * drawEdgeWithImage
+     *
+     * @param g2d       the graphics object
+     * @param start     the start point of the edge
+     * @param end       the end point of the edge
+     * @param edgeImage the image of the edge
+     *                  this method draws the edge with the image.
+     *                  it calculates the middle of the edge and the rotation angle.
+     *                  it scales the image of the edge.
+     *                  it then applies the transformation and draws the image.
+     * @see AffineTransform to see how the transformation is applied.
+     * @see #drawImagesInHexes to see how the images are drawn in the hexes.
+     * @see #drawVertices to see how the vertices are drawn.
+     * @see #drawPorts to see how the ports are drawn.
+     * @see #drawThief to see how the thief is drawn.
+     */
     private void drawEdgeWithImage(Graphics2D g2d, Point start, Point end, BufferedImage edgeImage) {
         // Sauvegarder l'état actuel du contexte Graphics2D
         AffineTransform oldTransform = g2d.getTransform();
@@ -823,6 +1226,16 @@ public class GameBoard implements Serializable {
     }
 
 
+    /**
+     * drawEdges
+     *
+     * @param g the graphics object
+     *          this method draws the edges on the board.
+     *          it goes through the edges of the board.
+     *          for each edge, it checks if the edge contains a building.
+     *          if the edge contains a building, then the edge image is drawn on the edge.
+     * @see #drawEdgeWithImage to see how the edge image is drawn on the edge.
+     */
     private void drawEdges(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.black);
@@ -834,8 +1247,27 @@ public class GameBoard implements Serializable {
         }
     }
 
+    /**
+     * drawPorts
+     *
+     * @param g the graphics object
+     *          this method draws the ports on the board.
+     *          it goes through the ports of the board.
+     *          for each port, it gets the pixel coordinates of the port.
+     *          it then draws the port image on the pixel coordinates.
+     * @see #drawBuildingImage to see how the building image is drawn on the vertex.
+     * @see #drawEdgeWithImage to see how the edge image is drawn on the edge.
+     * @see #drawImagesInHexes to see how the images are drawn in the hexes.
+     * @see #drawVertices to see how the vertices are drawn.
+     * @see #drawThief to see how the thief is drawn.
+     * @see #drawEdges to see how the edges are drawn.
+     * @see #drawPorts to see how the ports are drawn.
+     * @see #draw to see how the board is drawn.
+     */
     public void drawBoard(Graphics g) {
-        drawImagesInHexes(g);
+        if (!shadowHexes) {
+            drawImagesInHexes(g);
+        }
         drawEdges(g);
         drawVertices(g);
         drawPorts(g);
@@ -856,6 +1288,21 @@ public class GameBoard implements Serializable {
         }
     }
 
+    /**
+     * draw
+     *
+     * @param g the graphics object
+     *          this method draws the board.
+     *          it draws the images in the hexes, the edges, the vertices, the ports, and the thief.
+     * @see #drawImagesInHexes to see how the images are drawn in the hexes.
+     * @see #drawVertices to see how the vertices are drawn.
+     * @see #drawPorts to see how the ports are drawn.
+     * @see #drawThief to see how the thief is drawn.
+     * @see #drawEdges to see how the edges are drawn.
+     * @see #drawBuildingImage to see how the building image is drawn on the vertex.
+     * @see #drawEdgeWithImage to see how the edge image is drawn on the edge.
+     * @see #drawImagesInHexes to see how the images are drawn in the hexes.
+     */
     public void draw(Graphics g) {
         drawBoard(g);
         if (minDistanceToVertex < 20 && lookingForVertex) {
@@ -879,6 +1326,20 @@ public class GameBoard implements Serializable {
         drawThief(g);
     }
 
+
+    /**
+     * drawThief
+     * @param g the graphics object
+     * this method draws the thief on the board.
+     * it gets the pixel coordinates of the tile where the thief is.
+     * it then draws the thief image on the pixel coordinates.
+     * @see #layout to see how the pixel coordinates of the tile are obtained.
+     * @see Thief to see how the thief is set to the tile.
+     * @see Graphics2D to see how the thief image is drawn.
+     * @see Color to see the color of the thief image.
+     * @see Graphics2D#fillOval  to see how the thief image is drawn.
+     * @see #draw to see how the board is drawn.
+     */
     public void drawThief(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         Point p = layout.cubeToPixel(layout, thief.getTile().getCoordinates());
@@ -886,6 +1347,17 @@ public class GameBoard implements Serializable {
         g2d.fillOval((int) p.getX() - 10, (int) p.getY() - 10, 20, 20);
     }
 
+    /**
+     * mouseMoved
+     * @param e the mouse event
+     * this method is called when the mouse is moved.
+     * it gets the mouse position.
+     * it then finds the closest vertex and the closest edge to the mouse position.
+     * if the game is in thief mode, then the tile that is closest to the mouse position is highlighted.
+     * @see #findClosestVertex to see how the closest vertex is found.
+     * @see #findClosestEdge to see how the closest edge is found.
+     * @see #changeThief to see how the thief is changed.
+     */
     public void mouseMoved(MouseEvent e) {
         mousePosition = new Point(e.getX(), e.getY());
         minDistanceToVertex = Double.MAX_VALUE;
@@ -911,6 +1383,10 @@ public class GameBoard implements Serializable {
     }
 
     public void changeThiefNetwork() {
+        if (highlightedTile.getId() == thief.getTile().getId()) {
+            return;
+        }
+
         if (Main.hasServer()) {
             try {
                 PlayerClient player = ((PlayerClient) game.getPlayerClient());
@@ -928,12 +1404,7 @@ public class GameBoard implements Serializable {
     }
 
     public void changeThiefBot() {
-        int nbAlea = (int) (Math.random() * board.size());
-        for (Tile tile : board.values()) {
-            if (nbAlea == tile.getId()) {
-                highlightedTile = tile;
-            }
-        }
+        highlightedTile = ((Bot) game.getCurrentPlayer()).getThiefTile(game);
         changeThief();
     }
 
@@ -945,6 +1416,17 @@ public class GameBoard implements Serializable {
         App.getActionPlayerPanel().update();
     }
 
+    /**
+     * findClosestEdge
+     * @return the closest edge to the mouse position
+     * this method finds the closest edge to the mouse position.
+     * it goes through the edges of the board.
+     * for each edge, it calculates the distance between the edge and the mouse position.
+     * if the distance is less than the minimum distance to the edge, then the minimum distance to the edge is updated.
+     * the closest edge is then updated.
+     * @see TileEdge to see the class that represents the edge.
+     * @see Point to see the class that represents the coordinates.
+     */
     public TileEdge findClosestEdge() {
         for (Point edge : this.edgesMap.keySet()) {
             double distance = edge.distance(mousePosition);
@@ -958,17 +1440,29 @@ public class GameBoard implements Serializable {
         return closestTileEdge;
     }
 
+    /**
+     * findClosestVertex
+     * @return the closest vertex to the mouse position
+     * this method finds the closest vertex to the mouse position.
+     * it goes through the vertices of the board.
+     * for each vertex, it calculates the distance between the vertex and the mouse position.
+     * if the distance is less than the minimum distance to the vertex, then the minimum distance to the vertex is updated.
+     * the closest vertex is then updated.
+     * @see TileVertex to see the class that represents the vertex.
+     * @see Point to see the class that represents the coordinates.
+     */
     public TileVertex findClosestVertex() {
-        for (Point vertex : this.verticesMap.keySet()) {
+        closestTileVertex = new TileVertex();
+        for (TileVertex v : vertices) {
+            Point vertex = v.getCoordinates();
             double distance = vertex.distance(mousePosition);
-            if (distance < minDistanceToVertex) {
+            if  (closestTileVertex == null || distance < minDistanceToVertex) {
+                closestTileVertex = v;
                 minDistanceToVertex = distance;
-                closestVertex = vertex;
-                closestTileVertex = this.verticesMap.get(vertex);
-                App.getGamePanel().repaint();
+                closestVertex = v.getCoordinates();
             }
         }
-        return this.verticesMap.get(this.closestVertex);
+        return closestTileVertex;
     }
 
     public void initialiseBoardAfterTransfer() {
@@ -984,6 +1478,16 @@ public class GameBoard implements Serializable {
         loadHarborImage();
     }
 
+    /**
+     * initialiseLayout
+     * this method initialises the layout of the board.
+     * it creates a layout with the pointy orientation and the point1 and point2 coordinates.
+     * the point1 and point2 coordinates are scaled based on the game width and height.
+     * @see Constants.Game to see how the game width and height are used to scale the coordinates.
+     * @see Layout to see how the layout is created.
+     * @see Point to see how the coordinates are scaled.
+     * @see Constants.OrientationConstants to see the pointy orientation.
+     */
     public void initialiseLayout() {
         double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
         double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;

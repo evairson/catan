@@ -34,6 +34,7 @@ public class LogPanel extends JPanel {
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
+        chatArea.setCaretPosition(chatArea.getDocument().getLength());
     }
 
     public void addEventLog(int eventNo) {
@@ -49,12 +50,12 @@ public class LogPanel extends JPanel {
                     + "génère exceptionnellement ses ressources!\n", Color.GREEN); break;
             case 5: addMessageColor("Le Joueur avec le plus de points de victoire "
                     + "échange sa main avec celui en ayant le moins.\n", Color.BLACK); break;
-            case 6: addMessageColor("Affreux! Tous les joueurs perdent une ressource !\n", Color.RED);
+            case 6: addMessageColor("Affreux! Tous les joueurs perdent une ressource !\n", Color.RED); break;
             case 7: addMessageColor("De terribles inondations se sont produites dans les "
                     + "ports : ils sont tous désactivés pendant 2 tours !\n", Color.BLUE); break;
             case 8: addMessageColor("La chance est chamboulée! "
                     + "Toutes les cases prennent les valeurs inverses de celles actuelles ! (Les numéros "
-                    + "les moins probables deviennent"
+                    + "les moins probables deviennent "
                     + "les plus probables et inversement)\n", Color.BLACK); break;
             case 9: addMessageColor("Les chevaliers ont bien travaillé! "
                     + "Chaque joueur pioche son nombre de "
@@ -70,12 +71,13 @@ public class LogPanel extends JPanel {
                     + "seuil du voleur doivent abandonner la moitié de leurs cartes !\n", Color.RED); break;
             case 14: addMessageColor("C'est le jour de chance du joueur avec le moins de "
                     + "points de victoire! Il gagne un point de victoire !\n", Color.GREEN); break;
-            case 15: addMessageColor("Un terrible incendie fait rage dans les fôrets de la carte! "
-                    + "Tout les joueurs perdent leur bois !\n", Color.RED); break;
+            case 15: addMessageColor("Un terrible incendie fait rage dans les fôrets et "
+                    + "les champs de la carte! "
+                    + "Tous les joueurs perdent leur bois et leur blé !\n", Color.RED); break;
             case 16: addMessageColor("Les contrôleurs fiscaux arrivent!"
                     + "Perdez une ressource aléatoire par bâtiment sur la carte !\n", Color.RED); break;
             case 17: addMessageColor("C'est l'anniversaire de " + pName
-                    + "Chaque autre joueur lui donne une ressource aléatoire !\n", Color.GREEN); break;
+                    + "! Chaque autre joueur lui donne une ressource aléatoire !\n", Color.GREEN); break;
             case 18: addMessageColor("Chaque joueur mise une ressource dans un pot commun! "
                     + "Lorsque le dé à 20 faces tombera sur 19, le contenu du pot "
                     + "sera récupéré par le joueur ayant lancé le dé !\n", Color.BLACK); break;

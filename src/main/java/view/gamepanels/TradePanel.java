@@ -331,12 +331,13 @@ public class TradePanel extends JPanel {
             isRequestedDouble = random.nextBoolean();
         }
         updateAcceptButtonState();
+        selectedPlayerLabelIcon.setVisible(false);
         selectedPlayerLabelIcon = null;
         initializeSelectedPlayerImage();
         selectedPlayerLabel.setText("<html><div style='text-align: center;'>"
                 + "ÉCHANGE AVEC<br/> La Banque</div></html>");
     }
-    private void notifyOfferToPlayer(Player player) {
+    public void notifyOfferToPlayer(Player player) {
         // TODO : Implémentez la notification pour le joueur sélectionné.
         // Cela peut être un changement de couleur, un message pop-up, etc.
 
@@ -368,13 +369,31 @@ public class TradePanel extends JPanel {
         closeTradePanel();
     }
     private void declineAction() {
-        declineButton.setEnabled(false);
-        acceptButton.setEnabled(false);
-        toggleTradeInterface(true);
+        sendTradeExit(false);
+        closeTradePanel();
     }
-    public void performTrade(boolean isBank) {
-        HashMap<TileType, Integer> currentPlayerResources = listPlayers.getCurrentPlayer().getResources();
 
+    /**
+     * Send to the network the result of the trade.
+     * @param b true if the trade succeded, false if not
+     */
+    private void sendTradeExit(boolean b) {
+        if (Main.hasServer()) {
+            try {
+                PlayerClient playerClient = (PlayerClient) player;
+                int id = playerClient.getId();
+                String exit = b ? "Accept" : "Refuse";
+                NetworkObject object = new NetworkObject(TypeObject.Game, "trade" + exit, id,
+                        listPlayers.getCurrentPlayer().getId());
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void performTrade(boolean isBank) {
         if (isBank) {
             // Mise à jour des ressources pour une transaction avec la banque
             updateResources(listPlayers.getCurrentPlayer().getResources(), resourcesOffered, true, false);
@@ -401,23 +420,12 @@ public class TradePanel extends JPanel {
         resourcesOffered.clear();
 
         // Mettre à jour l'affichage des ressources pour les joueurs impliqués
-        resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
+        if (!App.getBotSoloMode()) {
+            resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
+        }
         App.getActionPlayerPanel().update();
 
-        if (player instanceof PlayerClient) {
-            try {
-                PlayerClient playerClient = (PlayerClient) player;
-                int id = playerClient.getId();
-                NetworkObject object = new NetworkObject(TypeObject.Game, "tradeAccept", id,
-                    listPlayers.getCurrentPlayer().getId());
-                playerClient.getOut().writeUnshared(object);
-                playerClient.getOut().flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Problème de downCast");
-        }
+        sendTradeExit(true);
     }
 
     /**
@@ -634,6 +642,7 @@ public class TradePanel extends JPanel {
     public GameWindow getParentFrame() {
         return (GameWindow) SwingUtilities.getWindowAncestor(this);
     }
+
     public void closeTradePanel() {
         GameWindow parentFrame = getParentFrame();
         if (parentFrame != null) {
@@ -647,6 +656,30 @@ public class TradePanel extends JPanel {
         ButtonImage returnButton = new ButtonImage("src/main/resources/backGame.png",
                 "src/main/resources/backGame.png", 100, 620, 1.2, this::closeTradePanel, null);
         add(returnButton);
+    }
+
+    // -------- TradePanel pour les bots --------- //
+
+    public TradePanel(ListPlayers listPlayers, HashMap<TileType, Integer> resourcesOffered,
+        HashMap<TileType, Integer> resourcesRequested, Player selectedPlayer) {
+
+        this.resourcesOffered = resourcesOffered;
+        this.resourcesRequested = resourcesRequested;
+        this.listPlayers = listPlayers;
+        this.selectedPlayer = selectedPlayer;
+        boolean canFulfillRequest = canSelectedPlayerFulfillRequest();
+        if (canFulfillRequest) {
+            if (((Bot) selectedPlayer).acceptTrade(resourcesRequested, resourcesOffered)) {
+                performTrade(false);
+                if (!App.getBotSoloMode()) {
+                    actionPlayerPanel.getApp().addMessageColor("Votre trade a été accepté \n", java.awt.Color.GREEN);
+                }
+            }
+        } else {
+            if(!App.getBotSoloMode()) {
+                actionPlayerPanel.getApp().addMessageColor("Votre trade a été refusé \n", java.awt.Color.ORANGE);
+            }
+        }
     }
 
     // -------- Fonctions d'affichage du panel et de son background -------- //

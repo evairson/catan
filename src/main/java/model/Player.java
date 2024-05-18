@@ -68,11 +68,11 @@ public class Player implements Serializable {
         color = c;
         this.name = name;
         resources = new HashMap<>();
-        resources.put(TileType.CLAY, 0);
-        resources.put(TileType.ORE, 0);
-        resources.put(TileType.WHEAT, 0);
-        resources.put(TileType.WOOD, 0);
-        resources.put(TileType.WOOL, 0);
+        resources.put(TileType.CLAY, 6);
+        resources.put(TileType.ORE, 6);
+        resources.put(TileType.WHEAT, 6);
+        resources.put(TileType.WOOD, 6);
+        resources.put(TileType.WOOL, 6);
         buildings = new ArrayList<>();
         cardsDev = new ArrayList<>();
         hasThrowDices = false;
@@ -258,6 +258,9 @@ public class Player implements Serializable {
     public int getResourcesSum() {
         int acc = 0;
         for (Integer i : resources.values()) {
+            if (i == null) {
+                continue;
+            }
             acc += i;
         }
         return acc;
@@ -265,8 +268,19 @@ public class Player implements Serializable {
     public ArrayList<DevelopmentCard> getCardsDev() {
         return cardsDev;
     }
-    public boolean hasWon() {
-        return points >= 10;
+    public boolean hasWon(Game game) {
+        int pointReal = points;
+        if (game.getPlayerWhoHasLongestRoad() != null) {
+            if (game.getPlayerWhoHasLongestRoad().getId() == id) {
+                pointReal += 2;
+            }
+        }
+        if (game.getPlayerWhoHasMoreKnights() != null) {
+            if (game.getPlayerWhoHasMoreKnights().getId() == id) {
+                pointReal += 2;
+            }
+        }
+        return pointReal >= 10;
     }
     public boolean hasBiggestArmy() {
         return hasBiggestArmy;
@@ -383,10 +397,16 @@ public class Player implements Serializable {
         return false;
     }
 
-    public boolean buildCity(TileVertex vertex) {
+
+    public boolean buildCity(TileVertex vertex, boolean us) {
+        Colony c = (Colony) vertex.getBuilding();
+        if (!us) {
+            System.out.println("SUUUUU");
+            c.place(this, true, vertex);
+            return true;
+        }
         if (vertex.getBuilding() != null && vertex.getBuilding() instanceof Colony) {
             if (vertex.getBuilding().getOwner().equals(this)) {
-                Colony c = (Colony) vertex.getBuilding();
                 if (c.buyAndPlace(this, true, vertex)) {
                     points++;
                     App.checkWin();
@@ -454,7 +474,7 @@ public class Player implements Serializable {
         }
         return true;
     }
-    public void removeOneRandom() {
+    public TileType removeOneRandom() {
         if (getResourcesSum() > 0) {
             Random rd = new Random();
             TileType[] resTList = {TileType.CLAY, TileType.ORE, TileType.WHEAT, TileType.WOOD, TileType.WOOL};
@@ -462,10 +482,11 @@ public class Player implements Serializable {
                 int k = rd.nextInt(0, 5);
                 if (resources.get(resTList[k]) > 0) {
                     addResource(resTList[k], -1);
-                    break;
+                    return resTList[k];
                 }
             }
         }
+        return null;
     }
     public void addOneRandom() {
         Random rd = new Random();

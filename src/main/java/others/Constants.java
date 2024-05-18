@@ -8,6 +8,7 @@ import view.utilities.Resolution;
 import java.awt.*;
 import java.util.HashMap;
 
+
 public class Constants {
     public static class CubeCoordinatesConst {
         public static final CubeCoordinates[] DIRECTIONS = new CubeCoordinates[] {

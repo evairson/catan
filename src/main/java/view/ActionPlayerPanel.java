@@ -29,7 +29,6 @@ import start.Main;
 import view.utilities.Animation;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
-
 import java.util.HashMap;
 import java.util.concurrent.*;
 
@@ -52,6 +51,7 @@ public class ActionPlayerPanel extends JPanel {
     private RollingDice dice;
     private HashMap<TileType, BufferedImage> resourceImages = new HashMap<>();
     private boolean harboursDisabled = false;
+    private boolean firstUpdate = true;
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -73,7 +73,7 @@ public class ActionPlayerPanel extends JPanel {
         initializeChat();
         initializeLogChat();
         //createPlayerPanel();
-        createButton();
+        createEndTurnButton();
         setVisible(true);
     }
 
@@ -122,7 +122,7 @@ public class ActionPlayerPanel extends JPanel {
         int xCoord = Resolution.calculateResolution(1108, 440)[0];
         int yCoord = Resolution.calculateResolution(1108, 440)[1];
 
-        dice = new RollingDice(game, true);
+        dice = new RollingDice(game, app.hasD20());
         dice.setBounds(xCoord, yCoord, (int) (205 / Resolution.divider()),
                 (int) (300 / Resolution.divider()));
         add(dice);
@@ -256,7 +256,9 @@ public class ActionPlayerPanel extends JPanel {
 
     public void setComponentsEnabled(boolean enabled) {
         for (Component comp : this.getComponents()) {
-            comp.setEnabled(enabled);
+            if (!(comp.equals(endTurn) || comp.equals(tradeButtonPanel))) {
+                comp.setEnabled(enabled);
+            }
         }
     }
 
@@ -307,7 +309,7 @@ public class ActionPlayerPanel extends JPanel {
         tradeButtonPanel.setOpaque(false);
     }
 
-    private void createButton() {
+    private void createEndTurnButton() {
         String basePath = "src/main/resources/";
         endTurn = new ButtonImage(basePath + "endTurn.png", basePath + "endTurn.png",
                 960, 600, 1.5, this::changeTurn, null);
@@ -488,13 +490,13 @@ public class ActionPlayerPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Function in charge of creating the little display of the player's name
+     * and color icon just above the "Fin de Tour" button.
+     * @throws IOException if perhaps the image getting fails
+     */
     private void createNamePlayer() throws IOException {
-        Player player;
-        if (Main.hasServer()) {
-            player = game.getPlayerClient();
-        } else {
-            player = game.getCurrentPlayer();
-        }
+        Player player = getPlayerFromGame();
         String src = "src/main/resources/pion/pion";
         String imagePath = src + player.getColorString() + ".png";
         Image origiImg = ImageIO.read(new File(imagePath));
@@ -520,7 +522,29 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     public void update() {
-        resourcesPanel.updateResourceLabels(game.getPlayerClient());
+        Player currentPlayer = game.getCurrentPlayer();
+
+        if (!Main.hasServer()) {
+            resourcesPanel.updateResourceLabels(currentPlayer);
+            namePlayer.setText(" " + game.getCurrentPlayer().getName().toUpperCase());
+        } else {
+            resourcesPanel.updateResourceLabels(game.getPlayerClient());
+        }
+        if (firstUpdate) {
+            try {
+                Player player = getPlayerFromGame();
+                String src = "src/main/resources/pion/pion";
+                String imagePath = src + player.getColorString() + ".png";
+                Image origiImg = ImageIO.read(new File(imagePath));
+                Image buttonImage = origiImg.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+                namePlayer.setIcon(new ImageIcon(buttonImage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (Main.hasServer()) {
+                firstUpdate = false;
+            }
+        }
         updateTurn();
 
         if (playersPanel != null) {
@@ -593,18 +617,41 @@ public class ActionPlayerPanel extends JPanel {
                 });
     }
 
+    /**
+     * Gets the player according to the game mode (network or local).
+     * @return The Player object representing the player in front of the screen
+     */
+
+    public Player getPlayerFromGame() {
+        Player player;
+        if (Main.hasServer()) {
+            player = game.getPlayerClient();
+        } else {
+            player = game.getCurrentPlayer();
+        }
+        return player;
+    }
 
     public void updateShopPanel() {
         shopPanel.updateEnablePanel(game);
     }
 
     public void updateTurn() {
-        if (game.isMyTurn()) {
-            updateShopPanel();
-            if (game.canPass()) {
-                endTurn.setEnabled(true);
+        if (Main.hasServer()) {
+            if (game.isMyTurn()) {
+                updateShopPanel();
+                tradeButtonPanel.getButton().setEnabled(!game.isInBeginningPhase()
+                        && game.getCurrentPlayer().hasThrowDices());
+                if (game.canPass()) {
+                    endTurn.setEnabled(true);
+                } else {
+                    endTurn.setEnabled(false);
+                }
             } else {
                 endTurn.setEnabled(false);
+                shopPanel.setEnabledPanel(false);
+                dice.setButtonIsOn(false);
+                tradeButtonPanel.getButton().setEnabled(false);
             }
         } else {
             dice.setButtonIsOn(false);

@@ -108,12 +108,15 @@ public class PlayerClient extends Player {
                     App.getActionPlayerPanel().showTradePanel(tradeObject);
                 }
                 break;
-            case "tradeAccept" :
+            case "tradeAccept":
                 int idTrader = (int) networkObject.getObject();
                 if (idTrader == id) {
                     App.getActionPlayerPanel().getTradePanel().acceptAction(false);
                     App.getActionPlayerPanel().update();
                 }
+                break;
+            case "tradeRefuse" :
+                App.getActionPlayerPanel().getTradePanel().closeTradePanel();
                 break;
             case "changeThief" :
                 app.getBoard().changehighlitedTile((int) networkObject.getObject());
@@ -139,7 +142,7 @@ public class PlayerClient extends Player {
                 app.getGame().endTurn();
                 app.addMessageColor("C'est au tour de ", java.awt.Color.BLACK);
                 app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
-                        app.getGame().getCurrentPlayer().getColorAwt());
+                    app.getGame().getCurrentPlayer().getColorAwt());
                 break;
             case "DrawCard":
                 if (id != networkObjet.getId()) {
@@ -158,8 +161,9 @@ public class PlayerClient extends Player {
         try {
             switch (networkObject.getMessage()) {
                 case "buildCity":
+                    int playerId = (int) networkObject.getId();
                     int idCity = (int) networkObject.getObject();
-                    app.getGame().buildCity(idCity);
+                    app.getGame().buildCity(idCity, playerId == app.getPlayer().getId());
                     if (networkObject.getId() == id) {
                         App.getActionPlayerPanel().updateShopPanel();
                     }
