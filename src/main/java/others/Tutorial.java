@@ -47,8 +47,6 @@ public class Tutorial extends JPanel {
         int[] coords = Resolution.calculateResolution(450, 450);
         texte.setLocation(coords[0], coords[1]);
         texte.setBounds(coords[0], coords[1], 600, 200);
-        texte.setBackground(Color.GRAY);
-        texte.setOpaque(true);
         texte.setHorizontalAlignment(SwingConstants.CENTER); // Aligner le texte au centre
         texte.setVerticalAlignment(SwingConstants.TOP); // Aligner le texte en haut
         texte.setVerticalTextPosition(SwingConstants.TOP); // Positionner le texte en haut
@@ -62,7 +60,7 @@ public class Tutorial extends JPanel {
         int height = Constants.Game.HEIGHT;
         backgroundImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
         images[0] = iconSheep.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-        images[1] = iconBubble.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+        images[1] = iconBubble.getImage().getScaledInstance(820, 600, Image.SCALE_SMOOTH);
 
         add(texte);
     }
@@ -96,6 +94,13 @@ public class Tutorial extends JPanel {
 
     public void updateText() {
         texte.setText(readLine(i - 1));
+        if (i >= 13) {
+            int[] coo = Resolution.calculateResolution(450, 350);
+            texte.setLocation(coo[0], coo[1]);
+        } else {
+            int[] coords = Resolution.calculateResolution(450, 450);
+            texte.setLocation(coords[0], coords[1]);
+        }
     }
 
     public void updateImage() {
@@ -109,8 +114,13 @@ public class Tutorial extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(backgroundImage, 0, 0, this);
-        g.drawImage(images[0], 185, 700, null);
-        //g.drawImage(images[1], 500, 300, null);
+        if (i >= 13) {
+            g.drawImage(images[0], 185, 500, null);
+            g.drawImage(images[1], 385, 150, null);
+        } else {
+            g.drawImage(images[0], 185, 700, null);
+            g.drawImage(images[1], 380, 350, null);
+        }
     }
 
     public String readLine(int n) {
