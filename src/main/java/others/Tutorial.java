@@ -62,7 +62,7 @@ public class Tutorial extends JPanel {
         //taille de l'image en fonction de la résolution
 
         int[] image0 = Resolution.calculateResolution(66, 60);
-        int[] image1 = Resolution.calculateResolution(575, 280);
+        int[] image1 = Resolution.calculateResolution(600, 280);
         int[] image2 = Resolution.calculateResolution(400, 240);
         int[] image3 = Resolution.calculateResolution(575, 130);
         images[0] = iconSheep.getImage().getScaledInstance(image0[0], image0[1], Image.SCALE_SMOOTH);
@@ -82,6 +82,8 @@ public class Tutorial extends JPanel {
         add(texte);
         updateText();
         updateImage();
+        revalidate();
+        repaint();
     }
 
     public void backToMenu() {
