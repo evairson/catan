@@ -7,7 +7,7 @@ import javax.swing.*;
 import model.App;
 import model.Game;
 import model.Player;
-import model.IA.Bot;
+import model.bots.Bot;
 import network.NetworkObject;
 import network.PlayerClient;
 import network.NetworkObject.TypeObject;

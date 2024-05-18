@@ -23,4 +23,11 @@ public enum TileType {
     public String getImagePathS() {
         return imagePathS;
     }
+
+    public String getSpecializedImagePath() {
+        String resourceName = name().toLowerCase();
+        resourceName = resourceName.substring(0, 1).toUpperCase()
+                + resourceName.substring(1); // Capitalize first letter
+        return "src/main/resources/harbor" + resourceName + ".png";
+    }
 }
