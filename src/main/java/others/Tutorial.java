@@ -1,12 +1,10 @@
 package others;
 
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Image;
 
-import javax.naming.spi.ResolveResult;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -50,13 +48,8 @@ public class Tutorial extends JPanel {
         add(prevBtn);
 
         texte = new JLabel(readLine(0));
-        int[] coords = Resolution.calculateResolution(440, 450);
-        int[] coords2 = Resolution.calculateResolution(535, 300);
-        texte.setBounds(coords[0], coords[1], coords2[0], coords2[1]);
-        //texte.setHorizontalAlignment(SwingConstants.CENTER); // Aligner le texte au centre
         texte.setVerticalAlignment(SwingConstants.TOP); // Aligner le texte en haut*
         texte.setVerticalTextPosition(SwingConstants.TOP); // Positionner le texte en haut
-        //texte.setHorizontalTextPosition(SwingConstants.CENTER);
 
         ImageIcon iconSheep = new ImageIcon(basePath + "tutoriel/sheep.png");
         ImageIcon icon = new ImageIcon(basePath + "tutoriel/1.png");
@@ -65,6 +58,9 @@ public class Tutorial extends JPanel {
         int width = Constants.Game.WIDTH;
         int height = Constants.Game.HEIGHT;
         backgroundImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
+        //taille de l'image en fonction de la résolution
+
         int[] image0 = Resolution.calculateResolution(66, 60);
         int[] image1 = Resolution.calculateResolution(575, 280);
         int[] image2 = Resolution.calculateResolution(400, 240);
@@ -73,6 +69,9 @@ public class Tutorial extends JPanel {
         images[1] = iconBubble.getImage().getScaledInstance(image1[0], image1[1], Image.SCALE_SMOOTH);
         images[2] = iconBubble.getImage().getScaledInstance(image2[0], image2[1], Image.SCALE_SMOOTH);
         images[3] = iconBubble.getImage().getScaledInstance(image3[0], image3[1], Image.SCALE_SMOOTH);
+
+
+        //positions de la bulle de texte et du mouton
 
         c1 = Resolution.calculateResolution(450, 285);
         c2 = Resolution.calculateResolution(445, 520);
