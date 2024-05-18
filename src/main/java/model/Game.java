@@ -203,7 +203,6 @@ public class Game implements StateMethods, Serializable {
         if (start && getCurrentPlayer().last(this)) {
             start = false;
             backwards = true;
-            System.out.println("Derchos 180");
         } else if (backwards && getCurrentPlayer().first(this)) {
             backwards = false;
         } else if (eventOrderJustChanged) {
@@ -211,7 +210,6 @@ public class Game implements StateMethods, Serializable {
         } else if (backwards || changeOrder) {
             players.prev();
         } else {
-            System.out.println("Derchos278: VRAI DEBUT DE PARTIE : " + start + " & " + backwards);
             players.next();
 //            if (getCurrentPlayer().equals(getFirstPlayer()) && !start && !backwards) {
 //                isNewTurnAnimationNeeded = false;
