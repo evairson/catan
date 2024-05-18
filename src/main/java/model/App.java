@@ -29,6 +29,11 @@ public class App {
     private static boolean playing;
     private boolean hasD20 = true;
     private static BackgroundPanel background;
+    private static Boolean botSoloMode = false;
+
+    public boolean isHasD20() {
+        return hasD20;
+    }
 
     public GameBoard getBoard() {
         return board;
@@ -59,10 +64,32 @@ public class App {
         mainMenu.requestFocus();
     }
 
+    public static boolean getBotSoloMode() {
+        return botSoloMode;
+    }
+
+    public static void setBotSoloMode() {
+        botSoloMode = true;
+    }
+
     public App(PlayerClient playerClient) {
         player = playerClient;
         player.setApp(this);
         mainMenu = new MainMenu(this, null);
+        optionPanel = new OptionPanel();
+        tutorial = new Tutorial();
+        if (playerClient != null) {
+            ((PlayerClient) player).setApp(this);
+            mainMenu = new MainMenu(this, null);
+        } else {
+            mainMenu = new MainMenu(this, player);
+        }
+        App.gameWindow = new GameWindow(mainMenu, optionPanel, tutorial);
+        mainMenu.requestFocus();
+    }
+
+    public App() {
+        mainMenu = new MainMenu(this, player);
         optionPanel = new OptionPanel();
         tutorial = new Tutorial();
         App.gameWindow = new GameWindow(mainMenu, optionPanel, tutorial);
@@ -99,8 +126,8 @@ public class App {
         try {
             NetworkObject gameObject;
             gameObject = new NetworkObject(TypeObject.Message, "tryStartGame", player.getId(), null);
-            player.getOut().writeUnshared(gameObject);
-            player.getOut().flush();
+            ((PlayerClient) player).getOut().writeUnshared(gameObject);
+            ((PlayerClient) player).getOut().flush();
         } catch (Exception e) {
             e.getStackTrace();
         }
@@ -110,13 +137,13 @@ public class App {
         try {
             game = new Game(hashSet);
             NetworkObject gameObject = new NetworkObject(TypeObject.Game, "startGame", player.getId(), game);
-            player.getOut().writeUnshared(gameObject);
-            player.getOut().flush();
+            ((PlayerClient) player).getOut().writeUnshared(gameObject);
+            ((PlayerClient) player).getOut().flush();
         } catch (Exception e) {
             e.getStackTrace();
         }
     }
-    public void addMessage(String message) {
+    public static void addMessage(String message) {
         ((ChatPanel) actionPlayer.getChat()).addMessage(message);
     }
 
@@ -144,9 +171,10 @@ public class App {
         }
         Music.update();
     }
+
     public static void checkWin() {
-        if (game.getCurrentPlayer().hasWon()) {
-            endPanel = new EndPanel(true, game.getCurrentPlayer());
+        if (game.getCurrentPlayer().hasWon(game)) {
+            endPanel = new EndPanel(true, game.getCurrentPlayer(), game);
             gameWindow.getContentPane().add(endPanel, "endPanel");
             endPanel.updatePanel();
             Container contentPane = getGameWindow().getContentPane();
@@ -161,7 +189,7 @@ public class App {
         gamePanel.repaint();
     }
 
-    public PlayerClient getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
@@ -172,4 +200,5 @@ public class App {
     public static ActionPlayerPanel getActionPlayer() {
         return actionPlayer;
     }
+
 }

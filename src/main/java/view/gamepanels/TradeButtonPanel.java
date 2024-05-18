@@ -12,6 +12,7 @@ public class TradeButtonPanel extends JPanel {
         this.tradeAction = tradeAction;
         setLayout(null);
         createTradeButton();
+        trade.setEnabled(false);
     }
 
     private void createTradeButton() {
@@ -21,4 +22,7 @@ public class TradeButtonPanel extends JPanel {
         add(trade);
     }
 
+    public ButtonImage getButton() {
+        return trade;
+    }
 }
