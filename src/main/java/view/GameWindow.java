@@ -1,6 +1,7 @@
 package view;
 
 import others.Constants;
+import others.Tutorial;
 import view.gamepanels.TradePanel;
 import view.menu.MainMenu;
 import javax.swing.*;
@@ -21,7 +22,7 @@ public class GameWindow extends JFrame {
     private BackgroundPanel background;
     private CardLayout layout;
 
-    public GameWindow(MainMenu mainMenu) {
+    public GameWindow(MainMenu mainMenu, OptionPanel optionPanel, Tutorial tutorial) {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gd = ge.getDefaultScreenDevice();
 
@@ -45,6 +46,8 @@ public class GameWindow extends JFrame {
         this.getContentPane().setLayout(layout);
 
         this.getContentPane().add(mainMenu, "mainMenu");
+        this.getContentPane().add(optionPanel, "optionPanel");
+        this.getContentPane().add(tutorial, "tutorial");
         //add(actionPlayer, BorderLayout.CENTER);
         //GameBoard board = new GameBoard(null);
         //add(board);
@@ -58,6 +61,8 @@ public class GameWindow extends JFrame {
         this.actionPlayer = actionPlayer;
         this.gamePanel = gamePanel;
         this.background = background;
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
+            new EventDispatcher(actionPlayer));
 
     }
     public void close(int i) {

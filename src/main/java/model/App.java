@@ -2,6 +2,7 @@ package model;
 
 import others.Constants;
 import others.Music;
+import others.Tutorial;
 import view.*;
 import view.menu.MainMenu;
 
@@ -18,6 +19,7 @@ public class App {
     private static ActionPlayerPanel actionPlayer;
     private static EndPanel endPanel;
     private OptionPanel optionPanel;
+    private Tutorial tutorial;
     private static GameWindow gameWindow;
     private Thread gameThread;
     private GameBoard board;
@@ -25,12 +27,17 @@ public class App {
     private static MainMenu mainMenu;
     private PlayerClient player;
     private static boolean playing;
-    private boolean hasD20 = true;
+    private boolean hasD20 = false;
     private static BackgroundPanel background;
     private static Boolean botSoloMode = false;
 
     public boolean isHasD20() {
         return hasD20;
+    }
+
+    public void checkD20() {
+        hasD20 = optionPanel.d20isSelected();
+        System.out.println("AIEAIEUAIUE" + hasD20);
     }
 
     public GameBoard getBoard() {
@@ -45,9 +52,21 @@ public class App {
         return mainMenu;
     }
 
+    public OptionPanel getOptionPanel() {
+        return optionPanel;
+    }
+
     public void setBoard(GameBoard board) {
         this.board = board;
         board.setApp(this);
+    }
+
+    public App(Player p) {
+        mainMenu = new MainMenu(this, p);
+        optionPanel = new OptionPanel();
+        tutorial = new Tutorial();
+        App.gameWindow = new GameWindow(mainMenu, optionPanel, tutorial);
+        mainMenu.requestFocus();
     }
 
     public static boolean getBotSoloMode() {
@@ -60,19 +79,25 @@ public class App {
 
     public App(PlayerClient playerClient) {
         player = playerClient;
+        player.setApp(this);
+        mainMenu = new MainMenu(this, null);
+        optionPanel = new OptionPanel();
+        tutorial = new Tutorial();
         if (playerClient != null) {
             ((PlayerClient) player).setApp(this);
             mainMenu = new MainMenu(this, null);
         } else {
             mainMenu = new MainMenu(this, player);
         }
-        App.gameWindow = new GameWindow(mainMenu);
+        App.gameWindow = new GameWindow(mainMenu, optionPanel, tutorial);
         mainMenu.requestFocus();
     }
 
     public App() {
         mainMenu = new MainMenu(this, player);
-        App.gameWindow = new GameWindow(mainMenu);
+        optionPanel = new OptionPanel();
+        tutorial = new Tutorial();
+        App.gameWindow = new GameWindow(mainMenu, optionPanel, tutorial);
         mainMenu.requestFocus();
     }
 
@@ -139,8 +164,6 @@ public class App {
         panelGame.add(actionPlayer, 0);
         panelGame.add(gamePanel, 1);
         panelGame.add(background, 2);
-
-        gameWindow.getContentPane().add(mainMenu, "mainMenu");
 
         gameWindow.getContentPane().add(panelGame, "actionPlayerPanel");
 

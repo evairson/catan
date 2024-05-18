@@ -15,6 +15,7 @@ public class ChatPanel extends JPanel {
     private JTextPane chatArea;
     private JTextField messageField;
     private JButton sendButton;
+    private ActionListener sender;
 
     public ChatPanel(ActionPlayerPanel actionPlayerPanel) {
         this.actionPlayerPanel = actionPlayerPanel;
@@ -36,7 +37,8 @@ public class ChatPanel extends JPanel {
         inputPanel.add(messageField, BorderLayout.CENTER);
 
         sendButton = new JButton("Envoyer");
-        sendButton.addActionListener(new ActionListener() {
+
+        sender = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 PlayerClient playerClient = ((PlayerClient) actionPlayerPanel.getApp().getPlayer());
@@ -59,10 +61,17 @@ public class ChatPanel extends JPanel {
                 }
                 flushChat();
             }
-        });
+        };
+
+        sendButton.addActionListener(sender);
+
         inputPanel.add(sendButton, BorderLayout.EAST);
 
         add(inputPanel, BorderLayout.SOUTH);
+    }
+
+    public ActionListener getSender() {
+        return sender;
     }
 
     private void flushChat() {
