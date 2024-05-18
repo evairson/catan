@@ -148,6 +148,10 @@ public class PlayerClient extends Player {
                 app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
                     app.getGame().getCurrentPlayer().getColorAwt());
                 break;
+            case "shadowHexes":
+                boolean value = (boolean) networkObjet.getObject();
+                app.getBoard().setShadowHexes(value);
+                break;
             case "DrawCard":
                 if (id != networkObjet.getId()) {
                     App.getActionPlayerPanel().drawCardServer();

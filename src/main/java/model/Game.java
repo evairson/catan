@@ -44,7 +44,7 @@ public class Game implements StateMethods, Serializable {
     private int yearOfPlentyWaiting = 0;
     private Player first;
     private int turnsBeforeHarbourActivated = 0;
-    private int turnsBeforeTilesRespawn = 0;
+    public int turnsBeforeTilesRespawn = 0;
     private ArrayList<TileType> betPot = new ArrayList<>();
     private int tradeEventTurn = 0;
 
@@ -86,7 +86,6 @@ public class Game implements StateMethods, Serializable {
             endTurn();
         }
         checkForHarboursDisabled();
-        checkForHexesRespawn();
     }
 
     public boolean getBlankTurn() {
@@ -721,6 +720,27 @@ public class Game implements StateMethods, Serializable {
             tradeEventTurn--;
         } else {
             TradePanel.setTradeAlea(false);
+
+        }
+    }
+
+    //Fonction auxiliaire pour gérer la désactivation des tuiles
+    public void checkForHexesRespawn() {
+        if (turnsBeforeTilesRespawn > 0) {
+            turnsBeforeTilesRespawn--;
+        }
+        else {
+            app.getBoard().setShadowHexes(false);
+            if (Main.hasServer()) {
+                try {
+                    int id = playerClient.getId();
+                    NetworkObject object = new NetworkObject(TypeObject.Message, "shadowHexes", id, false);
+                    playerClient.getOut().writeUnshared(object);
+                    playerClient.getOut().flush();
+                } catch (Exception e) {
+                    e.getStackTrace();
+                }
+            }
         }
     }
 
@@ -834,16 +854,17 @@ public class Game implements StateMethods, Serializable {
     //event 11
     public void tilesDispawn() {
         app.getBoard().setShadowHexes(true);
-        turnsBeforeTilesRespawn = 2 * players.size();
-    }
-
-    //Fonction auxiliaire pour gérer la désactivation des ports
-    public void checkForHexesRespawn() {
-        if (turnsBeforeHarbourActivated == 0) {
-            app.getBoard().setShadowHexes(false);
-        } else if (turnsBeforeHarbourActivated > 0) {
-            turnsBeforeHarbourActivated--;
+        if (Main.hasServer()) {
+            try {
+                int id = playerClient.getId();
+                NetworkObject object = new NetworkObject(TypeObject.Message, "shadowHexes", id, true);
+                playerClient.getOut().writeUnshared(object);
+                playerClient.getOut().flush();
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
         }
+        turnsBeforeTilesRespawn = players.size();
     }
 
     //event 12
