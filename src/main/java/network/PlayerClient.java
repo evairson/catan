@@ -90,10 +90,6 @@ public class PlayerClient extends Player {
         return in;
     }
 
-    public boolean isMyTurn(Game game) {
-        return id == game.getCurrentPlayer().getId();
-    }
-
     public void game(NetworkObject networkObject) {
         switch (networkObject.getMessage()) {
             case "startGame" :

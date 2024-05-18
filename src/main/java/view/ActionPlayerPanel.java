@@ -421,7 +421,7 @@ public class ActionPlayerPanel extends JPanel {
         game.getCurrentPlayer().drawCard(game.getStack());
         if (Main.hasServer() && game.getCurrentPlayer() instanceof PlayerClient) {
             try {
-                PlayerClient player = game.getPlayerClient();
+                PlayerClient player = (PlayerClient) game.getPlayerClient();
                 NetworkObject gameObject;
                 gameObject = new NetworkObject(TypeObject.Message, "DrawCard", player.getId(), null);
                 player.getOut().writeUnshared(gameObject);
@@ -514,7 +514,6 @@ public class ActionPlayerPanel extends JPanel {
                 firstUpdate = false;
             }
         }
-
         updateTurn();
 
         if (playersPanel != null) {
@@ -554,11 +553,15 @@ public class ActionPlayerPanel extends JPanel {
                     endTurn.setEnabled(false);
                 }
             } else {
-                dice.setButtonIsOn(false);
-                shopPanel.setEnabledPanel(false);
                 endTurn.setEnabled(false);
+                shopPanel.setEnabledPanel(false);
+                dice.setButtonIsOn(false);
                 tradeButtonPanel.getButton().setEnabled(false);
             }
+        } else {
+            dice.setButtonIsOn(false);
+            shopPanel.setEnabledPanel(false);
+            endTurn.setEnabled(false);
         }
     }
 

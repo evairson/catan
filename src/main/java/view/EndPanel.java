@@ -1,6 +1,7 @@
 package view;
 
 import model.App;
+import model.Game;
 import model.Player;
 import others.Constants;
 import view.utilities.ButtonImage;
@@ -17,9 +18,11 @@ public class EndPanel extends JPanel {
     private final Font bigFont = new Font("Serif", Font.PLAIN, (int) (96 / Resolution.divider()));
     private final Font smallFont = new Font("Serif", Font.PLAIN, (int) (72 / Resolution.divider()));
     private Player player;
-    public EndPanel(boolean playerWon, Player player) {
+    private Game game;
+    public EndPanel(boolean playerWon, Player player, Game game) {
         this.playerWon = true;
         this.player = player;
+        this.game = game;
         setLayout(null);
         updatePanel();
         initializeButtons();
@@ -69,7 +72,7 @@ public class EndPanel extends JPanel {
 
     public void updatePanel() {
         if (player != null) {
-            this.playerWon = player.hasWon();
+            this.playerWon = player.hasWon(game);
         }
         if (playerWon) {
             loadBackgroundImage("src/main/resources/winBackgroundB.png");

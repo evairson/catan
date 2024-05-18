@@ -12,6 +12,7 @@ import model.Game;
 import java.util.HashSet;
 
 import model.Player;
+import model.IA.Bot;
 import model.Player.Color;
 
 import java.awt.*;
@@ -67,10 +68,14 @@ public class MainMenu extends JPanel {
             app.tryStartGame();
         } else {
             HashSet<Player> players = new HashSet<>();
-            players.add(player);
-            players.add(new Player(Color.GREEN, "Player2"));
-            players.add(new Player(Color.RED, "Player3"));
-            players.add(new Player(Color.YELLOW, "Player4"));
+            if (player != null) {
+                players.add(player);
+            } else {
+                players.add(new Bot(Color.BLUE, "Player1", 1));
+            }
+            players.add(new Bot(Color.GREEN, "Player2", 2));
+            players.add(new Bot(Color.RED, "Player3", 3));
+            players.add(new Bot(Color.YELLOW, "Player4", 4));
             Game game = new Game(players);
             startapp(game);
         }
@@ -86,8 +91,9 @@ public class MainMenu extends JPanel {
         App.getActionPlayerPanel().createPlayerPanel();
         parentLayout.show(parent, "actionPlayerPanel");
         app.update();
-        App.getActionPlayerPanel().revalidate();
-        App.getActionPlayerPanel().repaint();
+        App.getActionPlayerPanel().update();
+        App.getGamePanel().repaint();
+        app.getGame().startTurnBot();
     }
 
     public void startOptions() {

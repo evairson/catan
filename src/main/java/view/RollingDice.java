@@ -4,12 +4,14 @@ import view.utilities.ImgService;
 
 import javax.swing.*;
 
-
+import model.App;
 import model.Game;
 import model.Player;
+import model.IA.Bot;
 import network.NetworkObject;
 import network.PlayerClient;
 import network.NetworkObject.TypeObject;
+import start.Main;
 import view.utilities.Resolution;
 
 import java.awt.*;
@@ -120,33 +122,49 @@ public class RollingDice extends JPanel {
             long endTime = System.currentTimeMillis();
             int refresh = 60;
             try {
-                while ((endTime - startTime) / 1000F < 3) {
-                    //roll dice
+                if (!App.getBotSoloMode()) {
+                    while ((endTime - startTime) / 1000F < 3) {
+                        //roll dice
 
-                    player.throwDices(d20Activated);
+                        player.throwDices(d20Activated);
 
-                    //update dice images
-                    ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
-                    ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
+                        //update dice images
+                        ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
+                        ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
 
-                    if (d20Activated) {
-                        ImgService.updateImage(d20Img, "/view/d20/d" + getD20() + ".png", 0.75);
+                        if (d20Activated) {
+                            ImgService.updateImage(d20Img, "/view/d20/d" + getD20() + ".png", 0.75);
+                        }
+
+                        repaint();
+                        revalidate();
+
+                        //Sleep thread
+                        Thread.sleep(refresh);
+                        refresh += 10;
+
+                        endTime = System.currentTimeMillis();
+
                     }
+                } else {
+                    player.throwDices(d20Activated);
 
                     repaint();
                     revalidate();
-
-                    //Sleep thread
-                    Thread.sleep(refresh);
-                    refresh += 10;
-
-                    endTime = System.currentTimeMillis();
-
                 }
                 if (player.getDice() == 7) {
                     game.setThiefMode(true);
+                    if (player instanceof Bot) {
+                        game.getBoard().changeThiefBot();
+                    }
                 }
                 sendDices();
+                if (!Main.hasServer()) {
+                    player.setHasTrowDices(true);
+                }
+                game.update();
+                App.getActionPlayerPanel().update();
+                App.getActionPlayerPanel().repaint();
             } catch (InterruptedException e) {
                 System.out.println("Threading Error in class RollingDice " + e);
             }
@@ -172,8 +190,6 @@ public class RollingDice extends JPanel {
             } catch (Exception e) {
                 e.getStackTrace();
             }
-        } else {
-            System.out.println("Problème de downCast");
         }
     }
 
