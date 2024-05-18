@@ -23,7 +23,7 @@ public class Tutorial extends JPanel {
     private Image backgroundImage;
     private int i = 1;
     private String basePath = "src/main/resources/";
-    private Image[] images = new Image[2];
+    private Image[] images = new Image[3];
     private JLabel texte;
 
     public Tutorial() {
@@ -34,23 +34,23 @@ public class Tutorial extends JPanel {
                 650, 150, 2, this::backToMenu, null);
         add(quitBtn);
 
-        JButton nextBtn = new ButtonImage(basePath + "acceptButton.png", basePath + "acceptButton.png",
-                850, 120, 0.5, this::next, null);
+        JButton nextBtn = new ButtonImage(basePath + "continueGame.png", basePath + "continueGame.png",
+                850, 120, 1, this::next, null);
         add(nextBtn);
 
 
-        JButton prevBtn = new ButtonImage(basePath + "acceptButton.png", basePath + "acceptButton.png",
-                850, 60, 0.5, this::previous, null);
+        JButton prevBtn = new ButtonImage(basePath + "backGame.png", basePath + "backGame.png",
+                850, 60, 1, this::previous, null);
         add(prevBtn);
 
         texte = new JLabel(readLine(0));
-        int[] coords = Resolution.calculateResolution(450, 450);
-        texte.setLocation(coords[0], coords[1]);
-        texte.setBounds(coords[0], coords[1], 600, 200);
-        texte.setHorizontalAlignment(SwingConstants.CENTER); // Aligner le texte au centre
-        texte.setVerticalAlignment(SwingConstants.TOP); // Aligner le texte en haut
+        int[] coords = Resolution.calculateResolution(440, 450);
+        int[] coords2 = Resolution.calculateResolution(535, 300);
+        texte.setBounds(coords[0], coords[1], coords2[0], coords2[1]);
+        //texte.setHorizontalAlignment(SwingConstants.CENTER); // Aligner le texte au centre
+        texte.setVerticalAlignment(SwingConstants.TOP); // Aligner le texte en haut*
         texte.setVerticalTextPosition(SwingConstants.TOP); // Positionner le texte en haut
-        texte.setHorizontalTextPosition(SwingConstants.CENTER);
+        //texte.setHorizontalTextPosition(SwingConstants.CENTER);
 
         ImageIcon iconSheep = new ImageIcon(basePath + "tutoriel/sheep.png");
         ImageIcon icon = new ImageIcon(basePath + "tutoriel/1.png");
@@ -61,8 +61,11 @@ public class Tutorial extends JPanel {
         backgroundImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
         images[0] = iconSheep.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         images[1] = iconBubble.getImage().getScaledInstance(820, 600, Image.SCALE_SMOOTH);
+        images[2] = iconBubble.getImage().getScaledInstance(600, 400, Image.SCALE_SMOOTH);
 
         add(texte);
+        updateText();
+        updateImage();
     }
 
     public void backToMenu() {
@@ -95,11 +98,16 @@ public class Tutorial extends JPanel {
     public void updateText() {
         texte.setText(readLine(i - 1));
         if (i >= 13) {
-            int[] coo = Resolution.calculateResolution(450, 350);
+            int[] coo = Resolution.calculateResolution(470, 300);
+            int[] coo2 = Resolution.calculateResolution(310, 200);
             texte.setLocation(coo[0], coo[1]);
+            texte.setBounds(coo[0], coo[1], coo2[0], coo2[1]);
         } else {
-            int[] coords = Resolution.calculateResolution(450, 450);
+            int[] coords = Resolution.calculateResolution(440, 450);
             texte.setLocation(coords[0], coords[1]);
+            int[] coords2 = Resolution.calculateResolution(535, 300);
+            texte.setBounds(coords[0], coords[1], coords2[0], coords2[1]);
+
         }
     }
 
@@ -115,11 +123,15 @@ public class Tutorial extends JPanel {
         super.paintComponent(g);
         g.drawImage(backgroundImage, 0, 0, this);
         if (i >= 13) {
-            g.drawImage(images[0], 185, 500, null);
-            g.drawImage(images[1], 385, 150, null);
+            int[] c1 = Resolution.calculateResolution(380, 200);
+            int[] c2 = Resolution.calculateResolution(450, 400);
+            g.drawImage(images[2], c1[0], c1[1], null);
+            g.drawImage(images[0], c2[0], c2[0], null);
         } else {
-            g.drawImage(images[0], 185, 700, null);
-            g.drawImage(images[1], 380, 350, null);
+            int[] c3 = Resolution.calculateResolution(335, 300);
+            int[] c4 = Resolution.calculateResolution(440, 610);
+            g.drawImage(images[1], c3[0], c3[1], null);
+            g.drawImage(images[0], c4[0], c4[1], null);
         }
     }
 
