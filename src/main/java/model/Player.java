@@ -451,10 +451,6 @@ public class Player implements Serializable {
             }
             cardsDev.add(card);
             App.getActionPlayerPanel().update();
-            if (!App.getBotSoloMode()) {
-                app.addMessageColor(name, getColorAwt());
-                app.addMessageColor(" a pioché une carte \n", java.awt.Color.RED);
-            }
         } else {
             System.out.println("0 cartes dans le deck");
         }
