@@ -318,6 +318,7 @@ public class ActionPlayerPanel extends JPanel {
 
     private void changeTurn() {
         game.serverEndTurn();
+        game.checkForHexesRespawn();
         game.checkIfTradeEventActive();
         update();
     }

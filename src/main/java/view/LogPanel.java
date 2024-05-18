@@ -74,7 +74,7 @@ public class LogPanel extends JPanel {
             case 15: addMessageColor("Un terrible incendie fait rage dans les fôrets et "
                     + "les champs de la carte! "
                     + "Tous les joueurs perdent leur bois et leur blé !\n", Color.RED); break;
-            case 16: addMessageColor("Les contrôleurs fiscaux arrivent!"
+            case 16: addMessageColor("Les contrôleurs fiscaux arrivent! "
                     + "Perdez une ressource aléatoire par bâtiment sur la carte !\n", Color.RED); break;
             case 17: addMessageColor("C'est l'anniversaire de " + pName
                     + "! Chaque autre joueur lui donne une ressource aléatoire !\n", Color.GREEN); break;
