@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.awt.*;
 
 import model.buildings.*;
 import model.cards.VictoryPointCard;
@@ -17,6 +16,7 @@ import model.cards.DevelopmentCard;
 
 public class Player implements Serializable {
     static final int NUMBER_DICE = 6;
+    static final int NUMBER_D20 = 20;
     private static final long serialVersionUID = 1L;
 
     public enum Color {
@@ -46,6 +46,7 @@ public class Player implements Serializable {
     protected Boolean turn;
     protected int dice1;
     protected int dice2;
+    protected int d20;
     protected String name;
     protected Boolean hasThrowDices;
     protected HashMap<TileType, Integer> resources;
@@ -56,6 +57,7 @@ public class Player implements Serializable {
     protected Boolean freeColony = true;
 
     protected int points;
+    protected int knights;
     protected boolean hasBiggestArmy;
     protected boolean hasLongestRoute;
     protected int resourceCap;
@@ -214,6 +216,9 @@ public class Player implements Serializable {
     public int getDice2() {
         return dice2;
     }
+    public int getD20() {
+        return d20;
+    }
 
     public int getPoints() {
         return points;
@@ -249,6 +254,7 @@ public class Player implements Serializable {
     public int getResource(TileType t) {
         return resources.get(t);
     }
+
     public int getResourcesSum() {
         int acc = 0;
         for (Integer i : resources.values()) {
@@ -287,6 +293,20 @@ public class Player implements Serializable {
         resources.merge(resourceType, valueToAdd, Integer::sum);
     }
 
+    /**
+     * Remvoes all resource from specified type.
+     * @param resourceType Type of the resource
+     */
+    public void removeAllResource(TileType resourceType) {
+        resources.merge(resourceType, -resources.get(resourceType), Integer::sum);
+    }
+
+    public void clearResources() {
+        for (TileType t : resources.keySet()) {
+            removeAllResource(t);
+        }
+    }
+
 // ------------------------------------
 
 
@@ -301,15 +321,28 @@ public class Player implements Serializable {
     public void throwDice2() {
         dice2 = (int) ((Math.random() * NUMBER_DICE) + 1);
     }
+    public void throwD20() {
+        d20 = (int) ((Math.random() * NUMBER_D20) + 1);
+    }
 
-    public void throwDices() {
+
+    public void throwDices(boolean d20Activated) {
         throwDice1();
         throwDice2();
+
+        if (d20Activated) {
+            throwD20();
+        }
     }
 
     public void setDices(int dice1, int dice2) {
         this.dice1 = dice1;
         this.dice2 = dice2;
+    }
+    public void setDices(int dice1, int dice2, int d20) {
+        this.dice1 = dice1;
+        this.dice2 = dice2;
+        this.d20 = d20;
     }
 
     public void placeBuilding(TileVertex vertex) {
@@ -434,12 +467,59 @@ public class Player implements Serializable {
             }
         }
     }
+    public void addOneRandom() {
+        Random rd = new Random();
+        TileType[] resTList = {TileType.CLAY, TileType.ORE, TileType.WHEAT, TileType.WOOD, TileType.WOOL};
+        int k = rd.nextInt(0, 5);
+        addResource(resTList[k], 1);
+    }
+
+    public void incrementKnights() {
+        knights++;
+    }
+
+    public int getKnights() {
+        return knights;
+    }
+    public void addOnePoint() {
+        points++;
+    }
 
     public boolean last(Game game) {
         return (game.getPlayers().get(game.getPlayers().size() - 1) == this);
     }
-
     public boolean first(Game game) {
         return game.getPlayers().get(0) == this;
+    }
+    public int getNbCitiesAndColonies() {
+        int acc = 0;
+        for (Building b : buildings) {
+            if (b instanceof Colony) {
+                acc++;
+            }
+        }
+        return acc;
+    }
+    public void swapResources(Player other) {
+        for (TileType t : resources.keySet()) {
+            int temp = resources.get(t);
+            resources.put(t, other.resources.get(t));
+            other.resources.put(t, temp);
+        }
+    }
+
+    public void giftOneRandomResource(Player other) {
+        if (getResourcesSum() > 0) {
+            Random rd = new Random();
+            TileType[] resTList = {TileType.CLAY, TileType.ORE, TileType.WHEAT, TileType.WOOD, TileType.WOOL};
+            while (true) {
+                int k = rd.nextInt(0, 5);
+                if (resources.get(resTList[k]) > 0) {
+                    addResource(resTList[k], -1);
+                    other.addResource(resTList[k], 1);
+                    break;
+                }
+            }
+        }
     }
 }

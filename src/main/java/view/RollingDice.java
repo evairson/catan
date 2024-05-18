@@ -19,9 +19,11 @@ import java.awt.*;
 public class RollingDice extends JPanel {
     private Game game;
     private Player player;
+    private boolean d20Activated;
     private JButton rollButton;
     private JLabel diceOneImg;
     private JLabel diceTwoImg;
+    private JLabel d20Img;
 
     public int getDiceOne() {
         return player.getDice1();
@@ -31,13 +33,19 @@ public class RollingDice extends JPanel {
         return player.getDice2();
     }
 
+    public int getD20() {
+        return player.getD20();
+    }
+
+
     public void setButtonIsOn(Boolean b) {
         rollButton.setEnabled(b);
     }
 
-    public RollingDice(Game game) {
+    public RollingDice(Game game, boolean d20Activated) {
         this.game = game;
         this.player = game.getCurrentPlayer();
+        this.d20Activated = d20Activated;
         int[] coords = Resolution.calculateResolution(0, 0);
         setLayout(null);
         setOpaque(true);
@@ -75,6 +83,25 @@ public class RollingDice extends JPanel {
         diceTwoImg.setBounds(xCoord, yCoord, (int) (85 / Resolution.divider()),
                 (int) (85 / Resolution.divider()));
         this.add(diceTwoImg);
+
+        //Pour le d20
+        if (d20Activated) {
+            icon = new ImageIcon(getClass().getResource("/view/d20/d1.png"));
+            originalImage = icon.getImage();
+            scaledWidth = (int) (originalImage.getWidth(null) / divider);
+            scaledHeight = (int) (originalImage.getHeight(null) / divider);
+            resizedImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+            resizedIcon = new ImageIcon(resizedImage);
+            d20Img = new JLabel(resizedIcon);
+            System.out.println("aaaaaaa" + d20Img == null);
+            coords = Resolution.calculateResolution(30, 80);
+            xCoord = coords[0];
+            yCoord = coords[1];
+            d20Img.setBounds(xCoord, yCoord, (int) (85 / Resolution.divider()),
+                    (int) (85 / Resolution.divider()));
+            this.add(d20Img);
+        }
+
         rollButton = new JButton("Roll!");
 
         coords = Resolution.calculateResolution(17, 50);
@@ -98,11 +125,15 @@ public class RollingDice extends JPanel {
                 while ((endTime - startTime) / 1000F < 3) {
                     //roll dice
 
-                    player.throwDices();
+                    player.throwDices(d20Activated);
 
                     //update dice images
                     ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
                     ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
+
+                    if (d20Activated) {
+                        ImgService.updateImage(d20Img, "/view/d20/d" + getD20() + ".png", 0.75);
+                    }
 
                     repaint();
                     revalidate();
@@ -145,7 +176,7 @@ public class RollingDice extends JPanel {
             try {
                 PlayerClient playerClient = (PlayerClient) player;
                 int id = playerClient.getId();
-                int[] tab = {getDiceOne(), getDiceTwo()};
+                int[] tab = {getDiceOne(), getDiceTwo(), getD20()};
                 NetworkObject object = new NetworkObject(TypeObject.Game, "dices", id, tab);
                 playerClient.getOut().writeUnshared(object);
                 playerClient.getOut().flush();
@@ -156,7 +187,12 @@ public class RollingDice extends JPanel {
     }
 
     public void networkThrowDices(int[] dices) {
-        player.setDices(dices[0], dices[1]);
+        if (d20Activated) {
+            player.setDices(dices[0], dices[1], dices[2]);
+            ImgService.updateImage(d20Img, "/view/d20/d" + getD20() + ".png", 0.75);
+        } else {
+            player.setDices(dices[0], dices[1]);
+        }
         player.setHasTrowDices(true);
         ImgService.updateImage(diceOneImg, "/view/dice/d" + getDiceOne() + "b.png", 0.75);
         ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);

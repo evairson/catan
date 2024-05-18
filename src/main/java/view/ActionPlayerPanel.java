@@ -47,9 +47,11 @@ public class ActionPlayerPanel extends JPanel {
     private JPanel cardsPanel;
     private JPanel cardPanel;
     private JPanel chat;
+    private LogPanel logChat;
     private PlayersPanel playersPanel;
     private RollingDice dice;
     private HashMap<TileType, BufferedImage> resourceImages = new HashMap<>();
+    private boolean harboursDisabled = false;
 
     public ActionPlayerPanel(App app) {
         setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -69,6 +71,7 @@ public class ActionPlayerPanel extends JPanel {
         initializeShopPanel(game);
         initializeDeckPanel();
         initializeChat();
+        initializeLogChat();
         //createPlayerPanel();
         createButton();
         setVisible(true);
@@ -119,9 +122,9 @@ public class ActionPlayerPanel extends JPanel {
         int xCoord = Resolution.calculateResolution(1108, 440)[0];
         int yCoord = Resolution.calculateResolution(1108, 440)[1];
 
-        dice = new RollingDice(game);
+        dice = new RollingDice(game, true);
         dice.setBounds(xCoord, yCoord, (int) (205 / Resolution.divider()),
-                (int) (150 / Resolution.divider()));
+                (int) (300 / Resolution.divider()));
         add(dice);
         dice.setOpaque(false);
     }
@@ -203,7 +206,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void initializeChat() {
-        int xCoord = Resolution.calculateResolution(750, 200)[0];
+        int xCoord = Resolution.calculateResolution(650, 200)[0];
         int yCoord = Resolution.calculateResolution(750, 200)[1];
 
         chat = new ChatPanel(this);
@@ -211,6 +214,17 @@ public class ActionPlayerPanel extends JPanel {
         chat.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
                 (int) (400 / Resolution.divider()));
         add(chat);
+    }
+
+    private void initializeLogChat() {
+        int xCoord = Resolution.calculateResolution(850, 200)[0];
+        int yCoord = Resolution.calculateResolution(750, 200)[1];
+
+        logChat = new LogPanel(this);
+        logChat.setVisible(true);
+        logChat.setBounds(xCoord, yCoord, (int) (400 / Resolution.divider()),
+                (int) (400 / Resolution.divider()));
+        add(logChat);
     }
 
     private JFrame getMainFrame() {
@@ -229,9 +243,10 @@ public class ActionPlayerPanel extends JPanel {
         JLayeredPane layeredPane = mainFrame.getLayeredPane();
         ListPlayers listPlayers = game.getPlayers();
         if (tradeObject == null) {
-            tradePanel = new TradePanel(listPlayers, resourcesPanel);
+            tradePanel = new TradePanel(listPlayers, resourcesPanel, this);
         } else {
-            tradePanel = new TradePanel(tradeObject, listPlayers, resourcesPanel, game.getPlayerClient());
+            tradePanel = new TradePanel(tradeObject, listPlayers, resourcesPanel,
+                    game.getPlayerClient(), this);
         }
         layeredPane.add(tradePanel, JLayeredPane.MODAL_LAYER);
         tradePanel.setVisible(true);
@@ -301,6 +316,7 @@ public class ActionPlayerPanel extends JPanel {
 
     private void changeTurn() {
         game.serverEndTurn();
+        game.checkIfTradeEventActive();
         update();
     }
 
@@ -349,10 +365,12 @@ public class ActionPlayerPanel extends JPanel {
 
     private void useKnight() {
         removeCardsPanel();
-        ArrayList<DevelopmentCard> cards = game.getCurrentPlayer().getCardsDev();
+        Player p = game.getCurrentPlayer();
+        ArrayList<DevelopmentCard> cards = p.getCardsDev();
         for (int i = 0; i < cards.size(); i++) {
             if (cards.get(i) instanceof KnightCard) {
                 cards.remove(i);
+                p.incrementKnights();
                 break;
             }
         }
@@ -597,5 +615,17 @@ public class ActionPlayerPanel extends JPanel {
 
     public App getApp() {
         return app;
+    }
+
+    public LogPanel getLogChat() {
+        return (LogPanel) logChat;
+    }
+
+    public boolean isHarboursDisabled() {
+        return harboursDisabled;
+    }
+
+    public void setHarboursDisabled(boolean harboursDisabled) {
+        this.harboursDisabled = harboursDisabled;
     }
 }

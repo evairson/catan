@@ -24,6 +24,7 @@ public class App {
     private static MainMenu mainMenu;
     private Player player;
     private static boolean playing;
+    private boolean hasD20 = true;
     private static BackgroundPanel background;
 
     public GameBoard getBoard() {
@@ -41,6 +42,10 @@ public class App {
     public void setBoard(GameBoard board) {
         this.board = board;
         board.setApp(this);
+    }
+
+    public boolean isHasD20() {
+        return hasD20;
     }
 
     public App(Player playerClient) {
@@ -106,8 +111,8 @@ public class App {
         ((ChatPanel) actionPlayer.getChat()).addMessage(message);
     }
 
-    public static void addMessageColor(String message, Color color) {
-        ((ChatPanel) actionPlayer.getChat()).addMessageColor(message, color);
+    public void addMessageColor(String message, Color color) {
+        (actionPlayer.getLogChat()).addMessageColor(message, color);
     }
 
     public void addPanels() {
@@ -150,5 +155,13 @@ public class App {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public boolean hasD20() {
+        return hasD20;
+    }
+
+    public static ActionPlayerPanel getActionPlayer() {
+        return actionPlayer;
     }
 }
