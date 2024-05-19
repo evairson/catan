@@ -3,7 +3,7 @@
 Bienvenue dans notre projet Catan ! Ce projet a été développé par :
 
 - Lùkas Koltes
-- Amael Mangeant Sastre Campos
+- Amaël Mangeant Sastre Campos
 - Lucas Verriere-Aboud
 - Léo Vernicos
 - Eva Herson
