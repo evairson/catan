@@ -17,7 +17,7 @@ Ce projet est une implémentation numérique du célèbre jeu de société Catan
 Pour lancer le projet, suivez les instructions ci-dessous en fonction de votre système d'exploitation.
 **Assurez-vous de disposer de [java version 21.](https://www.oracle.com/java/technologies/downloads/#java21)**
 
-### Sur Linux
+### Sur Système Unix
 
 1. Ouvrez un terminal.
 2. Placez-vous à la racine du projet avec la commande `cd catan`.
