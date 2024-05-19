@@ -67,14 +67,14 @@ public class PlayersPanel extends JPanel {
                     newBaseY + 25);
             // 25 pixels à droite de l'icône de carte pour le label de compte
 
-            JLabel vpIconLabel = createIconLabel(offsetX, newBaseY - 25,
+            JLabel vpIconLabel = createIconLabel(offsetX, newBaseY,
                     "src/main/resources/vplabel.png");
-            JLabel vpCountLabel = createCountLabel(offsetX + 25, newBaseY - 25);
+            JLabel vpCountLabel = createCountLabel(offsetX + 25, newBaseY);
             // ff
             add(vpIconLabel);
             add(vpCountLabel);
-            add(resourceIconLabel);
-            add(resourceCountLabel);
+//            add(resourceIconLabel);
+//            add(resourceCountLabel);
             add(cardIconLabel);
             add(cardCountLabel);
 

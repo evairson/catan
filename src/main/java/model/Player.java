@@ -13,6 +13,7 @@ import others.Constants;
 import view.TileType;
 import model.cards.CardStack;
 import model.cards.DevelopmentCard;
+import view.utilities.Resolution;
 
 public class Player implements Serializable {
     static final int NUMBER_DICE = 6;
@@ -381,6 +382,11 @@ public class Player implements Serializable {
         if (vertex.getBuilding() == null) {
             Colony c = new Colony(this);
             if (freeColony) {
+                System.out.println("Derchos 9934 : " + vertex.getCoordinates());
+                System.out.println("Derchos 123 : " + Constants.Game.DIVIDER);
+                int[] calRes = Resolution.calculateResolution((int) vertex.getCoordinates().getX(),
+                        (int) vertex.getCoordinates().getY());
+                System.out.println("Derchos 456 : " + calRes[0] + ", " + calRes[1]);
                 setFreeColony(false);
                 freeRoad++;
                 c.place(this, false, vertex);
