@@ -971,7 +971,7 @@ public class GameBoard implements Serializable {
         Graphics2D g2dBoard = boardImage.createGraphics();
         double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
         double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
-
+        System.out.println("first test");
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             Tile tile = entry.getValue();
             Polygon hexagon = new Polygon();
@@ -998,6 +998,53 @@ public class GameBoard implements Serializable {
             int imgY = bounds.y + (bounds.height - scaledImg.getHeight(null)) / 2;
 
             g2dBoard.drawImage(scaledImg, imgX, imgY, null);
+        }
+        System.out.println("second test");
+
+        for (Map.Entry<TileVertex, Harbor> entry : harborMap.entrySet()) {
+            TileVertex vertex = entry.getKey();
+            Point start = vertex.getCoordinates();
+            Point location = calculatePortPosition(start);
+
+            AffineTransform oldTransform = g2dBoard.getTransform();
+
+            // Calculer le milieu de l'arête et l'angle de rotation
+            int midX = (int) ((start.getX() + location.getX()) / 2);
+            int midY = (int) ((start.getY() + location.getY()) / 2);
+            double angle = Math.atan2(location.getY() - start.getY(),
+                    location.getX() - start.getX()) + Math.PI / 2;
+
+            // Mise à l'échelle de l'image de la route
+            int scaledWidth = (int) (roadImage.getWidth() * 1.2 / Resolution.divider());
+            int scaledHeight = (int) (roadImage.getHeight() * 1.2 / Resolution.divider());
+            Image scaledImage = roadImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+
+            // Appliquer la transformation
+            AffineTransform transform = new AffineTransform(oldTransform);
+            transform.translate(midX, midY);
+            transform.rotate(angle);
+            g2dBoard.setTransform(transform);
+
+            // Dessiner l'image
+            g2dBoard.drawImage(scaledImage, -scaledWidth / 2, -scaledHeight / 2, null);
+
+            g2dBoard.setTransform(oldTransform);
+
+            BufferedImage harborImage;
+            if (entry.getValue() instanceof SpecializedHarbor) {
+                SpecializedHarbor specializedHarbor = (SpecializedHarbor) entry.getValue();
+                harborImage = specializedHarborImages.get(specializedHarbor.getResourceType());
+            } else {
+                harborImage = standardHarborImage;
+            }
+
+            scaledWidth = (int) (harborImage.getWidth() * 0.8 / Resolution.divider());
+            scaledHeight = (int) (harborImage.getHeight() * 0.8 / Resolution.divider());
+            scaledImage = harborImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+
+            g2dBoard.drawImage(scaledImage, (int) location.getX() - scaledWidth / 2,
+                    (int) location.getY() - scaledHeight / 2, null);
+
         }
 
         g2dBoard.dispose();
@@ -1387,7 +1434,6 @@ public class GameBoard implements Serializable {
         if (!shadowHexes) {
             drawImagesInHexes(g);
         }
-        drawPorts(g);
         drawEdges(g);
         drawVertices(g);
 
@@ -1589,15 +1635,16 @@ public class GameBoard implements Serializable {
     public void initialiseBoardAfterTransfer() {
         initialiseLayout();
         loadImages();
+
+        loadHarborImage();
+        loadRoadImage();
         tileImages = TileImageLoader.loadAndResizeTileImages(false);
         tileImagesS = TileImageLoader.loadAndResizeTileImages(true);
         initialiseVertices();
         initialiseEdges();
+        this.initialisePorts();
         initialiseBoardImage();
         initDiceValueImages();
-        this.initialisePorts();
-        loadHarborImage();
-        loadRoadImage();
     }
 
     /**.
