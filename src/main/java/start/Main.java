@@ -20,8 +20,14 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("Quel est votre nom ?");
         String name = sc.nextLine();
-        System.out.println("1 : créer serveur 2 : se connecter à un existant 3 : Jouer en local 4 : Bots");
-        int nextLine = Integer.parseInt(sc.nextLine());
+        System.out.println("1 : créer serveur 2 : se connecter à un existant 3 : Bots");
+        int nextLine = 0;
+        try {
+             nextLine = Integer.parseInt(sc.nextLine());
+        } catch (Exception e) {
+            System.out.println("Veuillez rentrer une valeur valide");
+            System.exit(42);
+        }
         if (nextLine == 1) {
             new Thread(() -> {
                 try {
@@ -56,18 +62,14 @@ public class Main {
             }
         } else if (nextLine == 3) {
             server = false;
-            SwingUtilities.invokeLater(() -> {
-                System.out.println("launching game");
-                Player player = new Player(Color.BLUE, name, 0);
-                App game = new App(player);
-            });
-        } else {
-            server = false;
             App.setBotSoloMode();
             SwingUtilities.invokeLater(() -> {
                 System.out.println("launching game");
                 App game = new App();
             });
+        } else {
+            System.out.println("Veuillez rentrer une valeur valide");
+            System.exit(42);
         }
     }
 
