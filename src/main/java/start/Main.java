@@ -1,6 +1,7 @@
 package start;
 
 import model.App;
+import model.Player;
 import network.PlayerClient;
 import network.Server;
 
@@ -18,7 +19,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("Quel est votre nom ?");
         String name = sc.nextLine();
-        System.out.println("1 : créer serveur 2 : se connecter à un existant 3 : Bots");
+        System.out.println("1 : créer serveur 2 : se connecter à un existant 3 : Jouer en local 4 : Bots");
         int nextLine = 0;
         try {
             nextLine = Integer.parseInt(sc.nextLine());
@@ -59,6 +60,14 @@ public class Main {
                 e.printStackTrace();
             }
         } else if (nextLine == 3) {
+            server = false;
+            SwingUtilities.invokeLater(() -> {
+                System.out.println("launching game");
+                Player player = new Player(Player.Color.BLUE, name, 0);
+                App game = new App(player);
+            });
+        } else if (nextLine == 4) {
+
             server = false;
             App.setBotSoloMode();
             SwingUtilities.invokeLater(() -> {

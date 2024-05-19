@@ -460,7 +460,6 @@ public class Player implements Serializable {
                 App.checkWin();
             }
             cardsDev.add(card);
-            App.getActionPlayerPanel().update();
         } else {
             System.out.println("0 cartes dans le deck");
         }

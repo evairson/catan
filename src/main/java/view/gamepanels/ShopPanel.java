@@ -73,6 +73,7 @@ public class ShopPanel extends JPanel {
         city.setEnabled(game.canBuildCity());
         colony.setEnabled(game.canBuildColony());
         repaint();
+        revalidate();
     }
 
 }

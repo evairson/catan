@@ -180,7 +180,7 @@ public class App {
     public static void checkWin() {
         if (game.getPlayerClient().hasWon(game)) {
 
-            game.gameHasEnded = true;
+            game.setGameHasEnded(true);
             endPanel = new EndPanel(true, game.getPlayerClient(), game);
             gameWindow.getContentPane().add(endPanel, "endPanel");
             endPanel.updatePanel();

@@ -34,7 +34,7 @@ Pour lancer le projet, suivez les instructions ci-dessous en fonction de votre s
     ```cmd 
     launch.bat
     ```
-4. Suivez les instruction à l'écran pour commencer à jouer 
+4. Suivez les instructions à l'écran pour commencer à jouer 
 
 ## Fonctionnalités
 
@@ -46,6 +46,7 @@ Pour lancer le projet, suivez les instructions ci-dessous en fonction de votre s
 - **Cartes de Jeu** : Intégration des cartes de développement et de progression du jeu, ajoutant des éléments stratégiques et de variété aux parties.
 - **Dé 20** : Un dé à 20 faces est lancé une fois par tour, générant des événements aléatoires qui peuvent influencer le cours de la partie.
 - **Animation en jeu** : Les menus de ressources et d'achat de batiments sont animés. Il y a également une animation quand on reçoit des ressources. 
+- **Jeu en local contre des bots** : Le joueur peut lancer une partie seul et jouer contre des robots.
 
 ## Exécution des Tests
 
