@@ -51,7 +51,15 @@ public class Game implements StateMethods, Serializable {
     private int turnsBeforeTilesRespawn = 0;
     private ArrayList<TileType> betPot = new ArrayList<>();
     private int tradeEventTurn = 0;
-    public boolean gameHasEnded = false;
+    private boolean gameHasEnded = false;
+
+    public boolean isGameHasEnded() {
+        return gameHasEnded;
+    }
+
+    public void setGameHasEnded(boolean b) {
+        gameHasEnded = b;
+    }
 
     public Game(HashMap<Point, TileEdge> edge) { // Pour les tests
         thief = new Thief();
@@ -171,6 +179,7 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void endTurn() {
+        System.out.println("nouveau tour");
         if (!canPass()) {
             System.out.println("Impossible de passer le tour");
             if (App.getBotSoloMode()) {
@@ -180,6 +189,7 @@ public class Game implements StateMethods, Serializable {
         }
 
         if (isInBeginningPhase()) {
+            System.out.println("je suis dans la beginning phase");
             ArrayList<Colony> colony = getCurrentPlayer().getColony();
             if (colony.size() >= 2) {
                 for (Colony c: colony) {
@@ -261,11 +271,18 @@ public class Game implements StateMethods, Serializable {
     }
 
     public Player getPlayerClient() {
-        if (playerClient != null) {
+        if (App.getBotSoloMode()) {
+            return getCurrentPlayer();
+        } else if (playerClient != null) {
             return playerClient;
         } else {
-            return players.get(0);
+            for (Player player : players) {
+                if (player.getId() == 0) {
+                    return player;
+                }
+            }
         }
+        return null;
     }
 
     // Player action : -----------------
@@ -276,7 +293,7 @@ public class Game implements StateMethods, Serializable {
 
     @Override
     public void update() {
-        if(gameHasEnded){
+        if (gameHasEnded) {
             return;
         }
         lootResources();
@@ -763,8 +780,8 @@ public class Game implements StateMethods, Serializable {
     }
 
     public boolean isMyTurn() {
-        if (playerClient != null) {
-            return playerClient.isMyTurn(this);
+        if (this.getPlayerClient() != null) {
+            return this.getPlayerClient().isMyTurn(this);
         } else {
             return false;
         }

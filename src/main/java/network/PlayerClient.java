@@ -124,7 +124,7 @@ public class PlayerClient extends Player {
                 app.getBoard().changeThief();
                 break;
             case "endGame":
-                app.getGame().gameHasEnded = true;
+                app.getGame().setGameHasEnded(true);
                 break;
             default:
                 System.out.println("Pas de message correspondant");

@@ -317,7 +317,7 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void changeTurn() {
-        if(!game.gameHasEnded) {
+        if (!game.isGameHasEnded()) {
             game.serverEndTurn();
             game.checkForHexesRespawn();
             game.checkIfTradeEventActive();
@@ -333,11 +333,7 @@ public class ActionPlayerPanel extends JPanel {
             remove(cardsPanel);
         }
         Player player;
-        if (Main.hasServer()) {
-            player = game.getPlayerClient();
-        } else {
-            player = game.getCurrentPlayer();
-        }
+        player = game.getPlayerClient();
         cardsPanel = new JPanel();
         cardsPanel.setLayout(null);
         cardsPanel.setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
@@ -625,14 +621,11 @@ public class ActionPlayerPanel extends JPanel {
      */
 
     public Player getPlayerFromGame() {
-        Player player;
-        if (Main.hasServer()) {
-            player = game.getPlayerClient();
-            System.out.println("player : " + player.getName());
+        if (App.getBotSoloMode()) {
+            return game.getCurrentPlayer();
         } else {
-            player = game.getCurrentPlayer();
+            return game.getPlayerClient();
         }
-        return player;
     }
 
     public void updateShopPanel() {
@@ -640,26 +633,20 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     public void updateTurn() {
-        if (Main.hasServer()) {
-            if (game.isMyTurn()) {
-                updateShopPanel();
-                tradeButtonPanel.getButton().setEnabled(!game.isInBeginningPhase()
-                        && game.getCurrentPlayer().hasThrowDices());
-                if (game.canPass()) {
-                    endTurn.setEnabled(true);
-                } else {
-                    endTurn.setEnabled(false);
-                }
+        if (game.isMyTurn()) {
+            updateShopPanel();
+            tradeButtonPanel.getButton().setEnabled(!game.isInBeginningPhase()
+                    && game.getCurrentPlayer().hasThrowDices());
+            if (game.canPass()) {
+                endTurn.setEnabled(true);
             } else {
                 endTurn.setEnabled(false);
-                shopPanel.setEnabledPanel(false);
-                dice.setButtonIsOn(false);
-                tradeButtonPanel.getButton().setEnabled(false);
             }
         } else {
-            dice.setButtonIsOn(false);
-            shopPanel.setEnabledPanel(false);
             endTurn.setEnabled(false);
+            shopPanel.setEnabledPanel(false);
+            dice.setButtonIsOn(false);
+            tradeButtonPanel.getButton().setEnabled(false);
         }
     }
 
