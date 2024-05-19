@@ -55,7 +55,6 @@ public class CardStack implements Serializable {
             }
             cardStack.add(cardToMix.get(nbCard));
         }
-        System.out.println(cardStack.size());
     }
 
 }

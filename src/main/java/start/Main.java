@@ -39,7 +39,6 @@ public class Main {
                 InetAddress address = InetAddress.getByName("localhost");
                 System.out.println(address);
                 PlayerClient player = new PlayerClient(name, address, 8000);
-                System.out.println("yeaaah");
                 SwingUtilities.invokeLater(() -> {
                     System.out.println("launching game");
                     App game = new App(player);

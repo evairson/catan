@@ -64,7 +64,6 @@ public class PlayerClient extends Player {
                         case ChatMessage:
                             app.addMessage(networkObject.getMessage());
                         default:
-                            System.out.println("Pas de message correspondant");
                             break;
                     }
                 }
@@ -135,7 +134,6 @@ public class PlayerClient extends Player {
                 app.getGame().setGameHasEnded(true);
                 break;
             default:
-                System.out.println("Pas de message correspondant");
                 break;
         }
     }
@@ -144,7 +142,6 @@ public class PlayerClient extends Player {
         switch (networkObjet.getMessage()) {
             case "ID":
                 id = networkObjet.getId();
-                System.out.println("Je suis le joueur numéro : " + id);
                 break;
             case "NamePlayers":
                 HashSet<Player> hashSet = (HashSet<Player>) networkObjet.getObject();

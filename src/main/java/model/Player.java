@@ -104,11 +104,7 @@ public class Player implements Serializable {
         resourceCap = 7;
     }
 
-    public void printBuildings() {
-        for (Building b : buildings) {
-            System.out.println(b);
-        }
-    }
+  
 
     public int getFreeRoad() {
         return freeRoad;
@@ -385,11 +381,8 @@ public class Player implements Serializable {
         if (vertex.getBuilding() == null) {
             Colony c = new Colony(this);
             if (freeColony) {
-                System.out.println("Derchos 9934 : " + vertex.getCoordinates());
-                System.out.println("Derchos 123 : " + Constants.Game.DIVIDER);
                 int[] calRes = Resolution.calculateResolution((int) vertex.getCoordinates().getX(),
                         (int) vertex.getCoordinates().getY());
-                System.out.println("Derchos 456 : " + calRes[0] + ", " + calRes[1]);
                 setFreeColony(false);
                 freeRoad++;
                 c.place(this, false, vertex);
@@ -411,7 +404,6 @@ public class Player implements Serializable {
     public boolean buildCity(TileVertex vertex, boolean us) {
         Colony c = (Colony) vertex.getBuilding();
         if (!us) {
-            System.out.println("SUUUUU");
             c.place(this, true, vertex);
             return true;
         }
@@ -442,26 +434,15 @@ public class Player implements Serializable {
             int[] cost = Constants.BuildingCosts.CARD;
 
             resources.replace(TileType.CLAY, resources.get(TileType.CLAY) - cost[0]);
-            System.out.println("payed " + cost[0] + " clay");
-
             resources.replace(TileType.ORE, resources.get(TileType.ORE) - cost[1]);
-            System.out.println("payed " + cost[1] + " ore");
-
             resources.replace(TileType.WHEAT, resources.get(TileType.WHEAT) - cost[2]);
-            System.out.println("payed " + cost[2] + " wheat");
-
             resources.replace(TileType.WOOD, resources.get(TileType.WOOD) - cost[3]);
-            System.out.println("payed " + cost[3] + " wood");
-
             resources.replace(TileType.WOOL, resources.get(TileType.WOOL) - cost[4]);
-            System.out.println("payed " + cost[4] + " wool");
             if (card instanceof VictoryPointCard) {
                 points++;
                 App.checkWin();
             }
             cardsDev.add(card);
-        } else {
-            System.out.println("0 cartes dans le deck");
         }
     }
 

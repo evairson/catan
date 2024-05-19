@@ -37,7 +37,6 @@ public class App {
 
     public void checkD20() {
         hasD20 = optionPanel.d20isSelected();
-        System.out.println("AIEAIEUAIUE" + hasD20);
     }
 
     public GameBoard getBoard() {

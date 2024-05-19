@@ -107,7 +107,6 @@ public class TileEdge implements Serializable {
 
     public void setBuilding(Building building) {
         this.building = building;
-        System.out.println("Building set for TileEdge");
     }
 
     public int getNumberEdgesBefore(Game game) {

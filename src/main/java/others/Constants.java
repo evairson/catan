@@ -96,9 +96,9 @@ public class Constants {
 
         private static Dimension checkIfWindows(Dimension screenSize) {
             String osName = System.getProperty("os.name").toLowerCase();
+
             double width = screenSize.getWidth();
             double height = screenSize.getHeight();
-
             if (osName.contains("win")) {
                 Rectangle winSize = GraphicsEnvironment.getLocalGraphicsEnvironment()
                         .getMaximumWindowBounds();

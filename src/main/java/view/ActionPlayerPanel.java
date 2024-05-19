@@ -341,7 +341,6 @@ public class ActionPlayerPanel extends JPanel {
         for (int i = 0; i < player.getCardsDev().size(); i++) {
             DevelopmentCard card = player.getCardsDev().get(i);
             String stringCard = cardImageUrl(card);
-            System.out.println(card.getClass().getSimpleName());
             ButtonImage b = new ButtonImage(basePath + stringCard, basePath + stringCard,
                     300 + i * 100, 250, 1.5, () -> useCard(card.getClass().getSimpleName()), null);
             cardsPanel.add(b);
