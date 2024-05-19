@@ -156,23 +156,18 @@ public class Game implements StateMethods, Serializable {
     public boolean canPass() {
         Player p = getCurrentPlayer();
         if (p.getFreeRoad() > 0) {
-            System.out.println("freeRoad");
             return false;
         }
         if (monoWaiting || yearOfPlentyWaiting > 0) {
-            System.out.println("monoWaiting");
             return false;
         }
         if (p.getFreeColony()) {
-            System.out.println("freeColony");
             return false;
         }
         if (!p.hasThrowDices() && !start && !backwards) {
-            System.out.println("Le joueur n'a pas encore lancé les dés");
             return false;
         }
         if (board.getThiefMode()) {
-            System.out.println("thief");
             return false;
         }
         return true;

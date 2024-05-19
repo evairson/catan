@@ -419,10 +419,6 @@ public class TradePanel extends JPanel {
         resourcesRequested.clear();
         resourcesOffered.clear();
 
-        // Mettre à jour l'affichage des ressources pour les joueurs impliqués
-        if (!App.getBotSoloMode()) {
-            resourcesPanel.updateResourceLabels(listPlayers.getCurrentPlayer());
-        }
         App.getActionPlayerPanel().update();
 
         sendTradeExit(true);
@@ -661,7 +657,7 @@ public class TradePanel extends JPanel {
     // -------- TradePanel pour les bots --------- //
 
     public TradePanel(ListPlayers listPlayers, HashMap<TileType, Integer> resourcesOffered,
-        HashMap<TileType, Integer> resourcesRequested, Player selectedPlayer) {
+        HashMap<TileType, Integer> resourcesRequested, Player selectedPlayer, App app) {
 
         this.resourcesOffered = resourcesOffered;
         this.resourcesRequested = resourcesRequested;
@@ -672,14 +668,23 @@ public class TradePanel extends JPanel {
             if (((Bot) selectedPlayer).acceptTrade(resourcesRequested, resourcesOffered)) {
                 performTrade(false);
                 if (!App.getBotSoloMode()) {
-                    actionPlayerPanel.getApp().addMessageColor("Votre trade a été accepté \n",
+                    actionPlayerPanel.getApp().addMessageColor("trade avec :"
+                                    + selectedPlayer.getName() + " accepté \n",
+                            java.awt.Color.GREEN);
+                } else {
+                    app.addMessageColor("trade avec :" + selectedPlayer.getName() + " accepté \n",
                             java.awt.Color.GREEN);
                 }
+
             }
         } else {
             if (!App.getBotSoloMode()) {
-                actionPlayerPanel.getApp().addMessageColor("Votre trade a été refusé \n",
-                        java.awt.Color.ORANGE);
+                actionPlayerPanel.getApp().addMessageColor("trade avec :"
+                                + selectedPlayer.getName() + " refusé \n",
+                        Color.ORANGE);
+            } else {
+                app.addMessageColor("trade avec :" + selectedPlayer.getName() + " refusé \n",
+                        Color.ORANGE);
             }
         }
     }

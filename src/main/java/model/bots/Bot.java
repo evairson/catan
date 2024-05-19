@@ -296,7 +296,7 @@ public class Bot extends Player {
         }
 
         System.out.println("Je cherche à faire un trade avec" + playerToAsk.getName());
-        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk);
+        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk, game.getApp());
 
     }
 
@@ -417,7 +417,7 @@ public class Bot extends Player {
         }
 
         System.out.println("Je cherche à faire un trade avec" + playerToAsk.getName());
-        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk);
+        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk, game.getApp());
 
     }
 
