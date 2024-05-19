@@ -27,6 +27,7 @@ public class PlayerClient extends Player {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
+    public int countdown = 0;
 
     public PlayerClient(String s, InetAddress serverAddress, int serverPort) throws IOException {
         super(Color.BLUE, s);
@@ -143,6 +144,15 @@ public class PlayerClient extends Player {
                 app.addMessageColor("C'est au tour de ", java.awt.Color.BLACK);
                 app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
                     app.getGame().getCurrentPlayer().getColorAwt());
+                if(app.hasD20()) {
+                    if (countdown <= 0) {
+                        App.getActionPlayerPanel().getRollingDice().setD20Activated(true);
+                        countdown = app.getGame().getPlayers().size();
+                    } else {
+                        App.getActionPlayerPanel().getRollingDice().setD20Activated(false);
+                        countdown--;
+                    }
+                }
                 break;
             case "shadowHexes":
                 boolean shadowValue = (boolean) networkObjet.getObject();

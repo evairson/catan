@@ -24,6 +24,7 @@ public class RollingDice extends JPanel {
     private JLabel diceOneImg;
     private JLabel diceTwoImg;
     private JLabel d20Img;
+    private int turnsBeforeD20 = 0;
 
     public int getDiceOne() {
         return player.getDice1();
@@ -159,6 +160,7 @@ public class RollingDice extends JPanel {
                     }
                 }
                 sendDices();
+                d20Activated = false;
                 if (!Main.hasServer()) {
                     player.setHasTrowDices(true);
                 }
@@ -205,5 +207,14 @@ public class RollingDice extends JPanel {
         ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
         repaint();
         game.update();
+    }
+
+
+    public boolean isD20Activated() {
+        return d20Activated;
+    }
+
+    public void setD20Activated(boolean d20Activated) {
+        this.d20Activated = d20Activated;
     }
 }

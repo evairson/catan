@@ -221,11 +221,6 @@ public class Game implements StateMethods, Serializable {
         checkForHexesRespawn();
 
         App.getActionPlayerPanel().update();
-
-        app.addMessageColor("C'est au tour de ", java.awt.Color.RED);
-        app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
-                app.getGame().getCurrentPlayer().getColorAwt());
-
         App.getGamePanel().repaint();
 
         if (!Main.hasServer()) {
@@ -322,11 +317,9 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void activateD20Event() {
-        if (getCurrentPlayer().hasThrowDices()) {
+        if (getCurrentPlayer().hasThrowDices() && playerClient.countdown == players.size()) {
             switch (getCurrentPlayer().getD20()) {
-//                case 1: killAllSheep(); break;
-                case 1:
-                    System.out.println("et non");
+                case 1: killAllSheep(); break;
                 case 2 : showDevCards(); break;
                 case 3: christmas(); break;
                 case 4: lootThiefResources(); break;
