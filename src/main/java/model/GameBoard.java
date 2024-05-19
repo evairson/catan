@@ -123,8 +123,8 @@ public class GameBoard implements Serializable {
         try {
             BufferedImage originalImage = ImageIO.read(new File("src/main/resources/harbor.png"));
             // Ajustez la taille comme nécessaire
-            int width = originalImage.getWidth() / 5;
-            int height = originalImage.getHeight() / 5;
+            int width = originalImage.getWidth() / 2;
+            int height = originalImage.getHeight() / 2;
             standardHarborImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = standardHarborImage.createGraphics();
             g2d.drawImage(originalImage, 0, 0, width, height, null);
@@ -132,9 +132,13 @@ public class GameBoard implements Serializable {
 
             specializedHarborImages = new HashMap<>();
             for (TileType type : TileType.values()) {
+                if (type == TileType.DESERT) {
+                    break;
+                }
+                System.out.println("Derchos 99 : " + type.getSpecializedImagePath());
                 originalImage = ImageIO.read(new File(type.getSpecializedImagePath()));
-                width = originalImage.getWidth() / 5;
-                height = originalImage.getHeight() / 5;
+                width = originalImage.getWidth() / 2;
+                height = originalImage.getHeight() / 2;
                 BufferedImage specializedImage = new BufferedImage(width,
                         height, BufferedImage.TYPE_INT_ARGB);
                 g2d = specializedImage.createGraphics();
@@ -148,11 +152,14 @@ public class GameBoard implements Serializable {
     }
 
     public void drawPorts(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+
         for (Map.Entry<TileVertex, Harbor> entry : harborMap.entrySet()) {
             TileVertex vertex = entry.getKey();
             Point location = calculatePortPosition(vertex.getCoordinates());
             drawRoad(g, vertex.getCoordinates(), location);
 
+            BufferedImage harborImage;
             if (entry.getValue() instanceof SpecializedHarbor) {
                 SpecializedHarbor specializedHarbor = (SpecializedHarbor) entry.getValue();
                 harborImage = specializedHarborImages.get(specializedHarbor.getResourceType());
@@ -160,10 +167,15 @@ public class GameBoard implements Serializable {
                 harborImage = standardHarborImage;
             }
 
-            g.drawImage(harborImage, (int) location.getX() - harborImage.getWidth() / 2,
-                    (int) location.getY() - harborImage.getHeight() / 2, null);
+            int scaledWidth = (int) (harborImage.getWidth() * 0.8 / Resolution.divider());
+            int scaledHeight = (int) (harborImage.getHeight() * 0.8 / Resolution.divider());
+            Image scaledImage = harborImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+
+            g2d.drawImage(scaledImage, (int) location.getX() - scaledWidth / 2,
+                    (int) location.getY() - scaledHeight / 2, null);
         }
     }
+
 
     private Point calculatePortPosition(Point originalPoint) {
         Point center = new Point(400, 400);
@@ -200,20 +212,34 @@ public class GameBoard implements Serializable {
     }
 
     private void drawRoad(Graphics g, Point start, Point end) {
-        double angle = Math.atan2(end.getY() - start.getY(), end.getX() - start.getX());
-        angle += Math.PI / 2;
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Sauvegarder l'état actuel du contexte Graphics2D
+        AffineTransform oldTransform = g2d.getTransform();
+
+        // Calculer le milieu de l'arête et l'angle de rotation
         int midX = (int) ((start.getX() + end.getX()) / 2);
         int midY = (int) ((start.getY() + end.getY()) / 2);
+        double angle = Math.atan2(end.getY() - start.getY(), end.getX() - start.getX()) + Math.PI / 2;
 
-        Graphics2D g2d = (Graphics2D) g.create();
-        AffineTransform transform = new AffineTransform();
+        // Mise à l'échelle de l'image de la route
+        int scaledWidth = (int) (roadImage.getWidth() * 1.2 / Resolution.divider());
+        int scaledHeight = (int) (roadImage.getHeight() * 1.2 / Resolution.divider());
+        Image scaledImage = roadImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+
+        // Appliquer la transformation
+        AffineTransform transform = new AffineTransform(oldTransform);
         transform.translate(midX, midY);
         transform.rotate(angle);
-        transform.translate((double) -scaledRoadImage.getWidth() / 2,
-                (double) -scaledRoadImage.getHeight() / 2);
-        g2d.drawImage(scaledRoadImage, transform, null);
-        g2d.dispose();
+        g2d.setTransform(transform);
+
+        // Dessiner l'image
+        g2d.drawImage(scaledImage, -scaledWidth / 2, -scaledHeight / 2, null);
+
+        // Rétablir l'état original du contexte Graphics2D
+        g2d.setTransform(oldTransform);
     }
+
 
     public void initialisePorts() {
         Point[] classicPortsPoints = {
