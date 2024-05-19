@@ -26,16 +26,31 @@ Pour lancer le projet, suivez les instructions ci-dessous en fonction de votre s
    ./launch.sh
    ```
 4. Suivez les instructions à l'écran pour commencer à jouer 
+5. Amusez vous bien !
 
 ### Sur Windows
 
-1. Ouvrez une fenêtre de commande
-2. Placez-vous à la racine du projet avec la commande cd \chemin\vers\le\projet.
+#### Méthode 1
+
+1. Ouvrez un invite de commande.
+2. Placez-vous à la racine du projet avec la commande cd catan.
 3. Exécutez le script launch.bat en utilisant la commande suivante :
     ```cmd 
     launch.bat
     ```
-4. Suivez les instructions à l'écran pour commencer à jouer 
+4. Suivez les instructions à l'écran pour commencer à jouer.
+5. Amusez vous bien !
+
+#### Méthode 2 
+
+1. Ouvrez le répertoire où se situe le projet
+2. Double-cliquez sur le fichier launch.bat.
+3. Amusez vous bien !
+
+## Prise en main du jeu
+
+Un **tutoriel** se situe dans le **menu d'options** une fois que vous avez lancé le jeu.
+La meilleure méthode d'aprentissage reste **la pratique**. Nous vous invitons donc à lancer des parties pour apprendre à jouer.
 
 ## Fonctionnalités
 
