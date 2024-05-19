@@ -341,7 +341,7 @@ public class Game implements StateMethods, Serializable {
      * Function responsible for triggering the events according to dice20 value.
      */
     public void activateD20Event() {
-        if (getCurrentPlayer().hasThrowDices() && playerClient.countdown == players.size()) {
+        if (getCurrentPlayer().hasThrowDices() && playerClient.getCountdown() == players.size()) {
             switch (getCurrentPlayer().getD20()) {
                 case 1: killAllSheep(); break;
                 case 2 : showDevCards(); break;
