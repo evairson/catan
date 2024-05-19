@@ -178,8 +178,10 @@ public class App {
     }
 
     public static void checkWin() {
-        if (game.getCurrentPlayer().hasWon(game)) {
-            endPanel = new EndPanel(true, game.getCurrentPlayer(), game);
+        if (game.getPlayerClient().hasWon(game)) {
+
+            game.gameHasEnded = true;
+            endPanel = new EndPanel(true, game.getPlayerClient(), game);
             gameWindow.getContentPane().add(endPanel, "endPanel");
             endPanel.updatePanel();
             Container contentPane = getGameWindow().getContentPane();

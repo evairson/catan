@@ -317,10 +317,12 @@ public class ActionPlayerPanel extends JPanel {
     }
 
     private void changeTurn() {
-        game.serverEndTurn();
-        game.checkForHexesRespawn();
-        game.checkIfTradeEventActive();
-        update();
+        if(!game.gameHasEnded) {
+            game.serverEndTurn();
+            game.checkForHexesRespawn();
+            game.checkIfTradeEventActive();
+            update();
+        }
     }
 
     private void addCardsPanel() {

@@ -51,6 +51,7 @@ public class Game implements StateMethods, Serializable {
     private int turnsBeforeTilesRespawn = 0;
     private ArrayList<TileType> betPot = new ArrayList<>();
     private int tradeEventTurn = 0;
+    public boolean gameHasEnded = false;
 
     public Game(HashMap<Point, TileEdge> edge) { // Pour les tests
         thief = new Thief();
@@ -275,6 +276,9 @@ public class Game implements StateMethods, Serializable {
 
     @Override
     public void update() {
+        if(gameHasEnded){
+            return;
+        }
         lootResources();
         if (app.isHasD20()) {
             activateD20Event();
