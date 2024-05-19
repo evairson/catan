@@ -320,6 +320,9 @@ public class Game implements StateMethods, Serializable {
         App.getActionPlayerPanel().update();
     }
 
+    /**
+     * Function responsible for triggering the events according to dice20 value.
+     */
     public void activateD20Event() {
         if (getCurrentPlayer().hasThrowDices() && playerClient.countdown == players.size()) {
             switch (getCurrentPlayer().getD20()) {
@@ -830,11 +833,12 @@ public class Game implements StateMethods, Serializable {
                     getNumberRoads(edgesCopy, edgesNext.get(1), idPlayer));
         }
     }
+
     /**.
-     * @param edges : Edges de départ
-     * @param edge : Edge de départ
-     * @param idPlayer : L'id du player voulu
-     * @return edge d'arrivé du plus long chemin
+     * @param edges : Beginning edges
+     * @param edge : Beginning edge
+     * @param idPlayer : Player id that we want
+     * @return Final edge of the longest path
      */
     public static TileEdge getRoadMax(ArrayList<TileEdge> edges, TileEdge edge, int idPlayer) {
         ArrayList<TileEdge> edgesNext = new ArrayList<>();
@@ -949,7 +953,11 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
-    //Fonction auxiliaire pour gérer la désactivation des tuiles
+    /**
+     * Auxiliary function responsible for checking if the tiles are disabled,
+     * updating turnsBeforeTilesRespawn flag.
+     * @see Game#turnsBeforeTilesRespawn
+     */
     public void checkForHexesRespawn() {
         if (turnsBeforeTilesRespawn > 0) {
             turnsBeforeTilesRespawn--;
@@ -968,7 +976,11 @@ public class Game implements StateMethods, Serializable {
         }
     }
 
-    //Fonction auxiliaire pour gérer la désactivation des ports
+    /**
+     * Auxiliary function responsible for checking if the harbours are disabled,
+     * updating turnesBeforeHarbourActivated flag.
+     * @see Game#turnsBeforeHarbourActivated
+     */
     public void checkForHarboursDisabled() {
         if (turnsBeforeHarbourActivated > 0) {
             turnsBeforeHarbourActivated--;
@@ -1131,10 +1143,8 @@ public class Game implements StateMethods, Serializable {
             }
         }
     }
-    /**
-     * Event 14
-     * Fait en sorte que le joueur de la partie avec le moins de points gagne 1PV.
-     */
+
+    //Event 14 Makes the player with the least victory points gain 1 victory point
     public void worstWinVP() {
         Player min = getCurrentPlayer();
         for (Player p : players) {

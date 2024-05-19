@@ -15,6 +15,9 @@ import model.cards.CardStack;
 import model.cards.DevelopmentCard;
 import view.utilities.Resolution;
 
+/**
+ * Represents a player.
+ */
 public class Player implements Serializable {
     static final int NUMBER_DICE = 6;
     static final int NUMBER_D20 = 20;
@@ -309,7 +312,7 @@ public class Player implements Serializable {
     }
 
     /**
-     * Remvoes all resource from specified type.
+     * Removes all resource from specified type.
      * @param resourceType Type of the resource
      */
     public void removeAllResource(TileType resourceType) {
