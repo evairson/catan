@@ -288,8 +288,7 @@ public class Bot extends Player {
         if (resources.get(TileType.ORE) >= 1) {
             listToGive.put(TileType.ORE, 1);
         }
-
-        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk);
+        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk, game.getApp());
 
     }
 
@@ -408,8 +407,7 @@ public class Bot extends Player {
         if (resources.get(TileType.ORE) >= 1) {
             listToGive.put(TileType.ORE, 1);
         }
-
-        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk);
+        new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk, game.getApp());
 
     }
 
