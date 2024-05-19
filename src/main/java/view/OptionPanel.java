@@ -6,9 +6,12 @@ import javax.swing.event.ChangeListener;
 
 import java.awt.CardLayout;
 import java.awt.Container;
+import java.awt.Graphics;
+import java.awt.Image;
 
 import javax.swing.*;
 
+import others.Constants;
 import others.Music;
 import view.utilities.ButtonImage;
 import view.utilities.Resolution;
@@ -17,8 +20,15 @@ public class OptionPanel extends JPanel {
     private final String basePath = "src/main/resources/";
     private JCheckBox d20CheckBox;
     private JButton tutoJButton;
+    private Image backgroundImage;
 
     public OptionPanel() {
+        setBounds(0, 0, Constants.Game.WIDTH, Constants.Game.HEIGHT);
+        ImageIcon icon = new ImageIcon(basePath + "mainMenu.png");
+        int width = Constants.Game.WIDTH;
+        int height = Constants.Game.HEIGHT;
+        backgroundImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
         setLayout(null);
         setVisible(true);
         JSlider volumeSlider = new JSlider(-80, 6);
@@ -72,5 +82,10 @@ public class OptionPanel extends JPanel {
         CardLayout parentLayout = (CardLayout) parent.getLayout();
         parentLayout.show(parent, "tutorial");
         return;
+    }
+
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(backgroundImage, 0, 0, this);
     }
 }
