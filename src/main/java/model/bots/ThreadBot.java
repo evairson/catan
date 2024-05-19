@@ -26,7 +26,6 @@ public class ThreadBot extends Thread {
                 try {
                     game.buildColony(vertex.getId());
                 } catch (ConstructBuildingException e) {
-                    System.out.println("erreur lors du placement de la colony");
                 }
                 if (!App.getBotSoloMode()) {
                     Thread.sleep(3000);
@@ -58,7 +57,6 @@ public class ThreadBot extends Thread {
                     }
                 }
                 if (bot.needToWaitForColonies(game)) {
-                    System.out.println("J'ai besoin de ressource pour une colonie!");
                     bot.askForTradeColonies(game);
                     if (game.canBuildColony()) {
                         TileVertex vertex = bot.getBetterVertex(game);
@@ -66,7 +64,7 @@ public class ThreadBot extends Thread {
                             try {
                                 game.buildColony(vertex.getId());
                             } catch (ConstructBuildingException e) {
-                                System.out.println("erreur lors du placement de la colony");
+                                e.printStackTrace();
                             }
                         } else {
                             otherAction = true;
@@ -80,7 +78,7 @@ public class ThreadBot extends Thread {
                             try {
                                 game.buildColony(vertex.getId());
                             } catch (ConstructBuildingException e) {
-                                System.out.println("erreur lors du placement de la colony");
+                                e.printStackTrace();
                             }
                         }
                     }

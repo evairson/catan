@@ -22,7 +22,6 @@ public class ImgService {
             imageContainer = new JLabel(new ImageIcon(image));
             return imageContainer;
         } catch (Exception e) {
-            System.out.println("Error" + e);
             return null;
         }
     }

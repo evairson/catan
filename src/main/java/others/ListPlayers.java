@@ -36,7 +36,6 @@ public class ListPlayers extends ArrayList<Player> {
             currentPlayerIndex++;
         }
         currentPlayer = this.get(currentPlayerIndex);
-        System.out.println(currentPlayer instanceof PlayerClient);
         return currentPlayer;
     }
 

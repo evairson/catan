@@ -134,7 +134,6 @@ public class Game implements StateMethods, Serializable {
         }
         if (yearOfPlentyWaiting > 0) {
             getCurrentPlayer().addResource(t, 1);
-            System.out.println("gave " + t);
             yearOfPlentyWaiting--;
         }
     }
@@ -150,29 +149,23 @@ public class Game implements StateMethods, Serializable {
         }
         getCurrentPlayer().addResource(t, amount);
         App.getActionPlayerPanel().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
-        System.out.println("monopoly de " + amount + " " + t);
     }
 
     public boolean canPass() {
         Player p = getCurrentPlayer();
         if (p.getFreeRoad() > 0) {
-            System.out.println("freeRoad");
             return false;
         }
         if (monoWaiting || yearOfPlentyWaiting > 0) {
-            System.out.println("monoWaiting");
             return false;
         }
         if (p.getFreeColony()) {
-            System.out.println("freeColony");
             return false;
         }
         if (!p.hasThrowDices() && !start && !backwards) {
-            System.out.println("Le joueur n'a pas encore lancé les dés");
             return false;
         }
         if (board.getThiefMode()) {
-            System.out.println("thief");
             return false;
         }
         return true;
@@ -180,7 +173,6 @@ public class Game implements StateMethods, Serializable {
 
     public void endTurn() {
         if (!canPass()) {
-            System.out.println("Impossible de passer le tour");
             if (App.getBotSoloMode()) {
                 getCurrentPlayer().throwDices(app.hasD20());
             }
@@ -188,7 +180,6 @@ public class Game implements StateMethods, Serializable {
         }
 
         if (isInBeginningPhase()) {
-            System.out.println("je suis dans la beginning phase");
             ArrayList<Colony> colony = getCurrentPlayer().getColony();
             if (colony.size() >= 2) {
                 for (Colony c: colony) {
@@ -219,7 +210,6 @@ public class Game implements StateMethods, Serializable {
         if (!start && !backwards && !blankTurn) {
             App.getActionPlayerPanel().getRollingDice().setButtonIsOn(true);
         }
-        System.out.println("It's " + getCurrentPlayer() .getName() + "'s turn");
         app.addMessageColor("C'est au tour de ", java.awt.Color.BLACK);
         app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
                 app.getGame().getCurrentPlayer().getColorAwt());
@@ -366,7 +356,7 @@ public class Game implements StateMethods, Serializable {
                 case 19: lootBets(); break;
                 case 20: diceSecondRound(); break;
                 default:
-                    System.out.println("Event non pris en charge");
+                    break;
             }
             App.getActionPlayerPanel().getLogChat().addEventLog(getCurrentPlayer().getD20());
             App.getActionPlayer().getResourcesPanel().updateResourceLabels(getCurrentPlayer());
@@ -614,7 +604,6 @@ public class Game implements StateMethods, Serializable {
         for (TileVertex vertex : board.getVertices()) {
             if (vertex.getId() == idVertex) {
                 if (board.canPlaceColony(vertex, getCurrentPlayer())) {
-                    System.out.println("Je peux placer la colony");
                     board.setLookingForVertex(false);
                     board.setPlacingCity(false);
                     if (getCurrentPlayer().buildColony(vertex)) {
@@ -700,12 +689,9 @@ public class Game implements StateMethods, Serializable {
         TileVertex cVertex;
         if (board.isLookingForVertex()) {
             cVertex = board.getClosestTileVertex();
-            System.out.println("finding closest vertex");
             if (Main.hasServer()) {
                 if (cVertex != null) {
-                    System.out.println("Closest vertex different from null");
                     if (board.canPlaceCity(cVertex, getCurrentPlayer())) {
-                        System.out.println("CanPlace City and placing");
                         try {
                             int id = playerClient.getId();
                             NetworkObject object = new NetworkObject(TypeObject.Board, "buildCity",
@@ -883,13 +869,10 @@ public class Game implements StateMethods, Serializable {
             }
         }
         if (edgesNext.size() == 0) {
-            System.out.println("c'est zero");
             return edge;
         } else if (edgesNext.size() == 1) {
-            System.out.println("1");
             return getRoadMax(edgesCopy, edgesNext.get(0), idPlayer);
         } else {
-            System.out.println("2");
             if (getNumberRoads(edgesCopy, edgesNext.get(0), idPlayer)
                     > getNumberRoads(edgesCopy, edgesNext.get(1), idPlayer)) {
                 return getRoadMax(edgesCopy, edgesNext.get(0), idPlayer);
@@ -918,8 +901,6 @@ public class Game implements StateMethods, Serializable {
                 }
             }
         }
-
-        System.out.println(numbersRoadsMax);
         return edgeFirstMax;
     }
 
@@ -1162,7 +1143,6 @@ public class Game implements StateMethods, Serializable {
     public void capitalismPoorGetsPoorer() {
         ListPlayers pChecks = (ListPlayers) players.clone();
         for (Player p : pChecks) {
-            System.out.println("Ressources sum : " + p.getResourcesSum());
             if (p.getResourcesSum() <= p.getResourceCap()) {
                 for (int i = 0; i < p.getResourcesSum() / 2; i++) {
                     p.removeOneRandom();

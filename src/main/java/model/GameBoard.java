@@ -135,7 +135,6 @@ public class GameBoard implements Serializable {
                 if (type == TileType.DESERT) {
                     break;
                 }
-                System.out.println("Derchos 99 : " + type.getSpecializedImagePath());
                 originalImage = ImageIO.read(new File(type.getSpecializedImagePath()));
                 width = originalImage.getWidth() / 2;
                 height = originalImage.getHeight() / 2;
@@ -971,7 +970,6 @@ public class GameBoard implements Serializable {
         Graphics2D g2dBoard = boardImage.createGraphics();
         double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
         double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
-        System.out.println("first test");
         for (Map.Entry<CubeCoordinates, Tile> entry : board.entrySet()) {
             Tile tile = entry.getValue();
             Polygon hexagon = new Polygon();
@@ -999,7 +997,6 @@ public class GameBoard implements Serializable {
 
             g2dBoard.drawImage(scaledImg, imgX, imgY, null);
         }
-        System.out.println("second test");
 
         for (Map.Entry<TileVertex, Harbor> entry : harborMap.entrySet()) {
             TileVertex vertex = entry.getKey();
@@ -1660,12 +1657,10 @@ public class GameBoard implements Serializable {
     public void initialiseLayout() {
         double scaleFactorX = (double) Constants.Game.WIDTH / Constants.Game.BASE_WIDTH;
         double scaleFactorY = (double) Constants.Game.HEIGHT / Constants.Game.BASE_HEIGHT;
-        System.out.println(scaleFactorX + " et " + scaleFactorY);
         Point point1 = new Point(
                 (int) (267 * scaleFactorX),
                 (int) (267 * scaleFactorY)
         );
-        System.out.println((int) (267 * scaleFactorX) + " et  ; " + (int) (47 * scaleFactorX));
         Point point2 = new Point(
                 (int) (47 * scaleFactorX),
                 (int) (47 * scaleFactorY)
