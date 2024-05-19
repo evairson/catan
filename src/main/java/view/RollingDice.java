@@ -43,6 +43,11 @@ public class RollingDice extends JPanel {
         rollButton.setEnabled(b);
     }
 
+    /**
+     * Panel in charge of the dices display, and the roll button.
+     * @param game The game it's constructed with
+     * @param d20Activated If the d20 is activated in the options
+     */
     public RollingDice(Game game, boolean d20Activated) {
         this.game = game;
         this.player = game.getCurrentPlayer();
@@ -115,6 +120,10 @@ public class RollingDice extends JPanel {
         rollButton.setEnabled(false);
     }
 
+    /**
+     * Makes the dices roll and updates current attributes of the player to the valors rolled.
+     * @see RollingDice#player
+     */
     public void roll() {
         rollButton.setEnabled(false);
         //Start for 3 seconds
@@ -180,6 +189,9 @@ public class RollingDice extends JPanel {
         this.player = player;
     }
 
+    /**
+     * Sends the dices result to all the playerClients
+     */
     public void sendDices() {
         if (player instanceof PlayerClient) {
             try {
@@ -207,11 +219,6 @@ public class RollingDice extends JPanel {
         ImgService.updateImage(diceTwoImg, "/view/dice/d" + getDiceTwo() + "r.png", 0.75);
         repaint();
         game.update();
-    }
-
-
-    public boolean isD20Activated() {
-        return d20Activated;
     }
 
     public void setD20Activated(boolean d20Activated) {

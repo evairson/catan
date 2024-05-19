@@ -20,6 +20,11 @@ public class LogPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    /**
+     * Adds a message in the LogChat.
+     * @param message The message
+     * @param color The color
+     */
     public void addMessageColor(String message, Color color) {
 
         StyledDocument doc = chatArea.getStyledDocument();
@@ -37,6 +42,10 @@ public class LogPanel extends JPanel {
         chatArea.setCaretPosition(chatArea.getDocument().getLength());
     }
 
+    /**
+     * Adds the event description to the LogChat.
+     * @param eventNo The number of the event triggered
+     */
     public void addEventLog(int eventNo) {
         String pName = actionPlayerPanel.getApp().getGame().getCurrentPlayer().getName();
         switch (eventNo) {
