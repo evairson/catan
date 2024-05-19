@@ -32,7 +32,6 @@ public class Animation {
                     Thread.sleep(delay); // Attendre avant de répéter
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Rétablir le statut d'interruption
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }
@@ -62,7 +61,6 @@ public class Animation {
                     Thread.sleep(delay); // Attendre avant de répéter
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Rétablir le statut d'interruption
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }
@@ -92,7 +90,6 @@ public class Animation {
                     Thread.sleep(delay); // Attendre avant de répéter
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Rétablir le statut d'interruption
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }
@@ -122,7 +119,6 @@ public class Animation {
                     Thread.sleep(delay); // Attendre avant de répéter
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Rétablir le statut d'interruption
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }
@@ -152,7 +148,6 @@ public class Animation {
                     Thread.sleep(delay); // Attendre avant de répéter.
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Rétablir le statut d'interruption.
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }
@@ -182,7 +177,6 @@ public class Animation {
                     Thread.sleep(delay); // Attendre avant de répéter.
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Rétablir le statut d'interruption.
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }
@@ -212,7 +206,6 @@ public class Animation {
                     Thread.sleep(delay); // Attendre avant de répéter.
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Rétablir le statut d'interruption.
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }
@@ -242,7 +235,6 @@ public class Animation {
                     Thread.sleep(delay); // Attendre avant de répéter.
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Rétablir le statut d'interruption.
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }
@@ -272,7 +264,6 @@ public class Animation {
                     Thread.sleep(delay); // Attendre avant de répéter.
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Rétablir le statut d'interruption.
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }
@@ -313,7 +304,6 @@ public class Animation {
                     Thread.sleep(delay);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    System.out.println("Animation interrupted: " + e.getMessage());
                     return;
                 }
             }

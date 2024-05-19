@@ -67,12 +67,10 @@ public class Server {
                 while ((input = in.readObject()) != null) {
                     // Redistribuer le message à tous les clients
                     if (((NetworkObject) input).getMessage().equals("tryStartGame")) {
-                        System.out.println("J'ai recu");
                         input = new NetworkObject(TypeObject.Message, "NamePlayers", id, players);
                         out.writeUnshared(input);
                         out.flush();
                     } else {
-                        System.out.println(((NetworkObject) input).getMessage());
                         synchronized (writers) {
                             for (ObjectOutputStream writer : writers) {
                                 writer.writeUnshared(input);

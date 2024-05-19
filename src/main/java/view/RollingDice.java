@@ -99,7 +99,6 @@ public class RollingDice extends JPanel {
             resizedImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
             resizedIcon = new ImageIcon(resizedImage);
             d20Img = new JLabel(resizedIcon);
-            System.out.println("aaaaaaa" + d20Img == null);
             coords = Resolution.calculateResolution(30, 80);
             xCoord = coords[0];
             yCoord = coords[1];
@@ -177,11 +176,10 @@ public class RollingDice extends JPanel {
                 App.getActionPlayerPanel().update();
                 App.getActionPlayerPanel().repaint();
             } catch (InterruptedException e) {
-                System.out.println("Threading Error in class RollingDice " + e);
+                e.printStackTrace();
             }
         });
         rollThread.start();
-        System.out.println(player.getColorString());
     }
 
     public void newPlayer(Player player) {

@@ -101,11 +101,7 @@ public class Bot extends Player {
             if (!game.getBoard().canPlaceColony(vertex, this)) {
                 continue;
             }
-            for (Tile t : vertex.getTiles()) {
-                System.out.println(t.getDiceValue());
-            }
             double value = vertexToValue(vertex);
-            System.out.println(value);
             if (value > maxValue) {
                 maxValue = value;
                 maxVertex = vertex;
@@ -131,7 +127,6 @@ public class Bot extends Player {
 
     public void buildBestRoad(Game game) {
         TileEdge edge = game.getBestBeforeRoad(id);
-        System.out.println(edge);
         for (TileEdge edgePossible : game.getBoard().getEdgeMap().values()) {
             if (edgePossible.getBuilding() != null || edgePossible == edge) {
                 continue;
@@ -157,7 +152,6 @@ public class Bot extends Player {
                 continue;
             }
         }
-        System.out.println("Impossible de construire une route");
     }
 
 
@@ -294,8 +288,6 @@ public class Bot extends Player {
         if (resources.get(TileType.ORE) >= 1) {
             listToGive.put(TileType.ORE, 1);
         }
-
-        System.out.println("Je cherche à faire un trade avec" + playerToAsk.getName());
         new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk, game.getApp());
 
     }
@@ -415,8 +407,6 @@ public class Bot extends Player {
         if (resources.get(TileType.ORE) >= 1) {
             listToGive.put(TileType.ORE, 1);
         }
-
-        System.out.println("Je cherche à faire un trade avec" + playerToAsk.getName());
         new TradePanel(game.getPlayers(), listToGive, listToGet, playerToAsk, game.getApp());
 
     }

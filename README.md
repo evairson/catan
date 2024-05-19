@@ -15,8 +15,9 @@ Ce projet est une implémentation numérique du célèbre jeu de société Catan
 ## Lancement du Projet
 
 Pour lancer le projet, suivez les instructions ci-dessous en fonction de votre système d'exploitation.
+**Assurez-vous de disposer de [java version 21.](https://www.oracle.com/java/technologies/downloads/#java21)**
 
-### Sur Linux
+### Sur Système Unix
 
 1. Ouvrez un terminal.
 2. Placez-vous à la racine du projet avec la commande `cd catan`.
@@ -24,17 +25,32 @@ Pour lancer le projet, suivez les instructions ci-dessous en fonction de votre s
    ```bash
    ./launch.sh
    ```
-4. Suivez les instruction à l'écran pour commencer à jouer 
+4. Suivez les instructions à l'écran pour commencer à jouer 
+5. Amusez vous bien !
 
 ### Sur Windows
 
-1. Ouvrez une fenêtre de commande
-2. Placez-vous à la racine du projet avec la commande cd \chemin\vers\le\projet.
+#### Méthode 1
+
+1. Ouvrez un invite de commande.
+2. Placez-vous à la racine du projet avec la commande cd catan.
 3. Exécutez le script launch.bat en utilisant la commande suivante :
     ```cmd 
     launch.bat
     ```
-4. Suivez les instructions à l'écran pour commencer à jouer 
+4. Suivez les instructions à l'écran pour commencer à jouer.
+5. Amusez vous bien !
+
+#### Méthode 2 
+
+1. Ouvrez le répertoire où se situe le projet
+2. Double-cliquez sur le fichier launch.bat.
+3. Amusez vous bien !
+
+## Prise en main du jeu
+
+Un **tutoriel** se situe dans le **menu d'options** une fois que vous avez lancé le jeu.
+La meilleure méthode d'aprentissage reste **la pratique**. Nous vous invitons donc à lancer des parties pour apprendre à jouer.
 
 ## Fonctionnalités
 
@@ -45,17 +61,9 @@ Pour lancer le projet, suivez les instructions ci-dessous en fonction de votre s
 - **Jeu en Réseau** : Possibilité de jouer en ligne avec d'autres joueurs, permettant des parties multijoueurs.
 - **Cartes de Jeu** : Intégration des cartes de développement et de progression du jeu, ajoutant des éléments stratégiques et de variété aux parties.
 - **Dé 20** : Un dé à 20 faces est lancé une fois par tour, générant des événements aléatoires qui peuvent influencer le cours de la partie.
-- **Animation en jeu** : Les menus de ressources et d'achat de batiments sont animés. Il y a également une animation quand on reçoit des ressources. 
+- **Animation en jeu** : Les menus de ressources et d'achat de bâtiments sont animés. Il y a également une animation quand on reçoit des ressources. 
 - **Jeu en local contre des bots** : Le joueur peut lancer une partie seul et jouer contre des robots.
 
-## Exécution des Tests
-
-Pour exécuter les tests, utilisez la commande suivante :
-
-```bash
-java -jar lib/junit-platform-console-standalone-1.10.2.jar --class-path "bin;lib/*" --scan-class-path
-```
-Assurez-vous d'être à la racine du projet lors de l'exécution de cette commande.
 ## Contribuer
 
 Les contributions sont les bienvenues ! Si vous souhaitez améliorer ce projet, veuillez soumettre une pull request avec une description détaillée des modifications proposées.

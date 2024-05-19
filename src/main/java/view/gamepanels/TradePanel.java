@@ -109,7 +109,6 @@ public class TradePanel extends JPanel {
         createTradeButtons();
         //createPlayersButtons();
         initializeSelectedPlayerImage();
-        System.out.println(playerOneLabels);
         updateProposeButtonState();
         actionPlayerButton(listPlayers.getCurrentPlayer());
         bankTradeButton.setEnabled(false);
@@ -270,8 +269,6 @@ public class TradePanel extends JPanel {
                 TileType requestedResource = entry.getKey();
                 Integer requestedAmount = entry.getValue();
                 if (selectedPlayerResources.getOrDefault(requestedResource, 0) < requestedAmount) {
-                    System.out.println(requestedResource);
-                    System.out.println(selectedPlayerResources.get(requestedResource));
                     return false;
                 }
             }
@@ -294,11 +291,7 @@ public class TradePanel extends JPanel {
     }
     private void proposeAction() {
         gatherResourcesRequested();
-        displayResources(resourcesRequested);
-
         gatherResourcesOffered();
-        displayResources(resourcesOffered);
-
         boolean canFulfillRequest = canSelectedPlayerFulfillRequest();
         toggleTradeInterface(false);
         notifyOfferToPlayer(selectedPlayer);
@@ -360,8 +353,6 @@ public class TradePanel extends JPanel {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            System.out.println("Problème de downCast");
         }
     }
     public void acceptAction(boolean isBank) {
@@ -438,7 +429,6 @@ public class TradePanel extends JPanel {
         changes.forEach((resource, amount) -> {
             int currentAmount = playerResources.getOrDefault(resource, 0);
             if (tradeAlea && !subtract) {
-//                System.out.println("Mode trade event");
                 if (isDouble) {
                     playerResources.put(resource, currentAmount + 2 * amount);
                 }
@@ -702,16 +692,5 @@ public class TradePanel extends JPanel {
         g.drawImage(backgroundImage, 0, 0, this);
     }
 
-    // -------- Fonctions de tests -------- //
-
-    public void displayResources(Map<TileType, Integer> resourcesList) {
-        if (resourcesList.isEmpty()) {
-            System.out.println("Aucune ressource demandée ou offerte.");
-            return;
-        }
-
-        for (Map.Entry<TileType, Integer> entry : resourcesList.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
-    }
+  
 }
