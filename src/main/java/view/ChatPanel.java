@@ -74,9 +74,17 @@ public class ChatPanel extends JPanel {
         return sender;
     }
 
+    /**
+     * Removes all text from the type bar.
+     */
     private void flushChat() {
         messageField.setText("");
     }
+
+    /**
+     * Sends the string located in the type bar and performs a flush.
+     * @see ChatPanel#flushChat
+     */
     private void sendMessage() {
         String message = messageField.getText();
         if (!message.isEmpty()) {
@@ -89,6 +97,12 @@ public class ChatPanel extends JPanel {
         appendToPane(chatArea, message + "\n", null);
     }
 
+    /**
+     * Adds a message to the bottom of the chat area.
+     * @param tp The chat area
+     * @param msg The message
+     * @param attr Attributes of the message, often color
+     */
     private void appendToPane(JTextPane tp, String msg, AttributeSet attr) {
         Document doc = tp.getDocument();
         try {
