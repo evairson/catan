@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * calculate the corner offset of a hexagon in a hexagonal grid.
  *      The corner offset is used to calculate the corners of a hexagon in a hexagonal grid.
  * calculate the corners of a hexagon in a hexagonal grid.
- *      The corners are used to draw a hexagon in a hexagonal grid. 
+ *      The corners are used to draw a hexagon in a hexagonal grid.
  */
 public class Layout implements Serializable {
     private Orientation orientation;
@@ -22,11 +22,10 @@ public class Layout implements Serializable {
     private Point size;
 
     /**
-     * Constructor
+     * Constructor.
      * @param orientation
      * @param point
      * @param point2
-     * @return Layout with the given orientation, origin, and size
      */
     public Layout(Orientation orientation, Point point, Point point2) {
         this.orientation = orientation;
@@ -35,10 +34,11 @@ public class Layout implements Serializable {
     }
 
     /**
-     * cubeToPixel
+     * cubeToPixel.
      * @param layout
      * @param h
-     * calculate the pixel coordinates of a the center of a hexagon from cube coordinates, according to the layout
+     * calculate the pixel coordinates of a the center
+     * of a hexagon from cube coordinates, according to the layout
      * @return a Point representing the pixel coordinates of the center of the hexagon
      */
     public Point cubeToPixel(Layout layout, CubeCoordinates h) {
@@ -47,13 +47,15 @@ public class Layout implements Serializable {
         double y = (m.getF2() * h.getQ() + m.getF3() * h.getR()) * layout.size.getY();
         return new Point(x + layout.origin.getX(), y + layout.origin.getY());
     }
-    
+
     /**
-     * fractionalCubeToPixel
+     * fractionalCubeToPixel.
      * @param layout
      * @param h
-     * calculate the pixel coordinates of a the center of a hexagon from fractional cube coordinates, according to the layout
-     * this basically rounds the fractional cube coordinates to the nearest cube coordinates and then calculates the pixel coordinates
+     * calculate the pixel coordinates of a the center of
+     * a hexagon from fractional cube coordinates, according to the layout
+     * this basically rounds the fractional cube coordinates to
+     * the nearest cube coordinates and then calculates the pixel coordinates
      * using the previous method @see cubeToPixel
      * @return a Point representing the pixel coordinates of the center of the hexagon
      */
@@ -62,7 +64,7 @@ public class Layout implements Serializable {
     }
 
     /**
-     * pixelToFractionalCubeCo
+     * pixelToFractionalCubeCo.
      * @param layout
      * @param p
      * calculate the fractional cube coordinates of a hexagon from pixel coordinates, according to the layout
@@ -79,14 +81,13 @@ public class Layout implements Serializable {
     }
 
     /**
-     * cubeCoCornerOffset
+     * cubeCoCornerOffset.
      * @param layout
      * @param corner
      * calculate the corner offset of a hexagon in a hexagonal grid.
      * an offset is a distance from a point to another point.
      * The corner offset is used to calculate the positions of the corners of a hexagon in a hexagonal grid.
      * @return a Point representing the corner offset of the hexagon
-     * 
      */
     public Point cubeCoCornerOffset(Layout layout, int corner) {
         Point size = layout.size;
@@ -95,7 +96,7 @@ public class Layout implements Serializable {
     }
 
     /**
-     * polygonCorners
+     * polygonCorners.
      * @param layout
      * @param h (CubeCoordinates)
      * calculate the corners of a hexagon in a hexagonal grid.
@@ -115,7 +116,7 @@ public class Layout implements Serializable {
     }
 
     /**
-     * polygonCorners //overload//
+     * polygonCorners //overload//.
      * @param layout
      * @param h (FractionalCubeCoordinates)
      * calculate the corners of a hexagon in a hexagonal grid.
