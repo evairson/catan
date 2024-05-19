@@ -385,6 +385,7 @@ public class Player implements Serializable {
                 freeRoad++;
                 c.place(this, false, vertex);
                 App.getGamePanel().repaint();
+                points++;
                 return true;
             }
             if (c.buyAndPlace(this, false, vertex)) {
