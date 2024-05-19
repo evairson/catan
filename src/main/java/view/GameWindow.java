@@ -27,17 +27,6 @@ public class GameWindow extends JFrame {
         GraphicsDevice gd = ge.getDefaultScreenDevice();
 
         GraphicsDevice[] gds = ge.getScreenDevices();
-        if (gds.length > 1) { // S'il y a plus d'un écran, ça lance sur le deuxième écran
-            // Récupère les limites du deuxième écran
-            Rectangle bounds = gds[0].getDefaultConfiguration().getBounds();
-            int borderX = bounds.x + (bounds.width - getWidth()) / 2;
-            int borderY = bounds.y + (bounds.height - getHeight()) / 2;
-            setLocation(borderX, borderY);
-
-        } else {
-            setLocationRelativeTo(null);
-        } //full useless si un écran :)
-
         this.mainMenu = mainMenu;
 
         //Le layout de la JFrame est un CardLayout, qui permet de changer facilement de JPanel
