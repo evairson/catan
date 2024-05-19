@@ -64,14 +64,6 @@ La meilleure méthode d'aprentissage reste **la pratique**. Nous vous invitons d
 - **Animation en jeu** : Les menus de ressources et d'achat de bâtiments sont animés. Il y a également une animation quand on reçoit des ressources. 
 - **Jeu en local contre des bots** : Le joueur peut lancer une partie seul et jouer contre des robots.
 
-## Exécution des Tests
-
-Pour exécuter les tests, utilisez la commande suivante :
-
-```bash
-java -jar lib/junit-platform-console-standalone-1.10.2.jar --class-path "bin;lib/*" --scan-class-path
-```
-Assurez-vous d'être à la racine du projet lors de l'exécution de cette commande.
 ## Contribuer
 
 Les contributions sont les bienvenues ! Si vous souhaitez améliorer ce projet, veuillez soumettre une pull request avec une description détaillée des modifications proposées.
