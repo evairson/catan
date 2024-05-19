@@ -179,7 +179,6 @@ public class Game implements StateMethods, Serializable {
     }
 
     public void endTurn() {
-        System.out.println("nouveau tour");
         if (!canPass()) {
             System.out.println("Impossible de passer le tour");
             if (App.getBotSoloMode()) {
@@ -221,6 +220,9 @@ public class Game implements StateMethods, Serializable {
             App.getActionPlayerPanel().getRollingDice().setButtonIsOn(true);
         }
         System.out.println("It's " + getCurrentPlayer() .getName() + "'s turn");
+        app.addMessageColor("C'est au tour de ", java.awt.Color.BLACK);
+        app.addMessageColor(app.getGame().getCurrentPlayer().getName() + "\n",
+                app.getGame().getCurrentPlayer().getColorAwt());
         resourcesGiven = false;
         App.getActionPlayerPanel().getRollingDice().newPlayer(getCurrentPlayer());
 
@@ -582,9 +584,7 @@ public class Game implements StateMethods, Serializable {
                                 id, cVertex.getId());
                         playerClient.getOut().writeUnshared(object);
                         playerClient.getOut().flush();
-                        app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
-                                app.getGame().getCurrentPlayer().getColorAwt());
-                        app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.BLACK);
+
                     } catch (Exception e) {
                         e.getStackTrace();
                     }
@@ -618,6 +618,10 @@ public class Game implements StateMethods, Serializable {
                     board.setLookingForVertex(false);
                     board.setPlacingCity(false);
                     if (getCurrentPlayer().buildColony(vertex)) {
+
+                        app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                                app.getGame().getCurrentPlayer().getColorAwt());
+                        app.addMessageColor(" vient de placer une colonie \n", java.awt.Color.BLACK);
                         App.getActionPlayerPanel().update();
                         App.getGamePanel().repaint();
                         return true;
@@ -680,6 +684,9 @@ public class Game implements StateMethods, Serializable {
                 if (getCurrentPlayer().buildRoad(edge)) {
                     App.getActionPlayerPanel().update();
                     App.getGamePanel().repaint();
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                            app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une route \n", java.awt.Color.BLACK);
                     return true;
                 } else {
                     return false;
@@ -744,6 +751,9 @@ public class Game implements StateMethods, Serializable {
                 if (getCurrentPlayer().buildCity(vertex, us)) {
                     App.getActionPlayerPanel().update();
                     App.getGamePanel().repaint();
+                    app.addMessageColor(app.getGame().getCurrentPlayer().getName(),
+                            app.getGame().getCurrentPlayer().getColorAwt());
+                    app.addMessageColor(" vient de placer une ville \n", java.awt.Color.BLACK);
                     return true;
                 }
                 return false;
