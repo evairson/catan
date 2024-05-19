@@ -54,12 +54,13 @@ public class TileEdge implements Serializable {
     }
 
     /**
-     * Constructor with start and end points
+     * Constructor with start and end points.
      * @param start
      * @param end
      * the set of tiles is initialized.
      * The set contains the tiles that are connected to the edge.
-     * We don't give the building as a parameter because the edge does not contain a default building at the beginning.
+     * We don't give the building as a parameter because
+     * the edge does not contain a default building at the beginning.
      */
     public TileEdge(Point start, Point end) {
         this.start = start;
@@ -68,13 +69,14 @@ public class TileEdge implements Serializable {
     }
 
     /**
-     * Constructor with start and end points and a set of tiles
+     * Constructor with start and end points and a set of tiles.
      * @param start
      * @param end
      * @param tiles
      * the set of tiles is initialized.
      * The set contains the tiles that are connected to the edge.
-     * We don't give the building as a parameter because the edge does not contain a default building at the beginning.
+     * We don't give the building as a parameter because
+     * the edge does not contain a default building at the beginning.
 
      */
     public TileEdge(Point start, Point end, Set<Tile> tiles) {

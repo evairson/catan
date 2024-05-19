@@ -692,5 +692,5 @@ public class TradePanel extends JPanel {
         g.drawImage(backgroundImage, 0, 0, this);
     }
 
-  
+
 }

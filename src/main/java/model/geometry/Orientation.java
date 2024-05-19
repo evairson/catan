@@ -23,10 +23,9 @@ public class Orientation implements Serializable {
     private double b3;
 
     /**
-     * Constructor
+     * Constructor.
      * @param startAngle
-     * this is a multiple of 60 degrees, to determine where in a circle the hexagon starts
-     * 
+     * this is a multiple of 60 degrees, to determine where in a circle the hexagon start
      * The following parameters are used to calculate the next angles of the hexagon
      * f0, f1, f2, f3 are used to calculate the forward angles of the hexagon
      * b0, b1, b2, b3 are used to calculate the backward angles of the hexagon
@@ -38,7 +37,6 @@ public class Orientation implements Serializable {
      * @param b1
      * @param b2
      * @param b3
-     * @return Orientation with the given parameters
      */
     public Orientation(double startAngle, double f0, double f1, double f2, double f3, double b0,
             double b1, double b2, double b3) {

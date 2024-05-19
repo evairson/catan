@@ -27,7 +27,7 @@ public class Tile implements Serializable {
     private static int idClass = 0;
 
     /**
-     * Constructor with q and r coordinates
+     * Constructor with q and r coordinates.
      * @param q
      * @param r
      * the dice value is set to 0, for the resource type, it is set to null.
@@ -44,7 +44,7 @@ public class Tile implements Serializable {
     }
 
     /**
-     * Constructor with q, r coordinates and dice value
+     * Constructor with q, r coordinates and dice value.
      * @param q
      * @param r
      * @param diceValue
@@ -62,7 +62,7 @@ public class Tile implements Serializable {
     }
 
     /**
-     * Constructor with q, r coordinates, dice value and resource type
+     * Constructor with q, r coordinates, dice value and resource type.
      * @param q
      * @param r
      * @param diceValue
@@ -108,9 +108,10 @@ public class Tile implements Serializable {
     }
 
     /**
-     * getCoordinates
-     * @return CubeCoordinates. We use the q and r coordinates to get the s coordinate, and we return the cube coordinates.
-     * that is because q + r + s = 0 so we can get the s coordinate by -q - r.
+     * getCoordinates.
+     * @return CubeCoordinates.
+     * We use the q and r coordinates to get the s coordinate, and we return the cube coordinates.
+     * that is because q + r + s = 0, so we can get the s coordinate by -q - r.
      */
     public CubeCoordinates getCoordinates() {
         return new CubeCoordinates(q, r, -q - r);

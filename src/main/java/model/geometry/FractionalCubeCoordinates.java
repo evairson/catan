@@ -102,6 +102,7 @@ public class FractionalCubeCoordinates implements Serializable {
     }
 
     /**
+     * @param b
      * @return FractionalCubeCoordinates the distance between this
      * fractional cube coordinates and the given fractional cube coordinates
      */
@@ -113,7 +114,8 @@ public class FractionalCubeCoordinates implements Serializable {
      * findClosestNeighbour
      * This method is used to find the closest neighbour of a hexagon in a hexagonal grid.
      * The closest neighbour is the neighbour that has the smallest distance to the hexagon.
-     * More specifically, the closest neighbour is the neighbour that has the smallest distance to the position inside the hexagon.
+     * More specifically, the closest neighbour is the neighbour that has
+     * the smallest distance to the position inside the hexagon.
      * Used to pinpoint the common edge of two hexes when placing roads.
      * @return CubeCoordinates the closest neighbour of the fractional cube coordinates
      */
@@ -149,8 +151,10 @@ public class FractionalCubeCoordinates implements Serializable {
      * findTwoClosestNeighbours
      * This method is used to find the two closest neighbours of a hexagon in a hexagonal grid.
      * The two closest neighbours are the neighbours that have the smallest distance to the hexagon.
-     * More specifically, the two closest neighbours are the neighbours that have the smallest distance to the position inside the hexagon.
-     * Used to pinpoint on which vertex of the hexagon we place cities by comparing the common vertex of three hexes. 
+     * More specifically, the two closest neighbours are
+     * the neighbours that have the smallest distance to the position inside the hexagon.
+     * Used to pinpoint on which vertex of the hexagon
+     * we place cities by comparing the common vertex of three hexes.
      * @return CubeCoordinates[] the two closest neighbours of the fractional cube coordinates
      */
     public CubeCoordinates[] findTwoClosestNeighbours() {

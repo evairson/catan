@@ -23,7 +23,7 @@ public class TileVertex implements Serializable {
     private Harbor harbor;
     private Point coordinates;
 
-  
+
     public TileVertex() {
         tiles = new HashSet<>();
     }

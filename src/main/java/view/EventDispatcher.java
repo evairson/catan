@@ -4,7 +4,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
 
 public class EventDispatcher implements KeyEventDispatcher {
-    ActionPlayerPanel actionPlayer;
+    private ActionPlayerPanel actionPlayer;
 
     public EventDispatcher(ActionPlayerPanel actionPlayer) {
         this.actionPlayer = actionPlayer;

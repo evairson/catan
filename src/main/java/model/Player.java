@@ -104,7 +104,7 @@ public class Player implements Serializable {
         resourceCap = 7;
     }
 
-  
+
 
     public int getFreeRoad() {
         return freeRoad;

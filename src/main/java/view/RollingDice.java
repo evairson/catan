@@ -188,7 +188,7 @@ public class RollingDice extends JPanel {
     }
 
     /**
-     * Sends the dices result to all the playerClients
+     * Sends the dices result to all the playerClients.
      */
     public void sendDices() {
         if (player instanceof PlayerClient) {

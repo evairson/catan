@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import model.Player;
-import network.PlayerClient;
 
 public class ListPlayers extends ArrayList<Player> {
 
