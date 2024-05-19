@@ -64,6 +64,11 @@ La meilleure méthode d'aprentissage reste **la pratique**. Nous vous invitons d
 - **Animation en jeu** : Les menus de ressources et d'achat de bâtiments sont animés. Il y a également une animation quand on reçoit des ressources. 
 - **Jeu en local contre des bots** : Le joueur peut lancer une partie seul et jouer contre des robots.
 
+## Autres
+1. Le rapport de projet est le fichier à la racine `Rapport_Catan_VR2c.pdf`
+2. Les tests sont accessibles dans le sous-répertoire `src/test`
+3. La documention est disponible dans le répertoire `doc`, il suffit d'ouvrir `doc/index.html`
+
 ## Contribuer
 
 Les contributions sont les bienvenues ! Si vous souhaitez améliorer ce projet, veuillez soumettre une pull request avec une description détaillée des modifications proposées.
@@ -71,3 +76,4 @@ Les contributions sont les bienvenues ! Si vous souhaitez améliorer ce projet, 
 ## Remerciements
 
 Nous tenons à remercier chaleureusement tous les contributeurs, qui ont participé à ce projet, notamment DALL-E, qui a généré toutes les images utilisées pour l'aspect visuel du jeu.
+Merci également à Vlady Ravelomanana pour avoir encadré ce projet.
