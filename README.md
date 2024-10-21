@@ -14,7 +14,7 @@ Ce projet est une implémentation numérique du célèbre jeu de société Catan
 
 ## Lancement du Projet
 
-Pour lancer le projet, suivez les instructions ci-dessous en fonction de votre système d'exploitation.
+Pour lancer le projet, clonez le répertoire git puis suivez les instructions ci-dessous en fonction de votre système d'exploitation.
 **Assurez-vous de disposer de [java version 21.](https://www.oracle.com/java/technologies/downloads/#java21)**
 
 ### Sur Système Unix
